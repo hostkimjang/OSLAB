@@ -1,0 +1,59 @@
+schemaVersion: 1
+id: demo.python-unittest.windows
+name: Python unittest Windows demo
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+fixtures:
+  - id: demo-python-runtime
+    type: powershell
+    source: validation/fixtures/windows/demo-python-runtime.ps1
+    expectedOutput: "C:\\Oslab\\demo-python-runtime.json"
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\artifact"
+  transfer: archive
+  exclude:
+    - "__pycache__/*"
+    - "*/__pycache__/*"
+    - "*.pyc"
+  command:
+    shell: powershell
+    template: '& "{ArtifactDir}\run-python-unittest-demo.ps1" -OutputPath "{OutputPath}"'
+outputs:
+  actual:
+    path: "C:\\Oslab\\command-result.json"
+    adapter: canonical.command
+assertions:
+  - type: command.exitCode
+    id: python-unittest-exit-zero
+    exitCode: 0
+  - type: command.stdoutContains
+    id: python-unittest-ran-tests
+    text: "Ran 4 tests"
+  - type: command.stdoutContains
+    id: python-unittest-ok
+    text: OK
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

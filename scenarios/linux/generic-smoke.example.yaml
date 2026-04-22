@@ -1,0 +1,41 @@
+schemaVersion: 1
+id: generic.linux.smoke
+name: Generic Linux smoke
+os:
+  family: linux
+provider:
+  type: proxmox
+  template: ubuntu-2404-base-template
+  vmIdRange:
+    start: 9200
+    end: 9299
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  linuxOrder:
+    - ssh
+    - qemuAgent
+fixtures:
+  - id: baseline
+    type: shell
+    source: validation/fixtures/linux/generic-smoke.sh
+assertions:
+  - type: command.exitCode
+    id: uname-linux
+    command:
+      shell: sh
+      template: "uname -s"
+    expected: 0
+  - type: file.exists
+    id: os-release-exists
+    path: "/etc/os-release"
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false
+

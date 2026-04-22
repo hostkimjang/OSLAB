@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "image_id": "gold-lite",
+  "fixtures": [
+    {
+      "id": "known-registry-git",
+      "name_contains": "Git",
+      "required_sources": ["Registry"],
+      "optional_sources": ["PE", "StartMenu"],
+      "must_not_sources": ["Portable"]
+    }
+  ]
+}
+

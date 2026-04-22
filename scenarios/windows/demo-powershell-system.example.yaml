@@ -1,0 +1,47 @@
+schemaVersion: 1
+id: demo.powershell-system.windows
+name: Generic PowerShell system information Windows demo
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\artifact"
+  transfer: archive
+  command:
+    shell: powershell
+    template: '& "{ArtifactDir}\run-system-demo.ps1" -OutputPath "{OutputPath}"'
+outputs:
+  actual:
+    path: "C:\\Oslab\\command-result.json"
+    adapter: canonical.command
+assertions:
+  - type: command.exitCode
+    id: powershell-system-exit-zero
+    exitCode: 0
+  - type: command.stdoutContains
+    id: powershell-system-marker
+    text: oslab powershell system demo
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

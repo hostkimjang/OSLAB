@@ -1,0 +1,64 @@
+schemaVersion: 1
+id: fake.agent-cli-smoke.windows
+name: Fake Agent CLI Windows smoke
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+artifact:
+  type: installer
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\installer\\fake-agent-installer.ps1"
+  installCommand:
+    shell: powershell
+    template: '& "{InstallerPath}" -InstallDir "C:\Oslab\agent"'
+product:
+  steps:
+    - id: register
+      command:
+        shell: powershell
+        template: '& "C:\Oslab\agent\fake-agent.ps1" register --server-url "https://supplyscan.example.invalid" --sabun "oslab" --asset-name "{AssetName}" --asset-class-id "1" --access-token "{SupplyScanAccessToken}" --json'
+      secretTokens:
+        SupplyScanAccessToken:
+          env: OSLAB_FAKE_SUPPLYSCAN_TOKEN
+      captureStdoutJson: true
+    - id: status
+      command:
+        shell: powershell
+        template: '& "C:\Oslab\agent\fake-agent.ps1" status --remote --json'
+      captureStdoutJson: true
+    - id: scan
+      command:
+        shell: powershell
+        template: '& "C:\Oslab\agent\fake-agent.ps1" scan --wait --output "{OutputPath}" --json'
+      captureStdoutJson: true
+outputs:
+  actual:
+    path: "C:\\Oslab\\scan-result.json"
+    adapter: canonical.inventory
+assertions:
+  - type: inventory.contains
+    id: fake-agent-git
+    match:
+      nameContains: Git
+    requiredSources:
+      - Registry
+reports:
+  formats:
+    - json
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

@@ -1,0 +1,67 @@
+schemaVersion: 1
+id: supplyscan.agent-cli.windows
+name: SupplyScan Agent CLI Windows smoke
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\supplyscan-agent"
+  transfer: archive
+  exclude:
+    - "logs/**"
+    - "*.pdb"
+    - "*.xml"
+product:
+  steps:
+    - id: register
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\SupplyScanAgent.exe" cli_mode register --server-url "{SupplyScanServerUrl}" --sabun "{SupplyScanSabun}" --asset-name "{AssetName}" --asset-class-id "1" --json'
+      secretTokens:
+        SupplyScanServerUrl:
+          env: OSLAB_SUPPLYSCAN_SERVER_URL
+        SupplyScanSabun:
+          env: OSLAB_SUPPLYSCAN_SABUN
+      captureStdoutJson: true
+    - id: status
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\SupplyScanAgent.exe" cli_mode status --remote --json'
+      captureStdoutJson: true
+    - id: scan
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\SupplyScanAgent.exe" cli_mode scan --wait --output "{OutputPath}" --timeout-seconds 300 --json'
+      captureStdoutJson: true
+outputs:
+  actual:
+    path: "C:\\Oslab\\scan-result.json"
+    adapter: supplyscan.inventory
+assertions:
+  - type: inventory.sourcePresent
+    id: supplyscan-agent-registry-source
+    source: Registry
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

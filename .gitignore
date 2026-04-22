@@ -1,0 +1,30 @@
+# Local run outputs
+/runs/
+/artifacts/
+/logs/
+
+# Local config and secrets
+config/*.local.json
+config/*.local.yaml
+scenarios/**/*.local.yaml
+*.secret.json
+*.env
+!config/*.example.env
+
+# Build outputs
+bin/
+obj/
+TestResults/
+.pytest_cache/
+.venv/
+__pycache__/
+*.egg-info/
+*.pyc
+
+# Windows/IDE noise
+.vs/
+.vscode/
+*.user
+*.suo
+Thumbs.db
+Desktop.ini

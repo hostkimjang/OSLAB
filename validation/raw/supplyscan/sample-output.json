@@ -1,0 +1,11 @@
+{
+  "software": [
+    {
+      "sw_name": "Git",
+      "sw_version": "2.0.0",
+      "sw_publisher": "Git Project",
+      "sw_scan_method": "registry, pe",
+      "registry_path": "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Git"
+    }
+  ]
+}

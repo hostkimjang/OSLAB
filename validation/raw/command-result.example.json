@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "kind": "commandResult",
+  "command": "python hello.py",
+  "exitCode": 0,
+  "stdout": "hello from python\r\n",
+  "stderr": "",
+  "metadata": {
+    "demo": "python-hello"
+  }
+}

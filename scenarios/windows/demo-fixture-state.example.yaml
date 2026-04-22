@@ -1,0 +1,52 @@
+schemaVersion: 1
+id: demo.fixture-state.windows
+name: Generic fixture state handoff Windows demo
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+fixtures:
+  - id: demo-state-file
+    type: powershell
+    source: validation/fixtures/windows/demo-state-file.ps1
+    expectedOutput: "C:\\Oslab\\demo-fixture-state.json"
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\artifact"
+  transfer: archive
+  command:
+    shell: powershell
+    template: '& "{ArtifactDir}\run-fixture-state-demo.ps1" -OutputPath "{OutputPath}"'
+outputs:
+  actual:
+    path: "C:\\Oslab\\command-result.json"
+    adapter: canonical.command
+assertions:
+  - type: command.exitCode
+    id: fixture-state-exit-zero
+    exitCode: 0
+  - type: command.stdoutContains
+    id: fixture-state-marker
+    text: "fixture state: fixture state ready"
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

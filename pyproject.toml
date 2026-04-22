@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oslab"
+version = "0.1.0"
+description = "Provider-driven OS integration test platform for disposable VMs."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "PyYAML>=6.0.2",
+]
+
+[project.scripts]
+oslab = "oslab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+]
+

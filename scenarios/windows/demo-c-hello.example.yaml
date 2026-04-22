@@ -1,0 +1,52 @@
+schemaVersion: 1
+id: demo.c-hello.windows
+name: Generic C hello world Windows demo
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+fixtures:
+  - id: demo-c-compiler
+    type: powershell
+    source: validation/fixtures/windows/demo-c-compiler.ps1
+    expectedOutput: "C:\\Oslab\\demo-c-compiler.json"
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\artifact"
+  transfer: archive
+  command:
+    shell: powershell
+    template: '& "{ArtifactDir}\run-c-demo.ps1" -OutputPath "{OutputPath}"'
+outputs:
+  actual:
+    path: "C:\\Oslab\\command-result.json"
+    adapter: canonical.command
+assertions:
+  - type: command.exitCode
+    id: c-exit-zero
+    exitCode: 0
+  - type: command.stdoutContains
+    id: c-stdout-hello
+    text: hello from c
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

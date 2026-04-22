@@ -1,0 +1,55 @@
+schemaVersion: 1
+id: demo.c-unit.windows
+name: C multi-file unit test Windows demo
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+fixtures:
+  - id: demo-c-compiler
+    type: powershell
+    source: validation/fixtures/windows/demo-c-compiler.ps1
+    expectedOutput: "C:\\Oslab\\demo-c-compiler.json"
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\artifact"
+  transfer: archive
+  command:
+    shell: powershell
+    template: '& "{ArtifactDir}\run-c-unit-demo.ps1" -OutputPath "{OutputPath}"'
+outputs:
+  actual:
+    path: "C:\\Oslab\\command-result.json"
+    adapter: canonical.command
+assertions:
+  - type: command.exitCode
+    id: c-unit-exit-zero
+    exitCode: 0
+  - type: command.stdoutContains
+    id: c-unit-tests-passed
+    text: "c unit tests passed: 5"
+  - type: command.stdoutContains
+    id: c-unit-add-passed
+    text: PASS add
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

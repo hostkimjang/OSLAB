@@ -1,0 +1,68 @@
+schemaVersion: 1
+id: demo.agent-steps.windows
+name: Generic ordered agent steps Windows demo
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\artifact"
+  transfer: archive
+product:
+  steps:
+    - id: register
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\demo-agent.ps1" register -ServerUrl "https://demo.example.invalid" -AssetName "{AssetName}" -Json'
+      captureStdoutJson: true
+    - id: status
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\demo-agent.ps1" status -Json'
+      captureStdoutJson: true
+    - id: scan
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\demo-agent.ps1" scan -Output "{OutputPath}" -Json'
+      captureStdoutJson: true
+outputs:
+  actual:
+    path: "C:\\Oslab\\demo-agent-inventory.json"
+    adapter: canonical.inventory
+assertions:
+  - type: inventory.contains
+    id: demo-agent-record
+    match:
+      name: Demo Agent
+    requiredSources:
+      - DemoAgent
+  - type: inventory.evidencePresent
+    id: demo-agent-state-evidence
+    match:
+      name: Demo Agent
+    evidence:
+      type: state
+      source: DemoAgent
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

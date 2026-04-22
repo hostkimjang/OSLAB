@@ -1,0 +1,20 @@
+providerDefaults:
+  proxmox:
+    apiUrl: "https://proxmox.example.local:8006"
+    node: "pve01"
+    verifyTls: false
+    timeoutSeconds: 30
+    tokenEnv:
+      id: OSLAB_PROXMOX_TOKEN_ID
+      secret: OSLAB_PROXMOX_TOKEN_SECRET
+guestDefaults:
+  windows:
+    usernameEnv: OSLAB_WINDOWS_USERNAME
+    passwordEnv: OSLAB_WINDOWS_PASSWORD
+  linux:
+    usernameEnv: OSLAB_LINUX_USERNAME
+    privateKeyPathEnv: OSLAB_LINUX_SSH_KEY
+runDefaults:
+  outputRoot: runs
+  timeoutMinutes: 45
+  keepVmOnFailure: false

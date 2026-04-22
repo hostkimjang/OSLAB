@@ -1,0 +1,47 @@
+schemaVersion: 1
+id: fake.installer-smoke.windows
+name: Fake installer Windows smoke
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9101
+  templateVmId: 9101
+  vmIdRange:
+    start: 9102
+    end: 9199
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: auto
+  windowsOrder:
+    - qemuAgent
+    - winrm
+artifact:
+  type: installer
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\installer\\fake-installer.ps1"
+  installCommand:
+    shell: powershell
+    template: '& "{InstallerPath}" -InstallDir "C:\Oslab\installed"'
+  command:
+    shell: powershell
+    template: '& "C:\Oslab\installed\fake-scanner.ps1" -OutputPath "{OutputPath}"'
+outputs:
+  actual:
+    path: "C:\\Oslab\\scan-result.json"
+    adapter: canonical.inventory
+assertions:
+  - type: inventory.contains
+    id: fake-installed-git
+    match:
+      nameContains: Git
+    requiredSources:
+      - Registry
+reports:
+  formats:
+    - json
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

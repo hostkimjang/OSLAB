@@ -1,0 +1,1 @@
+"""SupplyScan oslab plugin package."""
