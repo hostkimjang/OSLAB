@@ -86,7 +86,7 @@ oslab powershell system demo
 
 ### Fixture State Handoff
 
-Fixture가 왜 필요한지 보여주는 데모입니다. Fixture는 `C:\Oslab\demo-fixture-state.json`을 쓰고, artifact command는 그 파일을 읽어서 command result를 만듭니다.
+Fixture가 왜 필요한지 보여주는 데모입니다. Fixture는 `C:\Oslab\demo-fixture-state.json`을 쓰고, artifact command는 그 파일을 읽은 뒤 `metadata.files`, `metadata.directories`에 확인한 file/directory 상태를 보고하고 command result를 만듭니다.
 
 실행:
 
@@ -102,7 +102,10 @@ uv run oslab run `
 
 ```text
 runs/<run-id>/raw/fixture-demo-state-file.expected-output.json
+runs/<run-id>/normalized/command-result.json
 ```
+
+예상 assertion에는 `command.exitCode`, `command.stdoutContains`, `file.exists`, `directory.exists`가 포함됩니다.
 
 ### Agent Steps
 

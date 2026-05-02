@@ -8,7 +8,7 @@ from oslab.providers.base import VmRef
 
 
 class FakeClient:
-    def __init__(self, statuses: list[dict]) -> None:
+    def __init__(self, statuses: list[dict | Exception]) -> None:
         self.statuses = list(statuses)
         self.commands: list[list[str]] = []
         self.file_writes: list[tuple[int, str, str, bool]] = []
@@ -25,7 +25,10 @@ class FakeClient:
     def get_guest_exec_status(self, vmid: int, pid: int):
         if not self.statuses:
             raise AssertionError("No fake exec status configured")
-        return self.statuses.pop(0)
+        status = self.statuses.pop(0)
+        if isinstance(status, Exception):
+            raise status
+        return status
 
     def guest_file_write(self, vmid: int, guest_path: str, content: str, *, encode: bool = True):
         self.file_writes.append((vmid, guest_path, content, encode))
@@ -75,6 +78,21 @@ def test_qemu_agent_channel_reports_nonzero_exit_code() -> None:
     assert result.passed is False
     assert result.exit_code == 5
     assert result.stderr == "bad\n"
+
+
+def test_qemu_agent_channel_retries_transient_exec_status_error() -> None:
+    client = FakeClient(
+        [
+            ProviderError("Proxmox API request failed: GET /nodes/pve/qemu/9101/agent/exec-status"),
+            {"exited": 1, "exitcode": 0, "out-data": "ok\n", "err-data": ""},
+        ]
+    )
+    channel = QemuAgentChannel(client, sleep=lambda _: None)
+
+    result = channel.execute(VmRef(vm_id=9101), ["powershell.exe", "-Command", "Write-Output ok"], poll_interval_seconds=0)
+
+    assert result.passed is True
+    assert result.stdout == "ok\n"
 
 
 def test_qemu_agent_channel_repairs_utf8_mojibake_output() -> None:

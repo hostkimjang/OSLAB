@@ -59,6 +59,45 @@ def write_artifact_html(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(body + "\n", encoding="utf-8")
 
 
+def write_suite_html(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    status = str(payload.get("status") or "unknown")
+    suite_id = str(payload.get("suiteId") or "unknown")
+    title = f"oslab suite - {suite_id}"
+    summary = payload.get("summary") if isinstance(payload.get("summary"), dict) else {}
+    entries = payload.get("entries") if isinstance(payload.get("entries"), list) else []
+    reports = payload.get("reports") if isinstance(payload.get("reports"), dict) else {}
+
+    body = "\n".join(
+        [
+            "<!doctype html>",
+            '<html lang="en">',
+            "<head>",
+            '<meta charset="utf-8">',
+            f"<title>{_e(title)}</title>",
+            "<style>",
+            "body{font-family:Segoe UI,Arial,sans-serif;margin:32px;color:#17202a;background:#f7f8fa}",
+            "main{max-width:1120px;margin:0 auto;background:white;border:1px solid #d8dee4;padding:24px}",
+            "h1,h2{margin:0 0 12px} h2{margin-top:28px}",
+            ".status{display:inline-block;padding:4px 10px;border-radius:4px;font-weight:600}",
+            ".passed{background:#dafbe1;color:#116329}.failed{background:#ffebe9;color:#82071e}",
+            ".allowed{background:#fff8c5;color:#7d4e00}",
+            "table{border-collapse:collapse;width:100%;margin-top:8px}th,td{border:1px solid #d8dee4;padding:8px;text-align:left;vertical-align:top}",
+            "th{background:#f0f3f6}code{font-family:Consolas,monospace;word-break:break-all}",
+            "</style>",
+            "</head>",
+            "<body><main>",
+            f"<h1>{_e(suite_id)}</h1>",
+            f'<p><span class="status {_e(status)}">{_e(status.upper())}</span> run id <code>{_e(str(payload.get("runId") or ""))}</code></p>',
+            _section("Summary", _mapping_table(summary)),
+            _section("Entries", _suite_entries_table(entries)),
+            _section("Reports", _links_table(reports)),
+            "</main></body></html>",
+        ]
+    )
+    path.write_text(body + "\n", encoding="utf-8")
+
+
 def _section(title: str, content: str) -> str:
     return f"<h2>{_e(title)}</h2>\n{content}"
 
@@ -165,6 +204,33 @@ def _links_table(mapping: dict[str, Any]) -> str:
     for key, value in mapping.items():
         text = str(value)
         rows.append(f"<tr><th>{_e(str(key))}</th><td><code>{_e(text)}</code></td></tr>")
+    rows.append("</tbody></table>")
+    return "\n".join(rows)
+
+
+def _suite_entries_table(entries: list[Any]) -> str:
+    if not entries:
+        return "<p>None</p>"
+    rows = [
+        "<table><thead><tr><th>ID</th><th>Status</th><th>Allow Failure</th><th>Tier</th><th>Scenario</th><th>Run</th><th>Failure</th></tr></thead><tbody>"
+    ]
+    for item in entries:
+        if not isinstance(item, dict):
+            continue
+        status = str(item.get("status") or "unknown")
+        allow_failure = bool(item.get("allowFailure"))
+        status_class = "allowed" if allow_failure and status != "passed" else status
+        rows.append(
+            "<tr>"
+            f"<td>{_e(str(item.get('id') or ''))}</td>"
+            f'<td><span class="status {status_class}">{_e(status)}</span></td>'
+            f"<td>{_e(str(allow_failure))}</td>"
+            f"<td>{_e(str(item.get('tier') or ''))}</td>"
+            f"<td><code>{_e(str(item.get('scenarioId') or item.get('scenarioPath') or ''))}</code></td>"
+            f"<td><code>{_e(str(item.get('runDir') or item.get('runId') or ''))}</code></td>"
+            f"<td>{_e(str(item.get('failureClass') or item.get('error') or ''))}</td>"
+            "</tr>"
+        )
     rows.append("</tbody></table>")
     return "\n".join(rows)
 

@@ -132,6 +132,8 @@ install -> register -> status -> scan
 
 The core runner treats these as generic steps. Product semantics belong in scenario files and plugins.
 
+When a step emits JSON, `captureStdoutJson: true` stores that object in `raw/product-steps.json`. `expectStdoutJson` can then gate required fields such as `ok: true`, `registered: true`, or `outputWritten: true` before the run moves to the next step.
+
 ## Adapter
 
 An adapter normalizes raw product output into a canonical model. In plain terms, it translates each product's output shape into a common scoring shape that `oslab` can assert on.
@@ -158,8 +160,16 @@ Implemented examples:
 | `command.exitCode` | Check command exit code |
 | `command.stdoutContains` | Check stdout text |
 | `command.stderrContains` | Check stderr text |
+| `file.exists` | Check a reported file exists |
+| `file.notExists` | Check a reported file does not exist |
+| `directory.exists` | Check a reported directory exists |
+| `process.exists` | Check a reported process exists |
+| `service.exists` | Check a reported service exists |
+| `package.exists` | Check a reported package exists |
 | `inventory.contains` | Check inventory contains a matching record |
 | `inventory.evidencePresent` | Check evidence exists |
+
+State assertions read from normalized output metadata, for example `metadata.files`, `metadata.directories`, `metadata.processes`, `metadata.services`, and `metadata.packages`. The artifact command is responsible for observing and reporting that state.
 
 ## Report
 

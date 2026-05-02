@@ -75,7 +75,7 @@ def test_run_proxmox_clone_smoke_creates_and_destroys_clone(tmp_path: Path, monk
         return client
 
     monkeypatch.setattr(proxmox_clone_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_clone_smoke(
         scenario=scenario,
@@ -99,7 +99,7 @@ def test_run_proxmox_clone_smoke_can_keep_clone(tmp_path: Path, monkeypatch) -> 
         return client
 
     monkeypatch.setattr(proxmox_clone_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_clone_smoke(
         scenario=scenario,

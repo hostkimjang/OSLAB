@@ -1,0 +1,8 @@
+# One private marker per line.
+# Copy to config/public-release-blocklist.local.txt and add company-only product
+# names, private domains, internal package names, and other strings that must
+# not appear in the public repository tree.
+#
+# Example entries:
+# internal-product-name
+# company-only-domain.example

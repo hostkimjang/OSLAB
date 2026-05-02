@@ -15,10 +15,13 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Any, Callable
 
+from oslab import __version__
 from oslab.config import OslabConfig
 from oslab.errors import CleanupError, ConfigError, ProviderError, VmCloneError
 from oslab.providers.base import GuestInfo, TemplateRef, VmRef, VmSpec, VmStatus
 from oslab.providers.vmid import used_vmids_from_resources
+
+DEFAULT_USER_AGENT = f"oslab/{__version__}"
 
 
 @dataclass(frozen=True)
@@ -82,6 +85,9 @@ class ProxmoxClient:
         headers = {
             "Accept": "application/json",
             "Authorization": f"PVEAPIToken={self.config.token_id}={self.config.token_secret}",
+            # Some reverse proxies and Cloudflare Tunnel policies block the
+            # default Python urllib signature before the request reaches Proxmox.
+            "User-Agent": DEFAULT_USER_AGENT,
         }
 
         if method in {"GET", "DELETE"} and params:

@@ -133,7 +133,7 @@ def test_run_proxmox_fixture_smoke_uploads_executes_collects_and_cleans_up(
         return client
 
     monkeypatch.setattr(proxmox_fixture_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_fixture_smoke(
         scenario=scenario,
@@ -168,7 +168,7 @@ def test_run_proxmox_fixture_smoke_reports_fixture_failure_and_cleans_up(
         return client
 
     monkeypatch.setattr(proxmox_fixture_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_fixture_smoke(
         scenario=scenario,

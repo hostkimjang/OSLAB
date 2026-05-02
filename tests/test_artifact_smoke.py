@@ -180,7 +180,9 @@ class FakeProxmoxClient:
             if " register " in command_text:
                 stdout = json.dumps({"ok": True, "step": "register", "assetName": "oslab-test"}) + "\n"
             elif " status " in command_text:
-                stdout = json.dumps({"ok": True, "step": "status", "registered": True}) + "\n"
+                stdout = json.dumps(
+                    {"ok": True, "step": "status", "registered": True, "tokenEcho": "secret-agent-token"}
+                ) + "\n"
             elif " scan " in command_text:
                 stdout = json.dumps({"ok": True, "step": "scan", "records": 1}) + "\n"
                 if exit_code == 0:
@@ -265,7 +267,7 @@ def test_run_proxmox_artifact_smoke_uploads_executes_collects_and_cleans_up(
         return client
 
     monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
     progress_events: list[proxmox_artifact_smoke.ProgressEvent] = []
 
     result = run_proxmox_artifact_smoke(
@@ -341,7 +343,7 @@ def test_run_artifact_validation_writes_full_run_layout(
         return client
 
     monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_artifact_validation(
         scenario,
@@ -519,7 +521,7 @@ def test_run_proxmox_artifact_smoke_respects_folder_artifact_excludes(
     (artifact / "SupplyScanAgent.pdb").write_bytes(b"debug symbols")
 
     monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
     scenario.raw["artifact"]["exclude"] = ["logs/**", "*.pdb"]
 
     result = run_proxmox_artifact_smoke(
@@ -552,7 +554,7 @@ def test_run_proxmox_artifact_smoke_can_upload_folder_as_archive(
     (artifact / "debug.pdb").write_bytes(b"debug")
 
     monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
     scenario.raw["artifact"]["transfer"] = "archive"
     scenario.raw["artifact"]["exclude"] = ["*.pdb"]
 
@@ -640,8 +642,10 @@ def test_run_proxmox_artifact_smoke_runs_product_steps_with_redacted_secret(
     assert result.command == result.product_steps[-1].command
     assert result.local_product_steps_path is not None
     assert "productStep.register.stdout" in result.local_log_paths
+    assert "productStep.status.stdout" in result.local_log_paths
     assert "productStep.scan.stdout" in result.local_log_paths
     assert "secret-agent-token" not in result.local_log_paths["productStep.register.stdout"].read_text(encoding="utf-8")
+    assert "secret-agent-token" not in result.local_log_paths["productStep.status.stdout"].read_text(encoding="utf-8")
     product_steps_payload = result.local_product_steps_path.read_text(encoding="utf-8")
     assert "secret-agent-token" not in product_steps_payload
     assert '"stdoutJson"' in product_steps_payload
@@ -727,6 +731,40 @@ def test_run_proxmox_artifact_smoke_treats_product_step_ok_false_as_failure(
     assert result.product_steps[0].passed is False
     assert result.product_steps[0].message == "Product step stdout reported failure"
     assert result.product_steps[0].stdout_json["ok"] is False
+
+
+def test_run_proxmox_artifact_smoke_fails_product_step_stdout_json_expectation(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    created_clients: list[FakeProxmoxClient] = []
+
+    def fake_client_factory(config: ProxmoxConfig) -> FakeProxmoxClient:
+        client = FakeProxmoxClient(config)
+        created_clients.append(client)
+        return client
+
+    monkeypatch.setenv("OSLAB_FAKE_SUPPLYSCAN_TOKEN", "secret-agent-token")
+    monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", fake_client_factory)
+    scenario = load_scenario(Path("scenarios/windows/fake-agent-cli-smoke.example.yaml"))
+    scenario.raw["product"]["steps"][1]["expectStdoutJson"]["registered"] = False
+
+    result = run_proxmox_artifact_smoke(
+        scenario=scenario,
+        oslab_config=make_config(tmp_path),
+        proxmox_config=make_proxmox_config(),
+        artifact_path=make_agent_installer_artifact(tmp_path),
+        poll_interval_seconds=0,
+    )
+
+    assert result.passed is False
+    assert result.message == "Product step failed: status"
+    assert [step.id for step in result.product_steps] == ["register", "status"]
+    failed_step = result.product_steps[-1]
+    assert failed_step.passed is False
+    assert failed_step.message == "Product step stdout JSON expectation failed"
+    mismatch = failed_step.details["stdoutJsonExpectation"]["mismatches"][0]
+    assert mismatch == {"path": "registered", "reason": "value_mismatch", "expected": False, "actual": True}
     assert result.collected_json is None
     assert created_clients[0].destroyed_vmids == [9102]
 
@@ -743,7 +781,7 @@ def test_run_proxmox_artifact_smoke_reports_command_failure_and_cleans_up(
         return client
 
     monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_artifact_smoke(
         scenario=scenario,

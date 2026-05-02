@@ -75,6 +75,8 @@ This README helps a new user understand `oslab` as a generic OS/VM integration t
 | Understand validation and JUnit | [docs/validation.md](docs/validation.md) |
 | Connect Proxmox | [docs/proxmox-connection.md](docs/proxmox-connection.md) |
 | Inspect reports | [docs/reports.md](docs/reports.md) |
+| Run the web dashboard | [docs/web-dashboard.md](docs/web-dashboard.md) |
+| Start/troubleshoot the web dashboard server | [docs/web-dashboard-server.md](docs/web-dashboard-server.md) |
 | Understand architecture | [docs/oslab-platform-plan.md](docs/oslab-platform-plan.md) |
 | Check public release readiness | [docs/github-release-checklist.md](docs/github-release-checklist.md) |
 
@@ -121,7 +123,7 @@ uv run oslab validate-scenario --scenario scenarios/windows/demo-c-hello.example
 This step does not contact Proxmox and should pass before you prepare a real lab. Expected local unit test result:
 
 ```text
-137 passed
+155 passed
 ```
 
 ### 2. Create Local Config
@@ -379,6 +381,7 @@ Use `uv run oslab --help` to see every command.
 | `validate-scenario` | Check YAML shape before touching lab infrastructure | No | Console validation result |
 | `preflight` | Check config, token, provider connectivity, template, VMID range | No | Console readiness report |
 | `run` | Normal full scenario execution for demos, product smoke tests, and CI | Yes | `runs/<run-id>/` |
+| `suite-run` | Run a YAML suite of multiple scenarios sequentially | Yes | `runs/<suite-run-id>/suite.json` |
 | `inspect-result` | Summarize a completed run for humans | No | Console summary from `run.json` and normalized files |
 | `clone-smoke` | Prove provider clone/destroy works before boot/guest debugging | Yes | Clone lifecycle status |
 | `boot-smoke` | Prove clone boot and guest readiness work | Yes | VM boot/QGA readiness status |
@@ -417,6 +420,8 @@ Run-specific options:
 | `--guest-timeout-seconds <n>` | No | `300` | Maximum time to wait for guest channel readiness, such as QEMU Guest Agent. |
 | `--command-timeout-seconds <n>` | No | `120` | Maximum time for fixture/product commands unless overridden by scenario behavior. |
 | `--poll-interval-seconds <n>` | No | `5.0` | Poll interval for VM/guest/command progress checks. |
+
+For suite files, `oslab suite-run` accepts the same VM timing and artifact options plus `--max-parallel <n>`. The default is `1`; increase it only when the VMID range and Proxmox host have enough headroom.
 
 For exact CLI help:
 

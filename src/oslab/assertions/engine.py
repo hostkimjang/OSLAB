@@ -75,6 +75,20 @@ def evaluate_assertions(
             results.append(_evaluate_command_text_contains(assertion, canonical_result, stream="stdout"))
         elif assertion_type == "command.stderrContains":
             results.append(_evaluate_command_text_contains(assertion, canonical_result, stream="stderr"))
+        elif assertion_type == "file.exists":
+            results.append(_evaluate_path_state(assertion, canonical_result, collection_key="files", label="File", expected_exists=True))
+        elif assertion_type == "file.notExists":
+            results.append(_evaluate_path_state(assertion, canonical_result, collection_key="files", label="File", expected_exists=False))
+        elif assertion_type == "directory.exists":
+            results.append(
+                _evaluate_path_state(assertion, canonical_result, collection_key="directories", label="Directory", expected_exists=True)
+            )
+        elif assertion_type == "process.exists":
+            results.append(_evaluate_named_state(assertion, canonical_result, collection_key="processes", label="Process"))
+        elif assertion_type == "service.exists":
+            results.append(_evaluate_named_state(assertion, canonical_result, collection_key="services", label="Service"))
+        elif assertion_type == "package.exists":
+            results.append(_evaluate_named_state(assertion, canonical_result, collection_key="packages", label="Package"))
         else:
             results.append(
                 _result(
@@ -295,6 +309,118 @@ def _evaluate_command_text_contains(
     )
 
 
+def _evaluate_path_state(
+    assertion: Mapping[str, Any],
+    canonical_result: Mapping[str, Any] | list[Any],
+    *,
+    collection_key: str,
+    label: str,
+    expected_exists: bool,
+) -> AssertionResult:
+    if not isinstance(canonical_result, Mapping):
+        return _result(
+            assertion,
+            passed=False,
+            message=f"{label} assertion requires a JSON object",
+            failure_class="assertion_config_error",
+        )
+
+    expected_path = assertion.get("path")
+    if not isinstance(expected_path, str) or not expected_path.strip():
+        return _assertion_config_error(assertion, f"`{assertion.get('type')}` requires non-empty `path`")
+
+    case_sensitive = bool(assertion.get("caseSensitive", False))
+    items = _metadata_collection(canonical_result, collection_key)
+    match = _find_path_state(items, expected_path, case_sensitive=case_sensitive)
+    if match is None:
+        return _result(
+            assertion,
+            passed=False,
+            message=f"{label} state was not reported",
+            failure_class="assertion_failure",
+            details={"path": expected_path, "collection": collection_key},
+        )
+
+    exists = _state_exists(match, default=True)
+    if exists is expected_exists:
+        state = "exists" if expected_exists else "does not exist"
+        return _result(
+            assertion,
+            passed=True,
+            message=f"{label} {state}",
+            details={"path": expected_path, "actual": _state_summary(match), "caseSensitive": case_sensitive},
+        )
+
+    state = "exist" if expected_exists else "be absent"
+    return _result(
+        assertion,
+        passed=False,
+        message=f"{label} did not {state}",
+        failure_class="assertion_failure",
+        details={
+            "path": expected_path,
+            "expectedExists": expected_exists,
+            "actualExists": exists,
+            "actual": _state_summary(match),
+        },
+    )
+
+
+def _evaluate_named_state(
+    assertion: Mapping[str, Any],
+    canonical_result: Mapping[str, Any] | list[Any],
+    *,
+    collection_key: str,
+    label: str,
+) -> AssertionResult:
+    if not isinstance(canonical_result, Mapping):
+        return _result(
+            assertion,
+            passed=False,
+            message=f"{label} assertion requires a JSON object",
+            failure_class="assertion_config_error",
+        )
+
+    expected_name = assertion.get("name")
+    expected_contains = assertion.get("nameContains")
+    if not isinstance(expected_name, str) and not isinstance(expected_contains, str):
+        return _assertion_config_error(assertion, f"`{assertion.get('type')}` requires `name` or `nameContains`")
+
+    case_sensitive = bool(assertion.get("caseSensitive", False))
+    items = _metadata_collection(canonical_result, collection_key)
+    match = _find_named_state(
+        items,
+        expected_name if isinstance(expected_name, str) else None,
+        expected_contains if isinstance(expected_contains, str) else None,
+        case_sensitive=case_sensitive,
+    )
+    if match is None:
+        return _result(
+            assertion,
+            passed=False,
+            message=f"{label} state was not reported",
+            failure_class="assertion_failure",
+            details={"name": expected_name, "nameContains": expected_contains, "collection": collection_key},
+        )
+
+    exists = _state_exists(match, default=True)
+    if exists:
+        return _result(
+            assertion,
+            passed=True,
+            message=f"{label} exists",
+            details={"actual": _state_summary(match), "caseSensitive": case_sensitive},
+        )
+
+    return _result(
+        assertion,
+        passed=False,
+        message=f"{label} did not exist",
+        failure_class="assertion_failure",
+        details={"expectedName": expected_name, "expectedNameContains": expected_contains, "actual": _state_summary(match)},
+    )
+
+
 def _inventory_records(canonical_result: Mapping[str, Any] | list[Any]) -> list[Mapping[str, Any]]:
     if isinstance(canonical_result, Mapping):
         records = canonical_result.get("records")
@@ -403,6 +529,79 @@ def _contains(actual: object, expected: object) -> bool:
 
 def _casefold(value: object) -> str:
     return str(value).casefold()
+
+
+def _metadata_collection(canonical_result: Mapping[str, Any], key: str) -> list[Any]:
+    metadata = canonical_result.get("metadata")
+    if not isinstance(metadata, Mapping):
+        return []
+    items = metadata.get(key)
+    if not isinstance(items, list):
+        return []
+    return list(items)
+
+
+def _find_path_state(items: list[Any], expected_path: str, *, case_sensitive: bool) -> Mapping[str, Any] | str | None:
+    expected = _normalize_path_for_match(expected_path, case_sensitive=case_sensitive)
+    for item in items:
+        path = _state_text(item, "path")
+        if path is None:
+            continue
+        if _normalize_path_for_match(path, case_sensitive=case_sensitive) == expected:
+            return item
+    return None
+
+
+def _find_named_state(
+    items: list[Any],
+    expected_name: str | None,
+    expected_contains: str | None,
+    *,
+    case_sensitive: bool,
+) -> Mapping[str, Any] | str | None:
+    expected = _normalize_text_for_match(expected_name, case_sensitive=case_sensitive) if expected_name else None
+    contains = _normalize_text_for_match(expected_contains, case_sensitive=case_sensitive) if expected_contains else None
+    for item in items:
+        name = _state_text(item, "name")
+        if name is None:
+            continue
+        actual = _normalize_text_for_match(name, case_sensitive=case_sensitive)
+        if expected is not None and actual == expected:
+            return item
+        if contains is not None and contains in actual:
+            return item
+    return None
+
+
+def _state_text(item: Any, key: str) -> str | None:
+    if isinstance(item, str):
+        return item
+    if isinstance(item, Mapping):
+        value = item.get(key)
+        if isinstance(value, str) and value.strip():
+            return value
+    return None
+
+
+def _state_exists(item: Mapping[str, Any] | str, *, default: bool) -> bool:
+    if isinstance(item, Mapping) and isinstance(item.get("exists"), bool):
+        return bool(item["exists"])
+    return default
+
+
+def _state_summary(item: Mapping[str, Any] | str) -> dict[str, Any]:
+    if isinstance(item, Mapping):
+        return dict(item)
+    return {"value": item, "exists": True}
+
+
+def _normalize_path_for_match(value: str, *, case_sensitive: bool) -> str:
+    normalized = value.replace("\\", "/").rstrip("/")
+    return normalized if case_sensitive else normalized.casefold()
+
+
+def _normalize_text_for_match(value: str, *, case_sensitive: bool) -> str:
+    return value if case_sensitive else value.casefold()
 
 
 def _record_summary(record: Mapping[str, Any]) -> dict[str, Any]:

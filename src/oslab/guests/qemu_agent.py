@@ -114,8 +114,15 @@ class QemuAgentChannel:
     ) -> GuestCommandResult:
         deadline = self.monotonic() + timeout_seconds
         last_status: dict[str, Any] | None = None
+        last_status_error: ProviderError | None = None
         while self.monotonic() <= deadline:
-            last_status = self.client.get_guest_exec_status(vm.vm_id, pid)
+            try:
+                last_status = self.client.get_guest_exec_status(vm.vm_id, pid)
+                last_status_error = None
+            except ProviderError as exc:
+                last_status_error = exc
+                self.sleep(poll_interval_seconds)
+                continue
             if bool(last_status.get("exited")):
                 return _result_from_status(command, last_status)
             self.sleep(poll_interval_seconds)
@@ -128,6 +135,7 @@ class QemuAgentChannel:
                 "pid": pid,
                 "command": list(command),
                 "lastStatus": last_status,
+                "lastStatusError": str(last_status_error) if last_status_error is not None else None,
             },
         )
 

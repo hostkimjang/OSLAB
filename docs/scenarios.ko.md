@@ -134,6 +134,25 @@ Fixture 전체 작성 규칙, manifest 예시, debugging command는 [Fixture 작
 
 Unknown token은 guest execution 전에 command template rendering 단계에서 거부됩니다. `validate-scenario`는 schema shape를 확인하지만 모든 command token의 full dry run은 아닙니다.
 
+## Product Step Stdout JSON Contract
+
+Agent-like scenario는 단일 `artifact.command` 대신 `product.steps`를 자주 사용합니다. Step에 `captureStdoutJson: true`가 있으면 stdout은 JSON object 하나여야 합니다. `expectStdoutJson`은 반드시 만족해야 하는 값을 선언합니다.
+
+```yaml
+product:
+  steps:
+    - id: scan
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\agent.exe" scan --wait --output "{OutputPath}" --json'
+      captureStdoutJson: true
+      expectStdoutJson:
+        ok: true
+        outputWritten: true
+```
+
+필수 field가 없거나 값이 다르면 해당 step은 product execution failure로 실패합니다. Dotted key를 사용하면 nested object도 확인할 수 있습니다.
+
 ## Generic Demo Scenarios
 
 | Scenario | Purpose |
@@ -204,7 +223,20 @@ outputs:
   "stdout": "hello from python\n",
   "stderr": "",
   "metadata": {
-    "runtime": "python"
+    "runtime": "python",
+    "files": [
+      {
+        "path": "C:\\Oslab\\demo-fixture-state.json",
+        "exists": true,
+        "length": 128
+      }
+    ],
+    "directories": [
+      {
+        "path": "C:\\Oslab",
+        "exists": true
+      }
+    ]
   }
 }
 ```
@@ -219,9 +251,11 @@ Required fields:
 | `exitCode` | Process exit code |
 | `stdout` | Captured stdout text |
 | `stderr` | Captured stderr text |
-| `metadata` | Runtime/compiler/version/path 같은 optional object |
+| `metadata` | Runtime/compiler/version/path/state 같은 optional object |
 
 Artifact command가 console stdout/stderr도 출력할 수는 있지만, assertion은 수집된 JSON file을 기준으로 동작합니다. Console 출력만으로는 `canonical.command` 검증에 충분하지 않습니다.
+
+`file.exists`, `file.notExists`, `directory.exists` 같은 state assertion은 `metadata.files`, `metadata.directories`에 보고된 상태를 읽습니다. `oslab`이 command 종료 후 guest state를 추측하지 않으므로, artifact command가 자신이 확인한 path 상태를 result JSON에 써야 합니다.
 
 Minimal PowerShell writer:
 

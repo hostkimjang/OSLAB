@@ -6,6 +6,7 @@ from typing import Any
 
 import pytest
 
+from oslab import __version__
 from oslab.config import OslabConfig
 from oslab.errors import ConfigError, ProviderError
 from oslab.providers.base import TemplateRef, VmRef, VmSpec
@@ -70,6 +71,7 @@ def test_clone_vm_sends_expected_proxmox_request() -> None:
     assert request.get_method() == "POST"
     assert request.full_url == "https://proxmox.example.local:8006/api2/json/nodes/pve01/qemu/9000/clone"
     assert request.get_header("Authorization") == "PVEAPIToken=root@pam!oslab=secret"
+    assert request.get_header("User-agent") == f"oslab/{__version__}"
     assert request.get_header("Content-type") == "application/x-www-form-urlencoded"
 
     body = urllib.parse.parse_qs(request.data.decode("utf-8"))

@@ -86,7 +86,7 @@ oslab powershell system demo
 
 ### Fixture State Handoff
 
-This demo shows why fixtures exist. The fixture writes `C:\Oslab\demo-fixture-state.json`; the artifact command reads that file and produces a command result.
+This demo shows why fixtures exist. The fixture writes `C:\Oslab\demo-fixture-state.json`; the artifact command reads that file, reports checked file/directory state in `metadata.files` and `metadata.directories`, and produces a command result.
 
 Run:
 
@@ -102,7 +102,10 @@ Expected evidence:
 
 ```text
 runs/<run-id>/raw/fixture-demo-state-file.expected-output.json
+runs/<run-id>/normalized/command-result.json
 ```
+
+Expected assertions include `command.exitCode`, `command.stdoutContains`, `file.exists`, and `directory.exists`.
 
 ### Agent Steps
 

@@ -32,7 +32,7 @@ def make_config() -> ProxmoxConfig:
 
 
 def test_check_proxmox_resources_passes_with_template_and_free_vmid() -> None:
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
     client = FakeProxmoxClient(
         nodes=[{"node": "softverse"}],
         resources=[
@@ -54,7 +54,7 @@ def test_check_proxmox_resources_passes_with_template_and_free_vmid() -> None:
 
 
 def test_check_proxmox_resources_reports_missing_node_and_template() -> None:
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
     client = FakeProxmoxClient(nodes=[{"node": "other-node"}], resources=[])
 
     result = check_proxmox_resources(client, scenario, make_config())
@@ -65,7 +65,7 @@ def test_check_proxmox_resources_reports_missing_node_and_template() -> None:
 
 
 def test_check_proxmox_resources_reports_non_template_vmid() -> None:
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
     client = FakeProxmoxClient(
         nodes=[{"node": "softverse"}],
         resources=[{"vmid": 9101, "name": "ordinary-vm", "node": "softverse", "status": "running"}],

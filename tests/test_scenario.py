@@ -7,7 +7,7 @@ from oslab.models.scenario import load_scenario
 
 
 def test_windows_supplyscan_scenario_is_valid() -> None:
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     assert scenario.scenario_id == "supplyscan.gold-lite.windows"
     assert scenario.os_family == "windows"
@@ -49,6 +49,7 @@ def test_fake_agent_cli_smoke_scenario_is_valid() -> None:
     assert scenario.os_family == "windows"
     assert scenario.output_adapter == "canonical.inventory"
     assert [step["id"] for step in scenario.raw["product"]["steps"]] == ["register", "status", "scan"]
+    assert scenario.raw["product"]["steps"][0]["expectStdoutJson"] == {"ok": True, "step": "register"}
 
 
 def test_generic_powershell_system_demo_scenario_is_valid() -> None:
@@ -85,6 +86,12 @@ def test_generic_fixture_state_demo_scenario_is_valid() -> None:
     assert scenario.os_family == "windows"
     assert scenario.output_adapter == "canonical.command"
     assert scenario.raw["fixtures"][0]["id"] == "demo-state-file"
+    assert [assertion["type"] for assertion in scenario.assertions] == [
+        "command.exitCode",
+        "command.stdoutContains",
+        "file.exists",
+        "directory.exists",
+    ]
 
 
 def test_generic_agent_steps_demo_scenario_is_valid() -> None:
@@ -137,7 +144,7 @@ def test_intentional_assertion_failure_demo_scenario_is_valid() -> None:
 
 
 def test_supplyscan_agent_cli_scenario_is_valid() -> None:
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-agent-cli.example.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-agent-cli.example.yaml"))
 
     assert scenario.scenario_id == "supplyscan.agent-cli.windows"
     assert scenario.os_family == "windows"
@@ -147,10 +154,70 @@ def test_supplyscan_agent_cli_scenario_is_valid() -> None:
     assert register_step["id"] == "register"
     assert "OSLAB_SUPPLYSCAN_TOKEN" not in register_step["command"]["template"]
     assert sorted(register_step["secretTokens"]) == ["SupplyScanSabun", "SupplyScanServerUrl"]
+    assert register_step["expectStdoutJson"]["accessTokenPresent"] is True
+    assert scenario.raw["product"]["steps"][-1]["expectStdoutJson"]["outputWritten"] is True
+
+
+def test_supplyscan_agent_clean_baseline_scenario_is_valid() -> None:
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-agent-clean-baseline.example.yaml"))
+
+    assert scenario.scenario_id == "supplyscan.agent-clean-baseline.windows"
+    assert scenario.os_family == "windows"
+    assert scenario.output_adapter == "supplyscan.inventory"
+    assert "fixtures" not in scenario.raw
+    assert scenario.assertions[0]["id"] == "clean-baseline-registry-source"
+
+
+def test_supplyscan_agent_os_profile_scenario_is_valid() -> None:
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-agent-os-profile.example.yaml"))
+
+    assert scenario.scenario_id == "supplyscan.agent-os-profile.windows"
+    assert scenario.os_family == "windows"
+    assert scenario.output_adapter == "supplyscan.inventory"
+    assert scenario.raw["fixtures"][0]["id"] == "supplyscan-os-profile"
+    assert [assertion["id"] for assertion in scenario.assertions] == [
+        "oslab-registry-x64-detected",
+        "oslab-registry-wow6432-detected",
+        "oslab-registry-korean-path-detected",
+        "oslab-registry-x64-install-path",
+    ]
+
+
+def test_supplyscan_agent_path_profile_scenario_is_valid() -> None:
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-agent-path-profile.example.yaml"))
+
+    assert scenario.scenario_id == "supplyscan.agent-path-profile.windows"
+    assert scenario.os_family == "windows"
+    assert scenario.output_adapter == "supplyscan.inventory"
+    assert scenario.raw["fixtures"][0]["id"] == "supplyscan-path-profile"
+    assert [assertion["id"] for assertion in scenario.assertions] == [
+        "oslab-path-program-files-detected",
+        "oslab-path-program-files-x86-detected",
+        "oslab-path-spaces-symbols-detected",
+        "oslab-path-unicode-detected",
+        "oslab-path-deep-detected",
+        "oslab-path-program-files-evidence",
+        "oslab-path-unicode-evidence",
+        "oslab-path-deep-evidence",
+    ]
+
+
+def test_supplyscan_agent_appx_readonly_scenario_is_valid() -> None:
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-agent-appx-readonly.example.yaml"))
+
+    assert scenario.scenario_id == "supplyscan.agent-appx-readonly.windows"
+    assert scenario.os_family == "windows"
+    assert scenario.output_adapter == "supplyscan.inventory"
+    assert scenario.raw["fixtures"][0]["id"] == "supplyscan-appx-readonly"
+    assert scenario.assertions[0] == {
+        "type": "inventory.sourcePresent",
+        "id": "appx-source-present",
+        "source": "Appx",
+    }
 
 
 def test_supplyscan_agent_status_scenario_is_valid() -> None:
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-agent-status.example.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-agent-status.example.yaml"))
 
     assert scenario.scenario_id == "supplyscan.agent-status.windows"
     assert scenario.os_family == "windows"
@@ -205,4 +272,36 @@ assertions:
     )
 
     with pytest.raises(ScenarioValidationError, match="Installer artifact requires `installCommand`"):
+        load_scenario(path)
+
+
+def test_product_step_expect_stdout_json_requires_capture_stdout_json(tmp_path: Path) -> None:
+    path = tmp_path / "bad-product-step.yaml"
+    path.write_text(
+        """
+schemaVersion: 1
+id: bad.product-step
+os:
+  family: windows
+provider:
+  type: proxmox
+guest:
+  mode: auto
+product:
+  steps:
+    - id: register
+      command:
+        shell: powershell
+        template: "echo ok"
+      expectStdoutJson:
+        ok: true
+assertions:
+  - type: command.exitCode
+    id: exit-zero
+    exitCode: 0
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ScenarioValidationError, match="expectStdoutJson"):
         load_scenario(path)

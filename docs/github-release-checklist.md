@@ -30,12 +30,17 @@
 - [x] `runs/`는 ignore 대상이다.
 - [x] Demo artifact files under `validation/artifacts/` are not ignored.
 - [x] Example env files do not contain real secrets.
+- [x] 개발/브라우저/authoring smoke 중 생성되는 timestamp 더미 산출물은 ignore 대상이다.
+- [x] 공개 repo에 포함하면 안 되는 product-specific overlay는 `private/`, `*.local.*`, `*.private.yaml` 계열로 분리한다.
+- [ ] `config/public-release-blocklist.local.txt`에 사내용 product marker와 private domain marker를 추가한다.
+- [ ] `scripts/check-public-release.ps1 -IncludeUntracked`로 tracked/untracked 공개 차단 marker와 더미 산출물을 확인한다.
 - [ ] 최종 commit 전에 secret scan을 한 번 더 실행한다.
 
 ## Validation
 
 - [x] Demo scenario schema validation passes.
 - [x] Local unit test suite passes.
+- [ ] Public release audit script passes with the local private marker blocklist.
 - [ ] GitHub Actions workflow를 추가한다.
 - [ ] README에 CI badge를 추가한다.
 

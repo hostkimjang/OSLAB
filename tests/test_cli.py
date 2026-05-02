@@ -10,6 +10,7 @@ from oslab.providers.base import GuestInfo
 from oslab.commands import CommandSpec
 from oslab.assertions import AssertionResult
 from oslab.models.result import RunResult
+from oslab.runners.suite_runner import SuiteEntryResult, SuiteRunResult
 from oslab.runners.proxmox_boot_smoke import BootSmokeResult
 from oslab.runners.proxmox_clone_smoke import CloneSmokeResult
 from oslab.runners.proxmox_artifact_smoke import ArtifactSmokeResult, ProductStepResult, ProgressEvent, UploadedArtifactFile
@@ -19,7 +20,7 @@ from oslab.cli import main
 
 
 def test_validate_scenario_command_passes(capsys) -> None:
-    exit_code = main(["validate-scenario", "--scenario", "scenarios/windows/supplyscan-gold-lite.yaml"])
+    exit_code = main(["validate-scenario", "--scenario", "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"])
 
     captured = capsys.readouterr()
     assert exit_code == 0
@@ -31,7 +32,7 @@ def test_preflight_command_validates_config(capsys) -> None:
         [
             "preflight",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
         ]
@@ -53,7 +54,7 @@ def test_preflight_provider_config_check_resolves_proxmox_env(monkeypatch, capsy
         [
             "preflight",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
             "--provider-config-check",
@@ -85,7 +86,7 @@ def test_preflight_provider_connectivity_check_calls_proxmox(monkeypatch, capsys
         [
             "preflight",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
             "--provider-connectivity-check",
@@ -134,7 +135,7 @@ def test_preflight_provider_resource_check_prints_lab_state(monkeypatch, capsys)
         [
             "preflight",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
             "--provider-resource-check",
@@ -165,7 +166,7 @@ OSLAB_PROXMOX_TOKEN_SECRET=secret-from-file
         [
             "preflight",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
             "--env-file",
@@ -187,7 +188,7 @@ def test_preflight_error_output_is_structured(capsys) -> None:
         [
             "preflight",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--provider-config-check",
         ]
     )
@@ -215,7 +216,7 @@ runDefaults:
         [
             "run",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             str(config_path),
             "--run-id",
@@ -267,7 +268,7 @@ def test_run_command_executes_artifact_validation(tmp_path: Path, monkeypatch, c
         [
             "run",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
             "--artifact-path",
@@ -284,6 +285,90 @@ def test_run_command_executes_artifact_validation(tmp_path: Path, monkeypatch, c
     assert "[OK] Run completed" in captured.out
     assert "runId: full-run" in captured.out
     assert "report:html: runs\\full-run\\reports\\result.html" in captured.out
+
+
+def test_suite_run_command_executes_suite_validation(tmp_path: Path, monkeypatch, capsys) -> None:
+    artifact = tmp_path / "artifact"
+    artifact.mkdir()
+    (artifact / "SupplyScanAgent.exe").write_bytes(b"fake")
+
+    def fake_run_suite_validation(suite, config, **kwargs):
+        assert suite.suite_id == "supplyscan.windows.v1"
+        assert kwargs["artifact_path"] == artifact
+        assert kwargs["run_id"] == "suite-run"
+        assert kwargs["max_parallel"] == 2
+        progress = kwargs.get("progress")
+        assert progress is not None
+        progress(ProgressEvent("vm.boot.done", "[clean-baseline] VM is running", {"suiteEntry": "clean-baseline", "vmId": 9102}))
+        result = SuiteRunResult(
+            suite_id=suite.suite_id,
+            run_id="suite-run",
+            status="running",
+            suite_dir=tmp_path / "runs" / "suite-run",
+        )
+        result.entries = [
+            SuiteEntryResult(
+                id="clean-baseline",
+                scenario_path="scenarios/windows/supplyscan/supplyscan-agent-clean-baseline.example.yaml",
+                scenario_id="supplyscan.agent-clean-baseline.windows",
+                status="passed",
+                allow_failure=False,
+                tier="ci",
+                run_id="suite-run-clean-baseline",
+                run_dir=r"runs\suite-run\scenarios\suite-run-clean-baseline",
+            ),
+            SuiteEntryResult(
+                id="appx-readonly",
+                scenario_path="scenarios/windows/supplyscan/supplyscan-agent-appx-readonly.example.yaml",
+                scenario_id="supplyscan.agent-appx-readonly.windows",
+                status="failed",
+                allow_failure=True,
+                tier="gap-probe",
+                run_id="suite-run-appx-readonly",
+                run_dir=r"runs\suite-run\scenarios\suite-run-appx-readonly",
+                failure_class="assertion_failure",
+            ),
+        ]
+        result.reports = {"suiteJson": r"runs\suite-run\suite.json"}
+        result.complete()
+        result.reports["html"] = r"runs\suite-run\reports\suite.html"
+        result.reports["junit"] = r"runs\suite-run\reports\suite.junit.xml"
+        return result
+
+    monkeypatch.setenv("OSLAB_PROXMOX_TOKEN_ID", "root@pam!oslab")
+    monkeypatch.setenv("OSLAB_PROXMOX_TOKEN_SECRET", "secret")
+    monkeypatch.setattr(oslab.cli, "run_suite_validation", fake_run_suite_validation)
+
+    exit_code = main(
+        [
+            "suite-run",
+            "--suite",
+            "validation/suites/supplyscan-windows-v1.example.yaml",
+            "--config",
+            "config/oslab.local.example.yaml",
+            "--artifact-path",
+            str(artifact),
+            "--run-id",
+            "suite-run",
+            "--max-parallel",
+            "2",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert exit_code == 0
+    assert "== oslab suite run ==" in captured.out
+    assert "[OK] [clean-baseline] VM is running" in captured.out
+    assert "suiteEntry: clean-baseline" in captured.out
+    assert "[OK] Suite completed" in captured.out
+    assert "suiteId: supplyscan.windows.v1" in captured.out
+    assert "maxParallel: 2" in captured.out
+    assert "allowedFailed: 1" in captured.out
+    assert "[OK] suiteEntry:clean-baseline" in captured.out
+    assert "[WARN] suiteEntry:appx-readonly" in captured.out
+    assert "report:suiteJson: runs\\suite-run\\suite.json" in captured.out
+    assert "report:html: runs\\suite-run\\reports\\suite.html" in captured.out
+    assert "report:junit: runs\\suite-run\\reports\\suite.junit.xml" in captured.out
 
 
 def test_inspect_result_prints_human_summary(tmp_path: Path, capsys) -> None:
@@ -479,7 +564,7 @@ def test_clone_smoke_command_prints_result(monkeypatch, capsys) -> None:
         [
             "clone-smoke",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
         ]
@@ -513,7 +598,7 @@ def test_boot_smoke_command_prints_result(monkeypatch, capsys) -> None:
         [
             "boot-smoke",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
         ]
@@ -552,7 +637,7 @@ def test_guest_preflight_command_prints_checks(monkeypatch, capsys) -> None:
         [
             "guest-preflight",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
         ]
@@ -578,7 +663,7 @@ def test_fixture_smoke_command_prints_fixture_result(monkeypatch, capsys) -> Non
                 FixtureSmokeItem(
                     id="gold-lite",
                     fixture_type="powershell",
-                    source=Path("validation/fixtures/windows/gold-lite.ps1"),
+                    source=Path("validation/fixtures/windows/supplyscan/gold-lite.ps1"),
                     guest_path=r"C:\Oslab\fixtures\gold-lite.ps1",
                     expected_output=r"C:\Oslab\expected_inventory.json",
                     uploaded_bytes=512,
@@ -604,7 +689,7 @@ def test_fixture_smoke_command_prints_fixture_result(monkeypatch, capsys) -> Non
         [
             "fixture-smoke",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
         ]
@@ -681,7 +766,7 @@ def test_artifact_smoke_command_prints_artifact_result(tmp_path: Path, monkeypat
         [
             "artifact-smoke",
             "--scenario",
-            "scenarios/windows/supplyscan-gold-lite.yaml",
+            "scenarios/windows/supplyscan/supplyscan-gold-lite.yaml",
             "--config",
             "config/oslab.local.example.yaml",
             "--artifact-path",

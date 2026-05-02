@@ -42,11 +42,11 @@
 
 `Ready With Changes`
 
-Core 방향은 타당합니다. 다만 provider async task, VMID allocation, command model, plugin failure semantics가 명시되지 않으면 구현 중 core에 Proxmox/SupplyScan 세부사항이 새어 들어갈 수 있습니다. 이 리뷰의 high-priority 변경은 `docs/oslab-platform-plan.md`에 반영되었습니다.
+Core 방향은 타당합니다. 다만 provider async task, VMID allocation, command model, plugin failure semantics가 명시되지 않으면 구현 중 core에 Proxmox/product-specific 세부사항이 새어 들어갈 수 있습니다. 이 리뷰의 high-priority 변경은 `docs/oslab-platform-plan.md`에 반영되었습니다.
 
 ### Strengths
 
-1. SupplyScan을 첫 plugin으로 두고 core platform에서 분리한 결정이 장기 확장성에 맞습니다.
+1. product-specific을 첫 plugin으로 두고 core platform에서 분리한 결정이 장기 확장성에 맞습니다.
 2. Provider, Guest Channel, Artifact, Plugin, Assertion, Report가 서로 다른 책임으로 분해되어 있습니다.
 3. YAML scenario를 public contract로 둔 것이 CI와 local 실행을 통합하기 좋습니다.
 4. Canonical Result Model을 둔 덕분에 제품별 raw output 변화가 assertion engine에 직접 영향을 주지 않습니다.
@@ -227,7 +227,7 @@ Linux path와 Windows path가 scenario examples에 섞여 있으므로, core doc
 2. Assertion result model이 `passed`, `failed`, `skipped`, `error`를 구분합니다.
 3. JUnit/JSON/HTML report output은 CI와 사람이 모두 사용할 수 있습니다.
 4. Scenario validation command가 있으면 VM을 만들기 전에 많은 오류를 잡을 수 있습니다.
-5. SupplyScan raw output을 canonical model로 normalize하면 assertion tests를 product-independent하게 작성할 수 있습니다.
+5. product-specific raw output을 canonical model로 normalize하면 assertion tests를 product-independent하게 작성할 수 있습니다.
 
 ### Risks
 
@@ -330,7 +330,7 @@ Architecture diagram은 CI를 직접 그리지 않습니다. 이는 platform-neu
 | --- | --- | --- |
 | Every major component in the diagram has a corresponding section | Pass | CLI, runner, provider, guest, fixture, artifact, plugin, assertion, reports are documented. |
 | Every flow edge maps to an implementable method, command, or artifact | Pass with changes | Provider and guest APIs were clarified. |
-| Product-specific logic does not appear inside core components | Pass | SupplyScan is plugin-only. |
+| Product-specific logic does not appear inside core components | Pass | product-specific is plugin-only. |
 | Windows-only concepts do not appear in Linux-generic flows | Pass with caution | Windows paths remain only in Windows scenario. |
 | Failure nodes map to failure taxonomy | Pass with changes | `guest_channel_failure` is documented in table and channel flow. |
 | Report outputs match documented run directory layout | Pass | Layout is explicit. |
@@ -390,7 +390,7 @@ Before writing platform code, confirm these points from the revised plan:
 
 - The first real lab target is Windows on Proxmox.
 - Linux remains schema/design/fake-test coverage during MVP.
-- SupplyScan remains a plugin, not a core dependency.
+- product-specific remains a plugin, not a core dependency.
 - CI wrappers must call the same local CLI.
 - Real secrets must be provided through environment variables.
 - Proxmox token permissions and runner concurrency rules must be finalized before shared CI rollout.

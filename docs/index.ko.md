@@ -22,6 +22,8 @@ README:
 | [Validation And JUnit](validation.ko.md) | 검증 계층, smoke command, JUnit 구현 상태, CI contract |
 | [Proxmox Connection Guide](proxmox-connection.ko.md) | API token, template, QEMU Guest Agent, preflight |
 | [Reports And Results](reports.ko.md) | `runs/<run-id>` layout, JUnit/JSON/HTML, progress logs |
+| [Web Dashboard](web-dashboard.ko.md) | CLI 실행과 결과 탐색을 감싸는 LAN/team dashboard |
+| [Web Dashboard 서버 실행 가이드](web-dashboard-server.ko.md) | API/Web 서버 실행, LAN 접근 설정, local dashboard runtime troubleshooting |
 
 ## 설계와 상태
 

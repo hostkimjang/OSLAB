@@ -22,6 +22,13 @@ class ScenarioValidationError(OslabError):
     failure_class = "scenario_validation_failure"
 
 
+class SuiteValidationError(OslabError):
+    """Raised when a suite YAML file is invalid."""
+
+    exit_code = 13
+    failure_class = "suite_validation_failure"
+
+
 class ConfigError(OslabError):
     """Raised when local config cannot be read or resolved."""
 

@@ -232,6 +232,17 @@ def _validate_product(product: dict[str, Any], *, where: str) -> None:
         _validate_command(_require_mapping(step, "command", where=where), where=where)
         if "captureStdoutJson" in step and not isinstance(step["captureStdoutJson"], bool):
             raise ScenarioValidationError(f"`product.steps[{index}].captureStdoutJson` must be a boolean{where}")
+        if "expectStdoutJson" in step:
+            if step.get("captureStdoutJson") is not True:
+                raise ScenarioValidationError(
+                    f"`product.steps[{index}].expectStdoutJson` requires `captureStdoutJson: true`{where}"
+                )
+            expectations = _require_mapping(step, "expectStdoutJson", where=where)
+            for key in expectations:
+                if not isinstance(key, str) or not key.strip():
+                    raise ScenarioValidationError(
+                        f"`product.steps[{index}].expectStdoutJson` keys must be non-empty strings{where}"
+                    )
         if "secretTokens" in step:
             secret_tokens = _require_mapping(step, "secretTokens", where=where)
             for token_name, source in secret_tokens.items():

@@ -19,6 +19,11 @@ if (-not $state.ready) {
 $outputDirectory = Split-Path -Parent $OutputPath
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 
+$stateDirectory = Split-Path -Parent $StatePath
+$stateFileExists = Test-Path -LiteralPath $StatePath -PathType Leaf
+$stateDirectoryExists = Test-Path -LiteralPath $stateDirectory -PathType Container
+$stateFileLength = if ($stateFileExists) { (Get-Item -LiteralPath $StatePath).Length } else { $null }
+
 $stdout = "fixture state: $($state.message)"
 $result = @{
   schemaVersion = 1
@@ -32,6 +37,19 @@ $result = @{
     fixtureId = $state.id
     ready = [bool]$state.ready
     message = $state.message
+    files = @(
+      @{
+        path = $StatePath
+        exists = [bool]$stateFileExists
+        length = $stateFileLength
+      }
+    )
+    directories = @(
+      @{
+        path = $stateDirectory
+        exists = [bool]$stateDirectoryExists
+      }
+    )
   }
 }
 

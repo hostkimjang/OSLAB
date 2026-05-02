@@ -42,6 +42,12 @@ assertions:
   - type: command.stdoutContains
     id: fixture-state-marker
     text: "fixture state: fixture state ready"
+  - type: file.exists
+    id: fixture-state-file-created
+    path: "C:\\Oslab\\demo-fixture-state.json"
+  - type: directory.exists
+    id: fixture-state-directory-created
+    path: "C:\\Oslab"
 reports:
   formats:
     - junit

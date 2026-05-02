@@ -83,7 +83,7 @@ def test_run_proxmox_boot_smoke_starts_guest_and_cleans_up(tmp_path: Path, monke
         return client
 
     monkeypatch.setattr(proxmox_boot_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_boot_smoke(
         scenario=scenario,
@@ -114,7 +114,7 @@ def test_run_proxmox_boot_smoke_can_keep_running_vm(tmp_path: Path, monkeypatch)
         return client
 
     monkeypatch.setattr(proxmox_boot_smoke, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_boot_smoke(
         scenario=scenario,

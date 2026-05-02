@@ -35,16 +35,26 @@ product:
         SupplyScanAccessToken:
           env: OSLAB_FAKE_SUPPLYSCAN_TOKEN
       captureStdoutJson: true
+      expectStdoutJson:
+        ok: true
+        step: register
     - id: status
       command:
         shell: powershell
         template: '& "C:\Oslab\agent\fake-agent.ps1" status --remote --json'
       captureStdoutJson: true
+      expectStdoutJson:
+        ok: true
+        step: status
+        registered: true
     - id: scan
       command:
         shell: powershell
         template: '& "C:\Oslab\agent\fake-agent.ps1" scan --wait --output "{OutputPath}" --json'
       captureStdoutJson: true
+      expectStdoutJson:
+        ok: true
+        step: scan
 outputs:
   actual:
     path: "C:\\Oslab\\scan-result.json"

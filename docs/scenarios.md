@@ -134,6 +134,25 @@ See [Fixture Authoring](fixtures.md) for full fixture rules, manifest examples, 
 
 Unknown tokens are rejected when the command template is rendered before guest execution. `validate-scenario` checks schema shape; it is not a full dry run of every command token.
 
+## Product Step Stdout JSON Contract
+
+Agent-like scenarios often use `product.steps` instead of a single `artifact.command`. If a step sets `captureStdoutJson: true`, stdout must contain one JSON object. `expectStdoutJson` can declare required values:
+
+```yaml
+product:
+  steps:
+    - id: scan
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\agent.exe" scan --wait --output "{OutputPath}" --json'
+      captureStdoutJson: true
+      expectStdoutJson:
+        ok: true
+        outputWritten: true
+```
+
+If a required field is missing or has a different value, the step fails as product execution failure. Dotted keys can address nested objects.
+
 ## Generic Demo Scenarios
 
 | Scenario | Purpose |
@@ -204,7 +223,20 @@ For `canonical.command`, the remote output file should look like this:
   "stdout": "hello from python\n",
   "stderr": "",
   "metadata": {
-    "runtime": "python"
+    "runtime": "python",
+    "files": [
+      {
+        "path": "C:\\Oslab\\demo-fixture-state.json",
+        "exists": true,
+        "length": 128
+      }
+    ],
+    "directories": [
+      {
+        "path": "C:\\Oslab",
+        "exists": true
+      }
+    ]
   }
 }
 ```
@@ -219,9 +251,11 @@ Required fields:
 | `exitCode` | Process exit code |
 | `stdout` | Captured stdout text |
 | `stderr` | Captured stderr text |
-| `metadata` | Optional object for runtime/compiler/version/path details |
+| `metadata` | Optional object for runtime/compiler/version/path/state details |
 
 The artifact command may also write stdout/stderr to the console, but assertions use the collected JSON file. Console output alone is not enough for `canonical.command`.
+
+State assertions such as `file.exists`, `file.notExists`, and `directory.exists` read checked state from `metadata.files` and `metadata.directories`. `oslab` does not guess guest state after the command finishes; the artifact command should report the paths it checked.
 
 Minimal PowerShell writer:
 

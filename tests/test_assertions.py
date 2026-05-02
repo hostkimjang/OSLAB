@@ -132,9 +132,79 @@ def test_command_stdout_contains_can_fail() -> None:
     assert "did not contain" in summary.results[0].message
 
 
+def test_file_and_directory_assertions_use_command_metadata() -> None:
+    summary = evaluate_assertions(
+        [
+            {"type": "file.exists", "id": "state-file", "path": r"C:\Oslab\demo-fixture-state.json"},
+            {"type": "file.notExists", "id": "old-state-missing", "path": r"C:\Oslab\old-state.json"},
+            {"type": "directory.exists", "id": "oslab-dir", "path": r"C:\Oslab"},
+        ],
+        {
+            "schemaVersion": 1,
+            "kind": "commandResult",
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": "",
+            "metadata": {
+                "files": [
+                    {"path": r"C:\Oslab\demo-fixture-state.json", "exists": True, "length": 128},
+                    {"path": r"C:\Oslab\old-state.json", "exists": False},
+                ],
+                "directories": [{"path": r"C:\Oslab", "exists": True}],
+            },
+        },
+    )
+
+    assert summary.passed is True
+    assert [result.id for result in summary.results] == ["state-file", "old-state-missing", "oslab-dir"]
+
+
+def test_file_exists_fails_when_state_is_not_reported() -> None:
+    summary = evaluate_assertions(
+        [{"type": "file.exists", "id": "missing-report", "path": r"C:\Oslab\missing.json"}],
+        {"schemaVersion": 1, "kind": "commandResult", "metadata": {"files": []}},
+    )
+
+    assert summary.passed is False
+    assert summary.results[0].failure_class == "assertion_failure"
+    assert "not reported" in summary.results[0].message
+
+
+def test_named_state_assertions_use_command_metadata() -> None:
+    summary = evaluate_assertions(
+        [
+            {"type": "process.exists", "id": "python-process", "nameContains": "python"},
+            {"type": "service.exists", "id": "spooler-service", "name": "Spooler"},
+            {"type": "package.exists", "id": "demo-package", "name": "Demo Runtime"},
+        ],
+        {
+            "schemaVersion": 1,
+            "kind": "commandResult",
+            "metadata": {
+                "processes": [{"name": "python.exe", "exists": True, "pid": 1234}],
+                "services": [{"name": "Spooler", "exists": True, "status": "Running"}],
+                "packages": [{"name": "Demo Runtime", "exists": True, "version": "1.0.0"}],
+            },
+        },
+    )
+
+    assert summary.passed is True
+    assert summary.failed_count == 0
+
+
+def test_named_state_assertion_requires_name_or_name_contains() -> None:
+    summary = evaluate_assertions(
+        [{"type": "process.exists", "id": "bad-process"}],
+        {"schemaVersion": 1, "kind": "commandResult", "metadata": {"processes": []}},
+    )
+
+    assert summary.passed is False
+    assert summary.results[0].failure_class == "assertion_config_error"
+
+
 def test_unsupported_assertion_type_fails_explicitly() -> None:
     summary = evaluate_assertions(
-        [{"type": "file.exists", "id": "future-file", "path": "/tmp/file"}],
+        [{"type": "future.assertion", "id": "future-check"}],
         CANONICAL_INVENTORY,
     )
 

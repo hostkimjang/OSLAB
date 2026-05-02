@@ -1,0 +1,20 @@
+{
+  "name": "oslab-workspace",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"corepack pnpm --filter @oslab/api dev\" \"corepack pnpm --filter @oslab/web dev\"",
+    "dev:api": "corepack pnpm --filter @oslab/api dev",
+    "dev:web": "corepack pnpm --filter @oslab/web dev",
+    "build": "corepack pnpm --filter @oslab/shared build && corepack pnpm --filter @oslab/api build && corepack pnpm --filter @oslab/web build",
+    "lint": "corepack pnpm --filter @oslab/api lint && corepack pnpm --filter @oslab/web lint",
+    "test": "corepack pnpm --filter @oslab/api test && corepack pnpm --filter @oslab/web test",
+    "prisma:generate": "corepack pnpm --filter @oslab/api prisma:generate",
+    "prisma:migrate": "corepack pnpm --filter @oslab/api prisma:migrate"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  }
+}

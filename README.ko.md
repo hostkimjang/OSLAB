@@ -75,6 +75,8 @@ Unit test나 container test만으로는 모든 OS compatibility 질문에 답하
 | 검증 계층과 JUnit 이해 | [docs/validation.ko.md](docs/validation.ko.md) |
 | Proxmox 연결 | [docs/proxmox-connection.ko.md](docs/proxmox-connection.ko.md) |
 | Report 확인 | [docs/reports.ko.md](docs/reports.ko.md) |
+| Web dashboard 실행 | [docs/web-dashboard.ko.md](docs/web-dashboard.ko.md) |
+| Web dashboard 서버 실행/문제 해결 | [docs/web-dashboard-server.ko.md](docs/web-dashboard-server.ko.md) |
 | Architecture 이해 | [docs/oslab-platform-plan.md](docs/oslab-platform-plan.md) |
 | 공개 release 체크 | [docs/github-release-checklist.md](docs/github-release-checklist.md) |
 
@@ -121,7 +123,7 @@ uv run oslab validate-scenario --scenario scenarios/windows/demo-c-hello.example
 이 단계는 Proxmox에 접속하지 않습니다. 실제 lab을 준비하기 전에 먼저 통과해야 합니다. 예상 local unit test 결과:
 
 ```text
-137 passed
+155 passed
 ```
 
 ### 2. Create Local Config
@@ -383,6 +385,7 @@ uv run oslab --help
 | `validate-scenario` | Lab을 건드리기 전에 YAML shape 확인 | No | Console validation result |
 | `preflight` | Config, token, provider connectivity, template, VMID range 확인 | No | Console readiness report |
 | `run` | Demo, product smoke, CI에서 사용하는 정상 full scenario 실행 | Yes | `runs/<run-id>/` |
+| `suite-run` | 여러 scenario를 선언한 YAML suite를 순차 실행 | Yes | `runs/<suite-run-id>/suite.json` |
 | `inspect-result` | 완료된 run을 사람이 읽기 좋게 요약 | No | `run.json`과 normalized files 기반 summary |
 | `clone-smoke` | Boot/guest debug 전에 provider clone/destroy만 검증 | Yes | Clone lifecycle status |
 | `boot-smoke` | Clone boot와 guest readiness 확인 | Yes | VM boot/QGA readiness status |
@@ -421,6 +424,8 @@ uv run oslab run `
 | `--guest-timeout-seconds <n>` | No | `300` | QEMU Guest Agent 같은 guest channel readiness 최대 대기 시간 |
 | `--command-timeout-seconds <n>` | No | `120` | Fixture/product command 최대 실행 시간 |
 | `--poll-interval-seconds <n>` | No | `5.0` | VM/guest/command progress polling interval |
+
+Suite file은 `oslab suite-run`으로 실행하며, 동일한 VM timeout/artifact option에 더해 `--max-parallel <n>`을 받을 수 있습니다. 기본값은 `1`이고, VMID range와 Proxmox host 여유가 있을 때만 올리는 것이 좋습니다.
 
 정확한 CLI help는 다음 명령으로 확인합니다.
 

@@ -74,6 +74,39 @@ def test_supplyscan_inventory_adapter_normalizes_common_raw_shapes() -> None:
     assert record["metadata"]["adapter"] == "supplyscan.inventory"
 
 
+def test_supplyscan_inventory_adapter_maps_real_agent_scan_fields() -> None:
+    result = normalize_output(
+        "supplyscan.inventory",
+        {
+            "items": [
+                {
+                    "sw_name": "Oslab SupplyScan Registry x64 Fixture",
+                    "sw_version": "1.2.3",
+                    "sw_vendor": "Oslab Fixture Publisher",
+                    "sw_scan_method": "Registry",
+                    "sw_install_path": r"C:\Oslab\supplyscan-fixtures\RegistryX64",
+                    "sw_dependencies": [
+                        {
+                            "file_install_path": r"C:\Oslab\supplyscan-fixtures\RegistryX64\fixture.exe",
+                            "sw_scan_method": "registry_fs",
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+
+    record = result.canonical["records"][0]
+    assert record["publisher"] == "Oslab Fixture Publisher"
+    assert record["sources"] == ["Registry"]
+    assert {"type": "directory", "source": "Registry", "path": r"C:\Oslab\supplyscan-fixtures\RegistryX64"} in record[
+        "evidence"
+    ]
+    assert {"type": "file", "source": "Registry", "path": r"C:\Oslab\supplyscan-fixtures\RegistryX64\fixture.exe"} in record[
+        "evidence"
+    ]
+
+
 def test_supplyscan_inventory_adapter_accepts_existing_canonical_output() -> None:
     result = normalize_output(
         "supplyscan.inventory",

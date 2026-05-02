@@ -18,6 +18,7 @@ from oslab.errors import OslabError, ProviderError
 from oslab.guests.base import GuestCommandResult
 from oslab.guests.qemu_agent import QemuAgentChannel
 from oslab.models.scenario import load_scenario
+from oslab.models.suite import load_suite
 from oslab.plugins import normalize_output
 from oslab.providers.base import VmRef
 from oslab.providers.proxmox import ProxmoxClient, proxmox_config_from_oslab
@@ -28,6 +29,7 @@ from oslab.runners.proxmox_clone_smoke import run_proxmox_clone_smoke
 from oslab.runners.proxmox_fixture_smoke import FixtureSmokeResult, run_proxmox_fixture_smoke
 from oslab.runners.proxmox_guest_preflight import GuestPreflightResult, run_proxmox_guest_preflight
 from oslab.runners.scenario_runner import run_artifact_validation, run_skeleton
+from oslab.runners.suite_runner import SuiteRunResult, run_suite_validation
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -75,6 +77,21 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--command-timeout-seconds", type=int, default=120)
     run.add_argument("--poll-interval-seconds", type=float, default=5.0)
     run.set_defaults(func=cmd_run)
+
+    suite_run = subparsers.add_parser("suite-run", help="Run multiple scenarios declared in a suite YAML file.")
+    suite_run.add_argument("--suite", required=True, type=Path)
+    suite_run.add_argument("--config", type=Path)
+    suite_run.add_argument("--env-file", type=Path, help="Load ignored KEY=VALUE secrets before resolving config.")
+    suite_run.add_argument("--run-id")
+    suite_run.add_argument("--artifact-path", required=True, type=Path)
+    suite_run.add_argument("--keep-vm", action="store_true", help="Keep each clone running after its scenario run.")
+    suite_run.add_argument("--full-clone", action="store_true", help="Request full clones instead of linked clones.")
+    suite_run.add_argument("--boot-timeout-seconds", type=int, default=300)
+    suite_run.add_argument("--guest-timeout-seconds", type=int, default=300)
+    suite_run.add_argument("--command-timeout-seconds", type=int, default=120)
+    suite_run.add_argument("--poll-interval-seconds", type=float, default=5.0)
+    suite_run.add_argument("--max-parallel", type=int, default=1, help="Maximum number of suite entries to run concurrently.")
+    suite_run.set_defaults(func=cmd_suite_run)
 
     clone_smoke = subparsers.add_parser(
         "clone-smoke",
@@ -361,6 +378,59 @@ def cmd_run(args: argparse.Namespace) -> int:
         progress=lambda event: _print_progress_event(console, event),
     )
     _print_run_result(console, result)
+    return 0 if result.status == "passed" else 1
+
+
+def cmd_suite_run(args: argparse.Namespace) -> int:
+    console = Console()
+    console.section("oslab suite run")
+
+    if args.env_file:
+        _print_env_load(console, args.env_file)
+
+    suite = load_suite(args.suite)
+    config = load_config(args.config)
+
+    if not args.artifact_path.exists():
+        raise OslabError(f"Artifact path does not exist: {args.artifact_path}", details={"path": str(args.artifact_path)})
+
+    proxmox = proxmox_config_from_oslab(config)
+    enabled_entries = [entry for entry in suite.entries if entry.enabled]
+    console.ok("Suite and provider config loaded")
+    console.detail("suite", suite.suite_id)
+    console.detail("entries", len(enabled_entries))
+    console.detail("artifactPath", args.artifact_path)
+    console.detail("apiUrl", proxmox.api_url)
+    console.detail("node", proxmox.node)
+    console.detail("tokenId", redact_value(proxmox.token_id))
+    console.detail("tokenSecret", "<redacted>")
+
+    console.step("Run suite with full output layout")
+    console.detail("runId", args.run_id or "<auto>")
+    console.detail("keepVm", str(args.keep_vm).lower())
+    console.detail("fullClone", str(args.full_clone).lower())
+    console.detail("bootTimeoutSeconds", args.boot_timeout_seconds)
+    console.detail("guestTimeoutSeconds", args.guest_timeout_seconds)
+    console.detail("commandTimeoutSeconds", args.command_timeout_seconds)
+    console.detail("pollIntervalSeconds", args.poll_interval_seconds)
+    console.detail("maxParallel", args.max_parallel)
+
+    result = run_suite_validation(
+        suite,
+        config,
+        proxmox_config=proxmox,
+        artifact_path=args.artifact_path,
+        run_id=args.run_id,
+        keep_vm=args.keep_vm,
+        full_clone=args.full_clone,
+        boot_timeout_seconds=args.boot_timeout_seconds,
+        guest_timeout_seconds=args.guest_timeout_seconds,
+        command_timeout_seconds=args.command_timeout_seconds,
+        poll_interval_seconds=args.poll_interval_seconds,
+        max_parallel=args.max_parallel,
+        progress=lambda event: _print_progress_event(console, event),
+    )
+    _print_suite_run_result(console, result)
     return 0 if result.status == "passed" else 1
 
 
@@ -1125,6 +1195,40 @@ def _print_run_result(console: Console, result) -> None:
     console.detail("scenario", result.scenario_id)
     console.detail("status", result.status)
     console.detail("failureClass", result.failure_class or "<none>")
+    for name, path in sorted(result.reports.items()):
+        console.detail(f"report:{name}", path)
+
+
+def _print_suite_run_result(console: Console, result: SuiteRunResult) -> None:
+    if result.status == "passed":
+        console.ok("Suite completed")
+    else:
+        console.fail("Suite failed")
+    payload = result.to_dict()
+    summary = payload.get("summary", {})
+    console.detail("suiteId", result.suite_id)
+    console.detail("runId", result.run_id)
+    console.detail("status", result.status)
+    console.detail("total", summary.get("total", 0))
+    console.detail("passed", summary.get("passed", 0))
+    console.detail("failed", summary.get("failed", 0))
+    console.detail("requiredFailed", summary.get("requiredFailed", 0))
+    console.detail("allowedFailed", summary.get("allowedFailed", 0))
+    for entry in result.entries:
+        if entry.status == "passed":
+            console.ok(f"suiteEntry:{entry.id}")
+        elif entry.allow_failure:
+            console.warn(f"suiteEntry:{entry.id}")
+        else:
+            console.fail(f"suiteEntry:{entry.id}")
+        console.detail("status", entry.status)
+        console.detail("allowFailure", entry.allow_failure)
+        console.detail("scenario", entry.scenario_id or "<none>")
+        console.detail("runId", entry.run_id or "<none>")
+        console.detail("runDir", entry.run_dir or "<none>")
+        console.detail("failureClass", entry.failure_class or "<none>")
+        if entry.error:
+            console.detail("error", entry.error)
     for name, path in sorted(result.reports.items()):
         console.detail(f"report:{name}", path)
 

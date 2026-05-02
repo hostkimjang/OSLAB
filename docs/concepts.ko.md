@@ -132,6 +132,8 @@ install -> register -> status -> scan
 
 Core runner는 이 steps를 generic step으로 취급합니다. Product semantics는 scenario file과 plugin에 위치해야 합니다.
 
+Step이 JSON을 출력하면 `captureStdoutJson: true`로 그 객체를 `raw/product-steps.json`에 저장할 수 있습니다. 그 다음 `expectStdoutJson`으로 `ok: true`, `registered: true`, `outputWritten: true` 같은 필수 field를 gate로 걸어 다음 step으로 넘어가기 전에 검증할 수 있습니다.
+
 ## Adapter
 
 Adapter는 raw product output을 canonical model로 normalize합니다. 쉽게 말해 제품마다 제각각인 출력 형식을 `oslab`이 공통으로 채점할 수 있는 형태로 바꾸는 변환기입니다.
@@ -158,8 +160,16 @@ Implemented examples:
 | `command.exitCode` | Command exit code 확인 |
 | `command.stdoutContains` | stdout text 확인 |
 | `command.stderrContains` | stderr text 확인 |
+| `file.exists` | 보고된 file 존재 확인 |
+| `file.notExists` | 보고된 file 부재 확인 |
+| `directory.exists` | 보고된 directory 존재 확인 |
+| `process.exists` | 보고된 process 존재 확인 |
+| `service.exists` | 보고된 service 존재 확인 |
+| `package.exists` | 보고된 package 존재 확인 |
 | `inventory.contains` | Inventory에 matching record가 있는지 확인 |
 | `inventory.evidencePresent` | Evidence 존재 확인 |
+
+State assertion은 normalized output metadata에서 읽습니다. 예를 들면 `metadata.files`, `metadata.directories`, `metadata.processes`, `metadata.services`, `metadata.packages`입니다. 실제 guest 상태 관찰과 보고는 artifact command가 담당합니다.
 
 ## Report
 

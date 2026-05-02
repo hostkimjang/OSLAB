@@ -2,24 +2,66 @@
 /runs/
 /artifacts/
 /logs/
+/output/
+apps/**/output/
 
 # Local config and secrets
 config/*.local.json
 config/*.local.yaml
+config/*.local.txt
 scenarios/**/*.local.yaml
+validation/suites/*.local.yaml
 *.secret.json
 *.env
 !config/*.example.env
+
+# Private overlays that must not be published
+/private/
+/docs/private/
+/plugins/private/
+/scenarios/**/private/
+/validation/fixtures/**/private/
+/validation/suites/*.private.yaml
 
 # Build outputs
 bin/
 obj/
 TestResults/
+test-results/
 .pytest_cache/
 .venv/
 __pycache__/
 *.egg-info/
 *.pyc
+
+# Node/web workspace
+node_modules/
+.next/
+dist/
+coverage/
+*.tsbuildinfo
+.web-data/
+.web-artifacts/
+.artifact-archive/
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+apps/**/test-results/
+
+# Browser/UI and authoring smoke scratch output
+/artifact-studio-*.png
+/artifact-studio-current-snapshot.md
+/validation/artifacts/web-*
+/validation/artifacts/artifact-studio-smoke-*.ps1
+/validation/artifacts/artifact-studio-project-*/
+/validation/artifacts/api-project-debug-*/
+/validation/artifacts/*-starter-*/
+/validation/artifacts/web-ui-demo-*/
+/validation/fixtures/windows/qa-*.ps1
+/scenarios/windows/new-windows-smoke*.example.yaml
+/scenarios/windows/qa-*.example.yaml
+/scenarios/windows/uat-*.example.yaml
+/validation/suites/new-smoke.example.yaml
+/validation/suites/qa-*.example.yaml
 
 # Windows/IDE noise
 .vs/
@@ -28,3 +70,5 @@ __pycache__/
 *.suo
 Thumbs.db
 Desktop.ini
+/.playwright-cli
+/.playwright-mcp

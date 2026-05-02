@@ -225,7 +225,7 @@ def _run_fixture(
 ) -> FixtureSmokeItem:
     fixture_id = str(fixture["id"])
     fixture_type = str(fixture["type"])
-    source = _resolve_repo_path(scenario.path.parent.parent.parent, str(fixture["source"]))
+    source = _resolve_repo_path(_repo_root_from_path(scenario.path), str(fixture["source"]))
     if not source.exists() or not source.is_file():
         raise OslabError(f"Fixture source does not exist: {source}", details={"fixtureId": fixture_id, "source": str(source)})
     if fixture_type != "powershell":
@@ -311,6 +311,14 @@ def _resolve_repo_path(repo_root: Path, path: str) -> Path:
     if candidate.is_absolute():
         return candidate
     return repo_root / candidate
+
+
+def _repo_root_from_path(path: Path) -> Path:
+    start = path.resolve().parent
+    for candidate in (start, *start.parents):
+        if (candidate / "pyproject.toml").exists() or (candidate / ".git").exists():
+            return candidate
+    return Path.cwd()
 
 
 def _write_fixture_output(

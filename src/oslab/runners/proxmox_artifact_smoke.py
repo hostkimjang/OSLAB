@@ -61,6 +61,7 @@ class ProductStepResult:
     stdout_json: dict[str, Any] | list[Any] | None
     passed: bool
     message: str
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -441,6 +442,7 @@ def run_windows_artifact(
     local_product_steps_path: Path | None = None
     product_step_specs = _scenario_product_steps(scenario)
     if product_step_specs:
+        product_secret_values = _scenario_product_secret_values(scenario)
         command = CommandSpec(shell="powershell", template="", rendered="")
         execution_exit_code: int | None = None
         execution_stdout = ""
@@ -457,6 +459,7 @@ def run_windows_artifact(
                 step=step,
                 tokens=command_tokens,
                 timeout_seconds=command_timeout_seconds,
+                redaction_secrets=product_secret_values,
             )
             product_steps.append(step_result)
             command = step_result.command
@@ -1067,6 +1070,7 @@ def _product_step_report_payload(step: ProductStepResult) -> dict[str, Any]:
         "stdoutJson": step.stdout_json,
         "passed": step.passed,
         "message": step.message,
+        "details": step.details,
     }
 
 
@@ -1119,7 +1123,7 @@ def _artifact_junit_cases(scenario: Scenario, result: ArtifactSmokeResult) -> li
                     classname=classname,
                     status="passed" if step.passed else "error",
                     message=step.message,
-                    details={"exitCode": step.exit_code, "command": step.command.safe_rendered},
+                    details={"exitCode": step.exit_code, "command": step.command.safe_rendered, "stepDetails": step.details},
                 )
             )
     elif result.command.rendered:
@@ -1479,6 +1483,15 @@ def _validate_required_product_secret_envs(scenario: Scenario) -> None:
         _resolve_secret_tokens(step, step_id=str(step.get("id") or "<missing>"))
 
 
+def _scenario_product_secret_values(scenario: Scenario) -> list[str]:
+    secrets: list[str] = []
+    for step in _scenario_product_steps(scenario):
+        for value in _resolve_secret_tokens(step, step_id=str(step.get("id") or "<missing>")).values():
+            if value and value not in secrets:
+                secrets.append(value)
+    return secrets
+
+
 def _run_product_step(
     channel: QemuAgentChannel,
     vm: VmRef,
@@ -1487,6 +1500,7 @@ def _run_product_step(
     step: dict[str, Any],
     tokens: dict[str, str],
     timeout_seconds: int,
+    redaction_secrets: list[str] | None = None,
 ) -> ProductStepResult:
     step_id = str(step["id"])
     command_mapping = step["command"]
@@ -1499,9 +1513,11 @@ def _run_product_step(
         }
     )
     secret_tokens = _resolve_secret_tokens(step, step_id=step_id)
+    redaction_values = _dedupe_secret_values([*(redaction_secrets or []), *secret_tokens.values()])
     command = render_command_template(command_mapping, step_tokens, secret_tokens=secret_tokens)
     execution = channel.execute(vm, _shell_argv(command), timeout_seconds=timeout_seconds)
     stdout_json: dict[str, Any] | list[Any] | None = None
+    details: dict[str, Any] = {}
     passed = execution.passed
     message = "Product step passed" if execution.passed else "Product step command failed"
     if passed and bool(step.get("captureStdoutJson", False)):
@@ -1518,17 +1534,65 @@ def _run_product_step(
             elif _is_product_failure_artifact(stdout_json):
                 passed = False
                 message = "Product step returned failure artifact"
-            stdout_json = _redact_json_secrets(stdout_json, secret_tokens.values())
+            stdout_json = _redact_json_secrets(stdout_json, redaction_values)
+            expectation_details = _evaluate_stdout_json_expectations(step, stdout_json) if passed else None
+            if expectation_details is not None:
+                passed = False
+                message = "Product step stdout JSON expectation failed"
+                details["stdoutJsonExpectation"] = expectation_details
     return ProductStepResult(
         id=step_id,
         command=command,
         exit_code=execution.exit_code,
-        stdout=_redact_text_secrets(execution.stdout, secret_tokens.values()),
-        stderr=_redact_text_secrets(execution.stderr, secret_tokens.values()),
+        stdout=_redact_text_secrets(execution.stdout, redaction_values),
+        stderr=_redact_text_secrets(execution.stderr, redaction_values),
         stdout_json=stdout_json,
         passed=passed,
         message=message,
+        details=details,
     )
+
+
+def _dedupe_secret_values(values: list[str]) -> list[str]:
+    deduped: list[str] = []
+    for value in values:
+        if isinstance(value, str) and value and value not in deduped:
+            deduped.append(value)
+    return deduped
+
+
+def _evaluate_stdout_json_expectations(step: dict[str, Any], stdout_json: dict[str, Any] | list[Any] | None) -> dict[str, Any] | None:
+    expectations = step.get("expectStdoutJson")
+    if not isinstance(expectations, dict):
+        return None
+    if not isinstance(stdout_json, dict):
+        return {
+            "expected": dict(expectations),
+            "mismatches": [{"path": "<root>", "reason": "stdout_json_not_object", "actualType": type(stdout_json).__name__}],
+        }
+
+    mismatches: list[dict[str, Any]] = []
+    for path, expected in expectations.items():
+        if not isinstance(path, str) or not path.strip():
+            continue
+        found, actual = _json_path_value(stdout_json, path)
+        if not found:
+            mismatches.append({"path": path, "reason": "missing", "expected": expected})
+        elif actual != expected:
+            mismatches.append({"path": path, "reason": "value_mismatch", "expected": expected, "actual": actual})
+
+    if not mismatches:
+        return None
+    return {"expected": dict(expectations), "mismatches": mismatches}
+
+
+def _json_path_value(payload: dict[str, Any], path: str) -> tuple[bool, Any]:
+    current: Any = payload
+    for part in path.split("."):
+        if not isinstance(current, dict) or part not in current:
+            return False, None
+        current = current[part]
+    return True, current
 
 
 def _resolve_secret_tokens(step: dict[str, Any], *, step_id: str) -> dict[str, str]:
@@ -1633,6 +1697,7 @@ def _write_product_steps_output(
             "stdoutJson": step.stdout_json,
             "passed": step.passed,
             "message": step.message,
+            "details": step.details,
         }
         for step in steps
     ]

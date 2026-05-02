@@ -15,6 +15,8 @@ Even if you normally use Proxmox through the web dashboard, `oslab` does not aut
 
 You can put the dashboard URL, such as `https://<proxmox-host>:8006`, in `config/oslab.local.yaml`. `oslab` normalizes it to the API base URL by appending `/api2/json` when needed.
 
+If you front Proxmox with Cloudflare Tunnel or another reverse proxy/WAF, remember that `oslab` talks to `/api2/json/*` as an API client, not as a browser session. The proxy policy must allow non-browser API requests to reach Proxmox.
+
 ## Connection Values
 
 | Value | Location | Description |
@@ -322,6 +324,7 @@ For CI, do not share one VMID range across unconstrained parallel jobs. Use CI c
 | Cannot reach Proxmox API | Host/IP/port route problem, firewall, VPN, or wrong `apiUrl` | `Test-NetConnection <host> -Port 8006` |
 | TLS/certificate failure | Self-signed certificate with `verifyTls: true` | Set `verifyTls: false` for lab or install trusted cert |
 | HTTP 401/403 | Wrong token id/secret or insufficient permissions | Rerun `--provider-config-check`; verify token id format |
+| Cloudflare `403 Error 1010` or reverse proxy blocks `/api2/json/*` | Proxy/WAF blocked the API client signature before Proxmox handled auth | Upgrade to an `oslab` build that sends an explicit `User-Agent`, and allowlist or relax the proxy/WAF rule for Proxmox API traffic |
 | Node not found | `node` does not match dashboard node name | Check Proxmox tree node name and `GET /nodes` output |
 | Template VMID missing | Scenario `templateVmId` does not match template | Check Proxmox VMID and scenario provider block |
 | Template flag is not set | VM exists but was not converted to template | Convert stopped base VM to template |

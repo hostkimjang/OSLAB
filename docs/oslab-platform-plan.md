@@ -620,11 +620,17 @@ product:
         shell: powershell
         template: '& "{ArtifactDir}\example-agent.exe" status --json'
       captureStdoutJson: true
+      expectStdoutJson:
+        ok: true
+        registered: true
     - id: run
       command:
         shell: powershell
         template: '& "{ArtifactDir}\example-agent.exe" run --output "{OutputPath}" --json'
       captureStdoutJson: true
+      expectStdoutJson:
+        ok: true
+        outputWritten: true
 ```
 
 Rules:
@@ -633,6 +639,7 @@ Rules:
 - A failed required step stops later steps.
 - Step stdout/stderr are collected.
 - `captureStdoutJson` parses stdout as a JSON object.
+- `expectStdoutJson` optionally declares required stdout JSON fields. Dotted keys such as `policy.id` can address nested objects.
 - Secret tokens are read from host env and redacted in logs/reports.
 - Step results are included in `run.json` and raw output files.
 
@@ -753,6 +760,8 @@ MVP built-in assertions:
 | `inventory.sourcePresent` | Check source exists in an inventory record |
 | `inventory.sourceAbsent` | Check source is absent |
 | `inventory.evidencePresent` | Check evidence exists |
+
+`file.*`, `directory.*`, `process.exists`, `service.exists`, and `package.exists` evaluate reported state in normalized output metadata. The core runner does not perform a second guest query during assertion evaluation; scenario artifacts or adapters must emit checked state in fields such as `metadata.files`, `metadata.directories`, `metadata.processes`, `metadata.services`, and `metadata.packages`.
 
 Assertion result:
 

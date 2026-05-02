@@ -113,7 +113,7 @@ def test_run_proxmox_guest_preflight_passes_and_cleans_up(tmp_path: Path, monkey
         return client
 
     monkeypatch.setattr(proxmox_guest_preflight, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_guest_preflight(
         scenario=scenario,
@@ -151,7 +151,7 @@ def test_run_proxmox_guest_preflight_reports_failed_check_and_still_cleans_up(
         return client
 
     monkeypatch.setattr(proxmox_guest_preflight, "ProxmoxClient", fake_client_factory)
-    scenario = load_scenario(Path("scenarios/windows/supplyscan-gold-lite.yaml"))
+    scenario = load_scenario(Path("scenarios/windows/supplyscan/supplyscan-gold-lite.yaml"))
 
     result = run_proxmox_guest_preflight(
         scenario=scenario,
