@@ -80,6 +80,39 @@ This README helps a new user understand `oslab` as a generic OS/VM integration t
 | Understand architecture | [docs/oslab-platform-plan.md](docs/oslab-platform-plan.md) |
 | Check public release readiness | [docs/github-release-checklist.md](docs/github-release-checklist.md) |
 
+## Web Dashboard Quick Start
+
+The full dashboard runbook is [docs/web-dashboard-server.md](docs/web-dashboard-server.md). The short local path is:
+
+```powershell
+corepack pnpm install
+Copy-Item apps/api/.env.example apps/api/.env
+Copy-Item apps/web/.env.example apps/web/.env
+```
+
+Edit `apps/api/.env` at minimum:
+
+```text
+OSLAB_REPO_ROOT=C:/path/to/oslab
+OSLAB_WEB_ADMIN_USERNAME=admin
+OSLAB_WEB_ADMIN_PASSWORD=change-me
+```
+
+If the web app should proxy to a different API endpoint, edit `apps/web/.env`:
+
+```text
+OSLAB_API_PROXY=http://127.0.0.1:3001
+```
+
+Then start the API and web UI together:
+
+```powershell
+corepack pnpm prisma:generate
+corepack pnpm dev
+```
+
+Open <http://127.0.0.1:3000>. For split terminals, use `corepack pnpm dev:api` and `corepack pnpm dev:web`.
+
 ## Adoption Map
 
 When a team adopts `oslab`, the first useful mental model is ownership: which files you create, which files describe the lab, and which files `oslab` creates after a run.

@@ -80,6 +80,39 @@ Unit test나 container test만으로는 모든 OS compatibility 질문에 답하
 | Architecture 이해 | [docs/oslab-platform-plan.md](docs/oslab-platform-plan.md) |
 | 공개 release 체크 | [docs/github-release-checklist.md](docs/github-release-checklist.md) |
 
+## Web Dashboard 빠른 실행
+
+자세한 서버 실행/문제 해결 문서는 [docs/web-dashboard-server.ko.md](docs/web-dashboard-server.ko.md)에 있습니다. 로컬에서 바로 켜는 최소 흐름은 다음입니다.
+
+```powershell
+corepack pnpm install
+Copy-Item apps/api/.env.example apps/api/.env
+Copy-Item apps/web/.env.example apps/web/.env
+```
+
+최소한 `apps/api/.env`에서 아래 값을 수정합니다.
+
+```text
+OSLAB_REPO_ROOT=C:/path/to/oslab
+OSLAB_WEB_ADMIN_USERNAME=admin
+OSLAB_WEB_ADMIN_PASSWORD=change-me
+```
+
+Web app이 다른 API endpoint로 proxy해야 하면 `apps/web/.env`를 수정합니다.
+
+```text
+OSLAB_API_PROXY=http://127.0.0.1:3001
+```
+
+그 다음 API와 Web UI를 함께 실행합니다.
+
+```powershell
+corepack pnpm prisma:generate
+corepack pnpm dev
+```
+
+브라우저에서 <http://127.0.0.1:3000>을 엽니다. API와 Web을 분리해서 보고 싶을 때는 `corepack pnpm dev:api`, `corepack pnpm dev:web`을 각각 실행합니다.
+
 ## Adoption Map
 
 팀이 `oslab`을 도입할 때 가장 먼저 잡아야 하는 것은 ownership입니다. 어떤 파일을 내가 만들고, 어떤 파일이 lab을 설명하고, 어떤 파일을 `oslab`이 생성하는지 구분해야 합니다.
