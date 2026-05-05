@@ -995,6 +995,16 @@ button.infoTooltip[aria-expanded="true"] {
   outline-offset: -2px;
 }
 
+.monacoCodeEditorShell {
+  display: block;
+}
+
+.authoringMonacoShell {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
 .lineNumberGutter {
   padding: 10px 8px 10px 6px;
   border-right: 1px solid #27323a;
@@ -1036,6 +1046,40 @@ button.infoTooltip[aria-expanded="true"] {
 .editorMode.editing {
   border-color: #6b5825;
   color: var(--amber);
+}
+
+button.editorModeReadOnly {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.02em;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+button.editorModeReadOnly:hover,
+button.editorModeReadOnly:focus-visible {
+  background: #0f181f;
+  border-color: var(--blue, #3b82f6);
+  color: var(--text, #f6f8fa);
+  outline: none;
+}
+
+.editorModeReadOnlyHint {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  opacity: 0.85;
+}
+
+button.editorModeReadOnly:hover .editorModeReadOnlyHint,
+button.editorModeReadOnly:focus-visible .editorModeReadOnlyHint {
+  color: var(--blue, #3b82f6);
+  opacity: 1;
+}
+
+button.primaryEditCta {
+  font-weight: 700;
 }
 
 .diffPreview {
@@ -1976,11 +2020,18 @@ button.infoTooltip[aria-expanded="true"] {
   padding: 7px 9px;
   font-size: 13px;
   line-height: 1.35;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .builderPanel textarea {
   min-height: 72px;
   resize: vertical;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono, ui-monospace, "Cascadia Code", Menlo, Consolas, monospace);
 }
 
 .builderPanel input:disabled,
@@ -2437,6 +2488,8 @@ button.infoTooltip[aria-expanded="true"] {
 
 .builderApplyActions {
   justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 0;
   position: sticky;
   bottom: -10px;
@@ -2449,6 +2502,51 @@ button.infoTooltip[aria-expanded="true"] {
   border-color: #2d5c78;
   color: var(--blue);
   background: #0c0f11;
+}
+
+.builderApplyButton.primary {
+  border-color: #2ea96b;
+  color: #0c0f11;
+  background: var(--green, #2ea96b);
+  font-weight: 600;
+}
+
+.builderApplyStatus {
+  font-size: 11px;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.builderApplyStatus::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.builderApplyStatus.synced {
+  color: var(--green, #2ea96b);
+}
+
+.builderApplyStatus.synced::before {
+  background: var(--green, #2ea96b);
+}
+
+.builderApplyStatus.dirty {
+  color: #d6a200;
+}
+
+.builderApplyStatus.dirty::before {
+  background: #d6a200;
+  animation: builderApplyPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes builderApplyPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 .helperText {
@@ -3338,6 +3436,19 @@ button.danger {
 
 .projectCreateGrid {
   grid-template-columns: minmax(140px, 0.8fr) minmax(120px, 0.6fr) minmax(160px, 1fr) minmax(220px, 1.6fr) auto;
+}
+
+.artifactCreateForm .createWorkspaceFormGrid {
+  grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr);
+}
+
+.artifactCreateForm .createWorkspaceFormGrid > button {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
+.artifactCreateForm .projectCreateGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .artifactStudioEditorGrid {

@@ -4,6 +4,7 @@ import { execFile } from "child_process";
 import { createHash } from "crypto";
 import { createReadStream, promises as fs } from "fs";
 import path from "path";
+import { parseDocument } from "yaml";
 import type {
   ArtifactAssistCheckResult,
   ArtifactAssistCompletionRequest,
@@ -30,8 +31,8 @@ import { PrismaService } from "../../infrastructure/prisma/prisma.service";
 import { WorkspaceService } from "../../infrastructure/workspace/workspace.service";
 import { ArtifactLanguageService } from "./artifact-language.service";
 
-const ALLOWED_UPLOAD_EXTENSIONS = new Set([".zip", ".exe", ".msi", ".ps1", ".sh", ".cmd", ".bat", ".py", ".c", ".json", ".txt"]);
-const TEXT_ARTIFACT_EXTENSIONS = new Set([".ps1", ".sh", ".py", ".c", ".json", ".txt", ".cmd", ".bat"]);
+const ALLOWED_UPLOAD_EXTENSIONS = new Set([".zip", ".exe", ".msi", ".ps1", ".sh", ".cmd", ".bat", ".py", ".c", ".cs", ".json", ".yaml", ".yml", ".js", ".mjs", ".cjs", ".ts", ".html", ".htm", ".css", ".md", ".markdown", ".dockerfile", ".txt"]);
+const TEXT_ARTIFACT_EXTENSIONS = new Set([".ps1", ".sh", ".py", ".c", ".cs", ".json", ".yaml", ".yml", ".js", ".mjs", ".cjs", ".ts", ".html", ".htm", ".css", ".md", ".markdown", ".dockerfile", ".txt", ".cmd", ".bat"]);
 const MAX_UPLOAD_BYTES = 512 * 1024 * 1024;
 const MAX_DIRECTORY_FILES = 5000;
 const MAX_TREE_ITEMS = 500;
@@ -42,7 +43,15 @@ const TEMPLATE_EXTENSION_BY_KIND: Record<ArtifactTemplateKind, string> = {
   shell: ".sh",
   python: ".py",
   c: ".c",
+  csharp: ".cs",
   json: ".json",
+  yaml: ".yaml",
+  javascript: ".js",
+  typescript: ".ts",
+  html: ".html",
+  css: ".css",
+  markdown: ".md",
+  dockerfile: ".dockerfile",
   txt: ".txt",
   cmd: ".cmd",
   bat: ".bat",
@@ -251,7 +260,7 @@ export class ArtifactController {
     if (!artifactPath) {
       throw new BadRequestException("artifact path is required");
     }
-    this.assertArtifactTextPath(artifactPath, "write");
+    this.assertLanguageAssistPath(artifactPath);
     return this.languageService.complete({
       path: artifactPath,
       language: body.language,
@@ -267,7 +276,7 @@ export class ArtifactController {
     if (!artifactPath) {
       throw new BadRequestException("artifact path is required");
     }
-    this.assertArtifactTextPath(artifactPath, "write");
+    this.assertLanguageAssistPath(artifactPath);
     return this.languageService.diagnostics({
       path: artifactPath,
       language: body.language,
@@ -349,7 +358,7 @@ export class ArtifactController {
       const source = sourceForManagedArtifact(normalizedPath);
       const extension = path.extname(relativePath).toLowerCase();
       const kind = stat.isDirectory() ? "directory" : stat.isFile() ? "file" : "other";
-      const artifactType = kind === "directory" ? "directory" : TEXT_ARTIFACT_EXTENSIONS.has(extension) ? "text" : ALLOWED_UPLOAD_EXTENSIONS.has(extension) ? "binary" : "other";
+      const artifactType = kind === "directory" ? "directory" : isTextArtifactPath(normalizedPath) ? "text" : ALLOWED_UPLOAD_EXTENSIONS.has(extension) ? "binary" : "other";
       const directorySummary = stat.isDirectory() ? await summarizeDirectory(target, MAX_DIRECTORY_SUMMARY_FILES) : null;
       return {
         path: normalizedPath,
@@ -379,6 +388,10 @@ export class ArtifactController {
     if (policy.kind !== "artifactText") {
       throw new BadRequestException("Only validation/artifacts text files are available through artifact authoring");
     }
+  }
+
+  private assertLanguageAssistPath(relativePath: string) {
+    this.workspace.enforceAuthoringPolicy(relativePath, "write");
   }
 
   private resolveManagedArtifactPath(relativePath: string): string {
@@ -434,7 +447,7 @@ export class ArtifactController {
     }
     const extension = path.extname(normalizedPath).toLowerCase();
     const kind = stat.isDirectory() ? "directory" : stat.isFile() ? "file" : "other";
-    const artifactType = kind === "directory" ? "directory" : TEXT_ARTIFACT_EXTENSIONS.has(extension) ? "text" : ALLOWED_UPLOAD_EXTENSIONS.has(extension) ? "binary" : "other";
+    const artifactType = kind === "directory" ? "directory" : isTextArtifactPath(normalizedPath) ? "text" : ALLOWED_UPLOAD_EXTENSIONS.has(extension) ? "binary" : "other";
     const summary = stat.isDirectory() ? await summarizeDirectory(target, MAX_DIRECTORY_SUMMARY_FILES) : { fileCount: stat.isFile() ? 1 : 0, totalBytes: stat.isFile() ? stat.size : 0, modifiedMs: stat.mtimeMs, truncated: false };
     const archivePath = action === "archive" ? await this.nextArchivePath(normalizedPath, source) : null;
     const confirmToken = confirmTokenFor(action, normalizedPath, source, stat.mtimeMs, summary.fileCount, summary.totalBytes);
@@ -542,7 +555,7 @@ export class ArtifactController {
     const targetStat = stat || await fs.lstat(target);
     const extension = path.extname(relativePath).toLowerCase();
     const kind = targetStat.isDirectory() ? "directory" : targetStat.isFile() ? "file" : "other";
-    const artifactType = kind === "directory" ? "directory" : TEXT_ARTIFACT_EXTENSIONS.has(extension) ? "text" : ALLOWED_UPLOAD_EXTENSIONS.has(extension) ? "binary" : "other";
+    const artifactType = kind === "directory" ? "directory" : isTextArtifactPath(relativePath) ? "text" : ALLOWED_UPLOAD_EXTENSIONS.has(extension) ? "binary" : "other";
     return {
       path: relativePath,
       name: path.basename(relativePath),
@@ -624,8 +637,24 @@ function artifactTemplate(kind: ArtifactTemplateKind): string {
       return "print(\"artifact executed\")\n";
     case "c":
       return "#include <stdio.h>\n\nint main(void) {\n  puts(\"artifact executed\");\n  return 0;\n}\n";
+    case "csharp":
+      return "using System;\nusing System.Text.Json;\n\nvar result = new {\n  schemaVersion = 1,\n  kind = \"commandResult\",\n  exitCode = 0,\n  stdout = \"artifact executed\\n\",\n  stderr = \"\"\n};\n\nConsole.WriteLine(JsonSerializer.Serialize(result));\n";
     case "json":
       return "{\n  \"schemaVersion\": 1,\n  \"kind\": \"artifact\"\n}\n";
+    case "yaml":
+      return "schemaVersion: 1\nkind: artifact\nmetadata:\n  generatedBy: Artifact Studio\n";
+    case "javascript":
+      return "const result = {\n  schemaVersion: 1,\n  kind: \"commandResult\",\n  exitCode: 0,\n  stdout: \"artifact executed\\n\",\n  stderr: \"\",\n};\nconsole.log(JSON.stringify(result, null, 2));\n";
+    case "typescript":
+      return "type CommandResult = {\n  schemaVersion: number;\n  kind: \"commandResult\";\n  exitCode: number;\n  stdout: string;\n  stderr: string;\n};\n\nconst result: CommandResult = {\n  schemaVersion: 1,\n  kind: \"commandResult\",\n  exitCode: 0,\n  stdout: \"artifact executed\\n\",\n  stderr: \"\",\n};\nconsole.log(JSON.stringify(result, null, 2));\n";
+    case "html":
+      return "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <title>OSLAB Artifact</title>\n  </head>\n  <body>\n    <main>artifact executed</main>\n  </body>\n</html>\n";
+    case "css":
+      return ":root {\n  color-scheme: light dark;\n}\n\nbody {\n  font-family: system-ui, sans-serif;\n}\n";
+    case "markdown":
+      return "# Artifact Notes\n\nDescribe what this artifact proves and how Results should inspect it.\n";
+    case "dockerfile":
+      return "FROM alpine:3.20\nWORKDIR /artifact\nCMD [\"sh\", \"-c\", \"printf '%s\\\\n' artifact executed\"]\n";
     case "cmd":
       return "@echo off\necho artifact executed\n";
     case "bat":
@@ -742,12 +771,21 @@ function entrypointForProject(shell: string): { filename: string; content: (name
 
 function languageForArtifactPath(artifactPath: string): ArtifactLanguageKind {
   const extension = path.extname(artifactPath).toLowerCase();
+  const basename = path.basename(artifactPath).toLowerCase();
   if (extension === ".ps1") return "powershell";
   if (extension === ".sh") return "shell";
   if (extension === ".py") return "python";
   if (extension === ".json") return "json";
+  if (extension === ".yaml" || extension === ".yml") return "yaml";
+  if (extension === ".js" || extension === ".mjs" || extension === ".cjs") return "javascript";
+  if (extension === ".ts") return "typescript";
+  if (extension === ".html" || extension === ".htm") return "html";
+  if (extension === ".css") return "css";
+  if (extension === ".md" || extension === ".markdown") return "markdown";
+  if (extension === ".dockerfile" || basename === "dockerfile") return "dockerfile";
   if (extension === ".cmd" || extension === ".bat") return "bat";
   if (extension === ".c") return "c";
+  if (extension === ".cs") return "csharp";
   return "plaintext";
 }
 
@@ -758,6 +796,12 @@ function inspectArtifactContent(artifactPath: string, content: string, language:
       JSON.parse(content || "{}");
     } catch (error: any) {
       issues.push({ severity: "error", code: "json.parse", message: `JSON parse error: ${String(error.message ?? error)}` });
+    }
+  }
+  if (language === "yaml") {
+    const parsed = parseDocument(content || "");
+    if (parsed.errors.length) {
+      issues.push({ severity: "error", code: "yaml.parse", message: `YAML parse error: ${parsed.errors[0]?.message || "Invalid YAML"}` });
     }
   }
   const placeholderMatches = content.match(/\{\{[^}]+\}\}/g) || [];
@@ -777,7 +821,7 @@ function inspectArtifactContent(artifactPath: string, content: string, language:
   if (/^[A-Za-z]:\\Users\\/im.test(content) || /\/home\/[^/\s]+/i.test(content)) {
     issues.push({ severity: "warning", code: "local.absolute.path", message: "Local user-specific absolute paths may not exist inside the VM." });
   }
-  if (["powershell", "shell", "python", "bat"].includes(language) && !/(OutputPath|command-result|ConvertTo-Json|json|Set-Content|echo|print)/i.test(content)) {
+  if (["powershell", "shell", "python", "javascript", "typescript", "csharp", "bat"].includes(language) && !/(OutputPath|command-result|ConvertTo-Json|JsonSerializer|json|Set-Content|echo|print|Console\.WriteLine|console\.log)/i.test(content)) {
     issues.push({ severity: "info", code: "output.contract", message: "Consider writing a machine-readable output file so assertions can inspect the result." });
   }
   if (!content.trim()) {
@@ -831,6 +875,29 @@ function artifactLintRules(language: ArtifactLanguageKind): Array<{ pattern: Reg
       { pattern: /\bgets\s*\(/i, severity: "warning", code: "c.gets", message: "gets is unsafe. Use fgets with an explicit buffer size." },
       { pattern: /\bstrcpy\s*\(/i, severity: "info", code: "c.strcpy", message: "strcpy can overflow buffers. Prefer bounded copy patterns." },
       { pattern: /\bsystem\s*\(/i, severity: "warning", code: "c.system", message: "system() hides quoting and exit detail. Prefer explicit process setup in the scenario command." },
+      ...common,
+    ];
+  }
+  if (language === "csharp") {
+    return [
+      { pattern: /\bProcess\.Start\s*\(/i, severity: "warning", code: "csharp.process-start", message: "Process.Start can hide quoting and exit handling. Prefer explicit ProcessStartInfo with redirected output." },
+      { pattern: /\bEnvironment\.GetEnvironmentVariable\s*\([^\n)]*(TOKEN|SECRET|PASSWORD|KEY)/i, severity: "info", code: "csharp.env-secret", message: "Secret-like env reads should stay documented and redacted in run logs." },
+      { pattern: /\bFile\.Delete\s*\(/i, severity: "warning", code: "csharp.file-delete", message: "File.Delete should be scoped to disposable VM state or {{OutputPath}}-adjacent files." },
+      ...common,
+    ];
+  }
+  if (language === "javascript" || language === "typescript") {
+    return [
+      { pattern: /\beval\s*\(/i, severity: "warning", code: "js.eval", message: "eval is hard to audit in validation artifacts. Prefer explicit parsing." },
+      { pattern: /\bchild_process\.(exec|execSync)\s*\(/i, severity: "warning", code: "js.child-process-exec", message: "child_process.exec uses a shell. Prefer spawn/execFile with argument arrays." },
+      { pattern: /\bprocess\.env\.[A-Z0-9_]*(TOKEN|SECRET|PASSWORD|KEY)/i, severity: "info", code: "js.env-secret", message: "Secret-like env reads should stay documented and redacted in run logs." },
+      ...common,
+    ];
+  }
+  if (language === "dockerfile") {
+    return [
+      { pattern: /^\s*ADD\s+https?:\/\//im, severity: "warning", code: "dockerfile.remote-add", message: "Remote ADD hides download policy. Prefer explicit curl with checksum or vendored assets." },
+      { pattern: /^\s*USER\s+root\s*$/im, severity: "info", code: "dockerfile.root-user", message: "Root container user is sometimes necessary, but call it out in artifact notes." },
       ...common,
     ];
   }
@@ -947,6 +1014,12 @@ function artifactAssistSnippets(language: ArtifactLanguageKind) {
       ...common,
     ];
   }
+  if (language === "csharp") {
+    return [
+      { id: "csharp-command-result", label: "C# commandResult writer", detail: "Serialize a commandResult object to stdout.", language, insertText: "using System;\nusing System.Text.Json;\n\nvar result = new {\n  schemaVersion = 1,\n  kind = \"commandResult\",\n  exitCode = 0,\n  stdout = \"artifact executed\\n\",\n  stderr = \"\"\n};\n\nConsole.WriteLine(JsonSerializer.Serialize(result));\n" },
+      ...common,
+    ];
+  }
   return common;
 }
 
@@ -971,6 +1044,9 @@ function firstRunTipsForLanguage(language: ArtifactLanguageKind): string[] {
   if (language === "c") {
     return ["Compile the C program as part of the artifact workflow or include a compiled binary separately.", ...common];
   }
+  if (language === "csharp") {
+    return ["Use System.Text.Json for machine-readable commandResult output.", "Run it with a prepared dotnet SDK/runtime in the VM or include a publish/build step.", ...common];
+  }
   if (language === "json") {
     return ["Keep JSON valid; comments are not allowed.", "Use this for expected output or configuration metadata.", ...common];
   }
@@ -978,7 +1054,7 @@ function firstRunTipsForLanguage(language: ArtifactLanguageKind): string[] {
 }
 
 function normalizeArtifactLanguageKind(language?: string): ArtifactLanguageKind {
-  if (language === "powershell" || language === "shell" || language === "python" || language === "json" || language === "bat" || language === "c" || language === "plaintext") {
+  if (language === "powershell" || language === "shell" || language === "python" || language === "json" || language === "yaml" || language === "javascript" || language === "typescript" || language === "html" || language === "css" || language === "markdown" || language === "dockerfile" || language === "bat" || language === "c" || language === "csharp" || language === "plaintext") {
     return language;
   }
   throw new BadRequestException("Unsupported artifact language tool");
@@ -1137,6 +1213,10 @@ function sourceForManagedArtifact(relativePath: string): ManagedArtifactSource {
   if (relativePath.startsWith(".web-artifacts/") || relativePath === ".web-artifacts") return "uploaded";
   if (relativePath.startsWith(`${ARCHIVE_ROOT}/`) || relativePath === ARCHIVE_ROOT) return "archive";
   return "repo";
+}
+
+function isTextArtifactPath(relativePath: string): boolean {
+  return TEXT_ARTIFACT_EXTENSIONS.has(path.extname(relativePath).toLowerCase()) || path.basename(relativePath).toLowerCase() === "dockerfile";
 }
 
 function isInsidePath(parent: string, child: string): boolean {

@@ -69,10 +69,10 @@ export type ManagedArtifactSource = "repo" | "uploaded" | "archive";
 export type ManagedArtifactKind = "file" | "directory" | "other";
 export type ManagedArtifactType = "text" | "binary" | "directory" | "other";
 export type ArtifactManageAction = "archive" | "delete";
-export type ArtifactTemplateKind = "powershell" | "shell" | "python" | "c" | "json" | "txt" | "cmd" | "bat";
+export type ArtifactTemplateKind = "powershell" | "shell" | "python" | "c" | "csharp" | "json" | "yaml" | "javascript" | "typescript" | "html" | "css" | "markdown" | "dockerfile" | "txt" | "cmd" | "bat";
 export type ArtifactProjectTemplateKind = "script-project" | "inventory-agent" | "install-profile";
 export type ArtifactStudioMode = "browse" | "create" | "edit";
-export type ArtifactLanguageKind = "powershell" | "shell" | "python" | "json" | "bat" | "c" | "plaintext";
+export type ArtifactLanguageKind = "powershell" | "shell" | "python" | "json" | "yaml" | "javascript" | "typescript" | "html" | "css" | "markdown" | "dockerfile" | "bat" | "c" | "csharp" | "plaintext";
 export type ArtifactLanguageToolState = "available" | "partial" | "missing" | "unsupported" | "error";
 export type ArtifactLanguageToolMode = "lsp" | "internal" | "setupNeeded" | "unavailable";
 export type ArtifactAssistCompletionSource = "lsp" | "internal" | "snippet";
@@ -125,6 +125,8 @@ export interface ArtifactAssistIssue {
   message: string;
   line?: number | null;
   column?: number | null;
+  endLine?: number | null;
+  endColumn?: number | null;
 }
 
 export interface ArtifactAssistSnippet {

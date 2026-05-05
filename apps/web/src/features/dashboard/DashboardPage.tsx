@@ -491,6 +491,17 @@ export function DashboardPage() {
     return () => window.clearTimeout(timer);
   }, [editors.scenarios.content, editors.scenarios.isEditing, editors.scenarios.selectedPath, syntaxChecking.scenarios, syntaxChecks.scenarios?.ok]);
 
+  // Auto-apply scenario builder changes to YAML on debounce when in edit mode.
+  useEffect(() => {
+    if (!editors.scenarios.isEditing) return;
+    if (!scenarioBuilder) return;
+    const next = stableStringify(scenarioBuilder);
+    if (!scenarioBuilderBaseline) return;
+    if (next === scenarioBuilderBaseline) return;
+    const timer = window.setTimeout(() => { void applyScenarioBuilder(); }, 600);
+    return () => window.clearTimeout(timer);
+  }, [scenarioBuilder, scenarioBuilderBaseline, editors.scenarios.isEditing]);
+
   useEffect(() => {
     const editor = editors.suites;
     if (!editor.selectedPath || !editor.content.trim()) {
@@ -903,6 +914,7 @@ export function DashboardPage() {
           content: payload.content,
         },
       }));
+      setScenarioBuilderBaseline(stableStringify(scenarioBuilder));
     } catch (error: any) {
       setNotice(error.message || String(error));
     }
@@ -1248,7 +1260,7 @@ export function DashboardPage() {
       body: JSON.stringify(login),
     });
     if (!response.ok) {
-      setNotice("Login failed");
+      setNotice(t.loginFailed);
       return;
     }
     setNotice("");
@@ -1353,8 +1365,17 @@ export function DashboardPage() {
 
   async function validatePath(kind: "scenario" | "suite", path: string) {
     try {
-      const response = await apiPost(`/api/validate/${kind}`, { path });
-      setNotice(response.ok ? `Valid ${kind}: ${path}` : JSON.stringify(response, null, 2));
+      const response = await apiPost<{ ok: boolean; errors?: string[] }>(`/api/validate/${kind}`, { path });
+      const kindLabel = kind === "scenario" ? t.validateScenarioLabel : t.validateSuiteLabel;
+      if (response.ok) {
+        setNotice(`${t.validateOkPrefix} ${kindLabel}: ${path}`);
+      } else {
+        const issues = Array.isArray(response.errors) && response.errors.length > 0
+          ? response.errors.slice(0, 3).join(" / ")
+          : "";
+        const base = `${t.validateFailedPrefix} ${kindLabel}${t.validateFailedSuffix}`;
+        setNotice(issues ? `${base} ${issues}` : base);
+      }
     } catch (error: any) {
       setNotice(error.message || String(error));
     }
@@ -1528,7 +1549,7 @@ export function DashboardPage() {
               syntaxChecking={syntaxChecking.scenarios}
               builderLayout="vertical"
               builderCollapsed={!scenarioBuilderExpanded}
-              builder={<ScenarioBuilderPanel t={t} model={scenarioBuilder} error={scenarioBuilderError} editable={editors.scenarios.isEditing} onChange={setScenarioBuilder} onApply={applyScenarioBuilder} expanded={scenarioBuilderExpanded} onExpandedChange={setScenarioBuilderExpanded} />}
+              builder={<ScenarioBuilderPanel t={t} model={scenarioBuilder} error={scenarioBuilderError} editable={editors.scenarios.isEditing} onChange={setScenarioBuilder} onApply={applyScenarioBuilder} dirty={scenarioBuilder !== null && stableStringify(scenarioBuilder) !== scenarioBuilderBaseline && scenarioBuilderBaseline !== ""} expanded={scenarioBuilderExpanded} onExpandedChange={setScenarioBuilderExpanded} />}
             />
             <ScenarioCreateDialog
               t={t}

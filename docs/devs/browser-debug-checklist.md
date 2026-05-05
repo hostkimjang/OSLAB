@@ -90,14 +90,27 @@
 - [x] Monaco suggest/hover/warning popup은 editor box 밖으로 나가도 잘리지 않음
 - [x] Script Assist `검사` 탭이 JSON 오류, placeholder 오타, output contract 힌트, 파괴적 명령 warning을 표시함
 - [x] Script Assist 언어 도구 상태가 PowerShell/shell/Python/JSON/CMD/BAT/C/txt에 맞게 표시되고, Python/shell/JSON은 repo-bundled LSP, PowerShell/C는 project-local LSP cache 준비 상태, BAT/txt는 internal provider로 구분됨
+- [x] Script Assist 언어 도구 상태가 YAML/JavaScript/TypeScript/HTML/CSS/Markdown/Dockerfile까지 repo-managed npm LSP로 표시됨 (2026-05-04 API smoke)
+- [x] Artifact Studio에서 YAML/JS/TS/HTML/CSS/Markdown/Dockerfile 텍스트 artifact template 생성과 Monaco language mode 매핑이 지원됨 (2026-05-04)
+- [x] YAML artifact는 `docs/schemas/artifact-yaml.schema.json` 기반 schema completion과 `yaml.parse` diagnostics가 동작함 (2026-05-04 API smoke)
+- [x] C# `.cs` artifact template, backend language mapping, `Console.WriteLine`/`JsonSerializer.Serialize` fallback completion, `dotnet`/`csharp-ls` tool status가 API/unit smoke에서 확인됨 (2026-05-04)
+- [x] Artifact Studio 실제 브라우저 화면에서 C# template 생성, Monaco `csharp` mode, `Con` -> `Console.WriteLine` suggestion popup 확인 (2026-05-04 FHD smoke)
 - [x] Script Assist `AI 도움` 탭은 실제 호출 없이 placeholder/extension point로 표시됨
 - [ ] Scenario builder의 `id`, `name`, `OS family`, `guest mode`, VMID, artifact, output, cleanup tooltip이 사용자 친화 설명으로 표시됨
-- [ ] `OS family`, `guest mode`, `artifact type`, `artifact transfer`는 text input이 아니라 select로 표시됨
-- [ ] report format과 guest 접속 우선순서는 chip toggle로 표시되고 YAML에 적용됨
+- [x] `OS family`, `guest mode`, `artifact type`, `artifact transfer`는 text input이 아니라 select로 표시됨 (2026-05-04 확인)
+- [x] report format과 guest 접속 우선순서는 chip toggle로 표시되고 YAML에 적용됨 (2026-05-04 확인)
+- [x] Assertion `type` 필드가 자유 입력이 아니라 알려진 type select로 제공되고, 알 수 없는 값은 `(custom)` 옵션으로 보존됨 (2026-05-04)
+- [x] Assertion type 변경 시 빈/기본 body JSON에 한해 자동으로 해당 type의 starter template으로 채워짐 (2026-05-04)
 - [ ] Fixture/Product step/Assertion 섹션이 열리고 추가/삭제/편집 후 YAML round-trip이 동작함
 - [ ] scenario 저장 전 YAML 문법뿐 아니라 scenario contract 검증 실패도 저장을 차단함
 - [ ] Suite visual builder는 실행 순서 리스트처럼 보이며 각 run row가 한 줄 compact 편집으로 표시됨
 - [ ] invalid YAML/PowerShell은 line/column issue를 inline으로 표시하고 `저장` 버튼 비활성화
+- [x] 시나리오 빌더 step 4 `template` 텍스트 영역이 가로 overflow 없이 줄바꿈하고 monospace로 표시됨 (2026-05-04)
+- [x] 빌더 모델을 편집하면 600ms 디바운스로 YAML이 자동 동기화되고 `YAML과 동기화됨` / `변경 사항 적용 대기 중` 상태 배지가 표시됨 (2026-05-04)
+- [x] 적용 대기 상태에서는 `YAML에 적용` 버튼이 primary 색상으로 강조됨 (2026-05-04)
+- [x] 시나리오/실행 묶음 검증 결과 배너가 한국어로 표시됨 (`유효 시나리오: ...` / `검증 실패 ...`) (2026-05-04)
+- [x] 로그인 실패 메시지가 한국어로 표시됨 (`로그인 실패. 사용자 이름과 비밀번호를 확인하세요.`) (2026-05-04)
+- [x] 읽기 전용 배지가 클릭 가능한 button으로 동작하여 클릭 시 수정 모드로 진입함, hover/focus 시 `→ 수정` 힌트 표시 (2026-05-04)
 - [ ] `취소` -> 읽기 전용 복귀
 - [ ] 저장하지 않은 변경 discard confirm
 
@@ -261,6 +274,59 @@
   - Smoke report: `output/web-dashboard/artifact-studio-visible-browser-smoke.json`
   - Screenshots: `output/web-dashboard/artifact-studio-visible-fhd-open.png`, `output/web-dashboard/artifact-studio-visible-python-print.png`, `output/web-dashboard/artifact-studio-visible-python-range.png`, `output/web-dashboard/artifact-studio-visible-autocomplete-guide.png`
   - Residual note: the visible smoke recorded two generic 404 console resource messages; no user-visible Artifact Studio workflow blocker was reproduced.
+
+### 2026-05-04 Artifact Studio npm LSP language pack expansion
+
+- [x] Repo-managed npm LSP pack 확장
+  - Added API dependencies: `yaml-language-server`, `typescript-language-server`, `dockerfile-language-server-nodejs`
+  - Connected existing repo-managed `vscode-html-language-server`, `vscode-css-language-server`, and `vscode-markdown-language-server`
+  - Artifact text authoring now allows `.yaml/.yml`, `.js/.mjs/.cjs`, `.ts`, `.html/.htm`, `.css`, `.md/.markdown`, `.dockerfile`, and `Dockerfile` under `validation/artifacts/**`
+  - Added `docs/schemas/artifact-yaml.schema.json` and associated it with YAML artifacts through the YAML language server configuration
+  - Raised backend LSP completion item handling to 200 and frontend completion merge to 250 to avoid VSCode-style suggestions being cut too aggressively
+- [x] Open language service smoke
+  - `output/web-dashboard/artifact-studio-language-pack-smoke.json`
+  - Tool status: YAML, JavaScript, TypeScript, HTML, CSS, Markdown, Dockerfile all reported `available/lsp`
+  - Completion smoke: YAML `schemaVersion`, JS/TS `console.log`, HTML `<!doctype html>`, CSS `color`, Markdown `code fence`, Dockerfile `FROM`
+  - Diagnostics smoke: invalid YAML returned `yaml.parse`
+  - Verification commands: `corepack pnpm --filter @oslab/api lint`, `corepack pnpm --filter @oslab/web lint`, `corepack pnpm --filter @oslab/api build`, `corepack pnpm --filter @oslab/api test`
+- [x] Visible FHD browser smoke
+  - Visible Chromium window at `1920x1080` opened against `http://127.0.0.1:3000`
+  - Dashboard login, Artifact Studio nav, TypeScript template create workspace, repo-managed TypeScript LSP tool card, Monaco edit mode, and `con` -> `console` / `console.log` suggestion popup confirmed
+  - Smoke report: `output/web-dashboard/artifact-studio-language-pack-visible-smoke.json`
+  - Screenshots: `output/web-dashboard/artifact-studio-language-pack-visible-create.png`, `output/web-dashboard/artifact-studio-language-pack-visible-typescript-completion.png`
+  - Generated verification artifact: `validation/artifacts/web-language-pack-visible-1777868256113.ts`
+  - Cleanup note: generated artifact deletion was skipped because local deletion requires explicit confirmation.
+- [x] Scenario/Suite authoring Monaco + YAML assist expansion
+  - Scenario/Suite YAML and fixture PowerShell/Shell authoring paths can call the same LSP-shaped assist completion/diagnostics surface without opening write/delete access outside authoring roots.
+  - Added YAML schema files: `docs/schemas/scenario-yaml.schema.json`, `docs/schemas/suite-yaml.schema.json`
+  - API smoke: `output/web-dashboard/authoring-yaml-lsp-smoke.json`
+    - Scenario YAML `sche` -> `schemaVersion`
+    - Suite YAML `runs: - scen` -> `scenario`
+    - Fixture PowerShell `Write-Ou` -> `Write-Output`
+    - Invalid scenario YAML returns `yaml.parse`
+    - Scenario schema diagnostics are sourced from `OSLAB Scenario YAML` (`schemaVersion: 2` -> `Value must be 1`, `os.family: plan9` -> accepted values `windows`/`linux`)
+  - Visible Chromium FHD smoke: `output/web-dashboard/authoring-yaml-monaco-visible-smoke.json`
+  - Screenshots: `output/web-dashboard/authoring-yaml-monaco-visible-open.png`, `output/web-dashboard/authoring-yaml-monaco-visible-completion.png`
+  - Confirmation: existing scenario opened in edit mode without saving; Monaco was visible and Ctrl+Space showed `schemaVersion`; console/page errors `0`.
+  - Visible diagnostics smoke: `output/web-dashboard/authoring-yaml-monaco-visible-diagnostics-smoke.json`
+  - Screenshot: `output/web-dashboard/authoring-yaml-monaco-visible-diagnostics.png`
+  - Confirmation: existing scenario opened in edit mode without saving; invalid YAML produced Monaco squiggle markers (`markerCount=3`), console/page errors `0`.
+  - Schema diagnostics smoke: `output/web-dashboard/authoring-yaml-monaco-visible-schema-diagnostics-smoke.json`
+  - Screenshot: `output/web-dashboard/authoring-yaml-monaco-visible-schema-diagnostics.png`
+  - Confirmation: exact inserted YAML included `schemaVersion: 2`, `os.family: plan9`, and `assertions: []`; Monaco showed schema markers (`markerCount=3`), console/page errors `0`.
+  - Dev server note: port `3000` hit a stale `.next` chunk 500 after build/dev mixing (`Cannot find module './691.js'`), so the diagnostics smoke used a fresh dev server at `http://127.0.0.1:3002` without deleting `.next`.
+  - Browser Use note: `@브라우저` could not attach in this session because `node_repl` resolves system Node `v22.14.0`; it needs `NODE_REPL_NODE_PATH` set to the bundled Node `v24.14.0` before a Codex/MCP restart.
+- [x] C# Artifact Studio visible usability smoke
+  - Login used the local dashboard credentials explicitly provided by the user in chat.
+  - Fresh dev server started at `http://127.0.0.1:3003` after port `3002` hit stale Monaco chunk `ChunkLoadError` following build/dev mixing.
+  - C# template create form showed `csharp.cs`, `validation/artifacts/web-csharp-20260504071123.cs`, C# language tool status, missing `csharp-ls`, and available `.NET SDK 10.0.102`.
+  - Created verification artifact: `validation/artifacts/web-csharp-20260504071123.cs`.
+  - Selected the created `.cs` artifact, entered edit mode, typed `Con` without saving, and confirmed Monaco suggest popup showed `Console.WriteLine`.
+  - Smoke report: `output/web-dashboard/usability-csharp-browser-smoke.json`.
+  - Screenshots: `output/web-dashboard/usability-csharp-create-form-fhd.png`, `output/web-dashboard/usability-csharp-selected-loaded-fhd.png`, `output/web-dashboard/usability-csharp-completion-con-fhd.png`.
+  - Fresh `3003` console error check: `output/web-dashboard/usability-3003-console-errors.txt`, errors `0`.
+  - 1280px create-form 압축 회귀는 CSS 수정 후 production `3005`에서 재검증 완료: `output/web-dashboard/usability-artifact-create-panel-1280-fixed-reload.png`, final build reload `output/web-dashboard/usability-artifact-create-panel-1280-final-build.png`, visible/runtime errors `0`, horizontal overflow `false`.
+  - FHD/QHD follow-up screenshots: `output/web-dashboard/usability-artifact-create-panel-fhd-fixed.png`, `output/web-dashboard/usability-artifact-create-panel-qhd-fixed.png`.
 
 ### 2026-04-29
 

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oslab.local/schemas/suite-yaml.schema.json",
+  "title": "OSLAB Suite YAML",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": {
+      "const": 1,
+      "description": "Suite document schema version."
+    },
+    "id": {
+      "type": "string",
+      "description": "Stable suite id."
+    },
+    "name": {
+      "type": "string"
+    },
+    "maxParallel": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "scenario": {
+            "type": "string",
+            "description": "Repository-relative scenario path under scenarios/**."
+          },
+          "tier": {
+            "type": "string"
+          },
+          "allowFailure": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["id", "scenario"]
+      }
+    }
+  },
+  "required": ["schemaVersion", "id", "runs"]
+}

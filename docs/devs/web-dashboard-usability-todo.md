@@ -156,6 +156,43 @@
   - Visible FHD QA: 사용자 화면에 뜬 Chrome에서 Artifact Studio 진입, Python artifact 편집, `print/range` completion popup, 자동완성 안내 탭 확인
   - Open LSP smoke: `output/web-dashboard/artifact-studio-lsp-open-service-smoke.json` (`pyright`는 `print/range` source `lsp`, JSON LS는 `$schema` source `lsp`, shell command는 fallback dataset)
   - Screenshots: `output/web-dashboard/artifact-studio-python-lsp-print.png`, `output/web-dashboard/artifact-studio-python-lsp-range.png`, `output/web-dashboard/artifact-studio-python-typing-stability.png`, `output/web-dashboard/artifact-studio-visible-python-print.png`, `output/web-dashboard/artifact-studio-visible-python-range.png`
+- [x] Artifact Studio npm LSP language pack 확장
+  - API dependency: `yaml-language-server`, `typescript-language-server`, `dockerfile-language-server-nodejs` 추가
+  - 기존 `vscode-langservers-extracted`의 HTML/CSS/Markdown 서버를 Artifact Assist LSP bridge에 연결
+  - Safe text artifact authoring allowlist에 YAML, JS/TS, HTML, CSS, Markdown, Dockerfile 확장자 추가
+  - YAML artifact completion은 `docs/schemas/artifact-yaml.schema.json`을 `validation/artifacts/**/*.yaml`/`.yml`에 연결
+  - Backend LSP item cap은 200, frontend merge cap은 250으로 맞춰 VSCode보다 훨씬 적게 잘리던 completion 문제 완화
+  - API smoke: `output/web-dashboard/artifact-studio-language-pack-smoke.json`
+  - 확인: YAML/JS/TS/HTML/CSS/Markdown/Dockerfile tool status `available/lsp`, YAML schema completion, CSS/HTML/JS/TS/Dockerfile LSP 후보, YAML parse diagnostics
+  - Visible FHD QA: 사용자 화면에 뜬 Chromium에서 TypeScript artifact create workspace의 language tool card와 Monaco `con` -> `console`/`console.log` suggestion popup 확인
+  - Visible QA 산출물: `output/web-dashboard/artifact-studio-language-pack-visible-smoke.json`, `output/web-dashboard/artifact-studio-language-pack-visible-create.png`, `output/web-dashboard/artifact-studio-language-pack-visible-typescript-completion.png`
+  - 검증 중 생성된 artifact: `validation/artifacts/web-language-pack-visible-1777868256113.ts` (로컬 삭제는 명시 확인이 필요해 남겨둠)
+- [x] Artifact Studio C# 옵션 언어 지원
+  - Safe text artifact authoring allowlist와 template 목록에 `.cs`/`csharp` 추가
+  - API language tool status는 `dotnet`과 `csharp-ls`를 확인하고, `csharp-ls`가 있으면 LSP로 전환하며 없으면 setupNeeded + 내부 provider로 유지
+  - Internal fallback: `Console.WriteLine`, `using System.Text.Json`, `JsonSerializer.Serialize`, `commandResult object` snippets
+  - Static lint: C# `Process.Start`, secret-like `Environment.GetEnvironmentVariable`, `File.Delete` warning
+  - API/unit 검증 대상: C# template 생성, `Con` -> `Console.WriteLine` completion, `.cs` authoring allowlist, `language-tools` C# status
+  - Smoke 산출물: `output/web-dashboard/artifact-studio-csharp-language-smoke.json` (`Console.WriteLine`, `JsonSerializer.Serialize`, `csharp.process-start`, `dotnet` available, `csharp-ls` setupNeeded)
+  - Visible browser smoke: `output/web-dashboard/usability-csharp-browser-smoke.json`, `output/web-dashboard/usability-csharp-completion-con-fhd.png`
+- [x] Artifact Studio create form 1280px layout 압축 수정
+  - 1280x720에서 `저장 경로` label/input이 극단적으로 좁아져 세로 글자처럼 표시됨
+  - 재현 화면: `output/web-dashboard/usability-artifact-create-panel.png`
+  - FHD에서는 정상: `output/web-dashboard/usability-csharp-create-form-fhd.png`
+  - 수정: `.artifactCreateForm .createWorkspaceFormGrid`와 내부 project grid 폭을 조정해 1280px에서 label/input 세로 압축을 해소
+  - Production `3005` 재로드 검증: `output/web-dashboard/usability-artifact-create-panel-1280-fixed-reload.png`, final build reload `output/web-dashboard/usability-artifact-create-panel-1280-final-build.png`, visible/runtime errors `0`, horizontal overflow `false`
+  - FHD/QHD 재검증: `output/web-dashboard/usability-artifact-create-panel-fhd-fixed.png`, `output/web-dashboard/usability-artifact-create-panel-qhd-fixed.png`
+- [x] Scenario/Suite authoring Monaco + YAML LSP 확장
+  - Scenario/Suite YAML과 fixture PowerShell/Shell authoring path가 Artifact Assist LSP-shaped completion/diagnostics endpoint를 재사용
+  - Scenario/Suite 편집 surface는 YAML/PowerShell/Shell 파일에서 textarea 대신 Monaco를 사용하고, 기존 diff/save flow는 유지
+  - 추가 schema: `docs/schemas/scenario-yaml.schema.json`, `docs/schemas/suite-yaml.schema.json`
+  - API smoke: `output/web-dashboard/authoring-yaml-lsp-smoke.json` (`schemaVersion`, suite `scenario`, fixture `Write-Output`, invalid YAML diagnostics)
+  - LSP diagnostics: Scenario schema diagnostics now come from `OSLAB Scenario YAML`, including `schemaVersion: 2` and invalid `os.family` values
+  - Visible FHD QA: `output/web-dashboard/authoring-yaml-monaco-visible-smoke.json`, `output/web-dashboard/authoring-yaml-monaco-visible-open.png`, `output/web-dashboard/authoring-yaml-monaco-visible-completion.png`
+  - Visible diagnostics QA: `output/web-dashboard/authoring-yaml-monaco-visible-diagnostics-smoke.json`, `output/web-dashboard/authoring-yaml-monaco-visible-diagnostics.png`
+  - Visible schema diagnostics QA: `output/web-dashboard/authoring-yaml-monaco-visible-schema-diagnostics-smoke.json`, `output/web-dashboard/authoring-yaml-monaco-visible-schema-diagnostics.png`
+  - 검증 메모: `3000` dev server는 build/dev cache 혼선으로 stale `.next` chunk 500이 나서, `.next` 삭제 없이 `3002` fresh dev server에서 diagnostics smoke 진행
+  - 남음: Scenario/Suite schema를 runtime contract 전체로 더 깊게 확장하고, `@브라우저`는 Node REPL runtime 경로 설정 후 재검증
 - [x] 접근성 계약 1차 보강
   - focus ring
   - nav landmark

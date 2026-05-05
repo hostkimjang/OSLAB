@@ -30,14 +30,22 @@ type ArtifactTypeFilter = "all" | "text" | "binary" | "directory";
 type ArtifactCreateMode = "file" | "project" | "inventory";
 type AssistTab = "help" | "complete" | "check" | "contract" | "ai";
 
-const TEMPLATE_KINDS: ArtifactTemplateKind[] = ["powershell", "shell", "python", "c", "json", "txt", "cmd", "bat"];
+const TEMPLATE_KINDS: ArtifactTemplateKind[] = ["powershell", "shell", "python", "c", "csharp", "json", "yaml", "javascript", "typescript", "html", "css", "markdown", "dockerfile", "txt", "cmd", "bat"];
 const PROJECT_SHELLS = ["powershell", "shell", "python", "cmd", "bat"] as const;
 const TEMPLATE_EXTENSIONS: Record<ArtifactTemplateKind, string> = {
   powershell: ".ps1",
   shell: ".sh",
   python: ".py",
   c: ".c",
+  csharp: ".cs",
   json: ".json",
+  yaml: ".yaml",
+  javascript: ".js",
+  typescript: ".ts",
+  html: ".html",
+  css: ".css",
+  markdown: ".md",
+  dockerfile: ".dockerfile",
   txt: ".txt",
   cmd: ".cmd",
   bat: ".bat",
@@ -1331,7 +1339,15 @@ function monacoLanguageForPath(pathValue: string): ArtifactLanguageKind {
   if (lower.endsWith(".sh")) return "shell";
   if (lower.endsWith(".py")) return "python";
   if (lower.endsWith(".json")) return "json";
+  if (lower.endsWith(".yaml") || lower.endsWith(".yml")) return "yaml";
+  if (lower.endsWith(".js") || lower.endsWith(".mjs") || lower.endsWith(".cjs")) return "javascript";
+  if (lower.endsWith(".ts")) return "typescript";
+  if (lower.endsWith(".html") || lower.endsWith(".htm")) return "html";
+  if (lower.endsWith(".css")) return "css";
+  if (lower.endsWith(".md") || lower.endsWith(".markdown")) return "markdown";
+  if (lower.endsWith(".dockerfile") || lower.endsWith("/dockerfile")) return "dockerfile";
   if (lower.endsWith(".c")) return "c";
+  if (lower.endsWith(".cs")) return "csharp";
   if (lower.endsWith(".cmd") || lower.endsWith(".bat")) return "bat";
   return "plaintext";
 }
@@ -1341,7 +1357,15 @@ function monacoLanguageForTemplate(kind: ArtifactTemplateKind): ArtifactLanguage
   if (kind === "shell") return "shell";
   if (kind === "python") return "python";
   if (kind === "json") return "json";
+  if (kind === "yaml") return "yaml";
+  if (kind === "javascript") return "javascript";
+  if (kind === "typescript") return "typescript";
+  if (kind === "html") return "html";
+  if (kind === "css") return "css";
+  if (kind === "markdown") return "markdown";
+  if (kind === "dockerfile") return "dockerfile";
   if (kind === "c") return "c";
+  if (kind === "csharp") return "csharp";
   if (kind === "cmd" || kind === "bat") return "bat";
   return "plaintext";
 }
@@ -1359,7 +1383,7 @@ function configureMonaco(monaco: any, language: ArtifactLanguageKind) {
   if ((window as any)[configuredKey]) return;
   (window as any)[configuredKey] = true;
   monaco.languages.registerCompletionItemProvider(providerLanguage, {
-    triggerCharacters: ["{", "$", ".", "%", "-", "#", "@", "p", "P", "W", "w", "r", "R", "f", "F", "j", "J", "s", "S", "m", "M", "e", "E", "i", "I", "o", "O", "c", "C", "t", "T", "g", "G"],
+    triggerCharacters: ["{", "$", ".", "%", "-", "#", "@", ":", "/", "\\", "\"", "'", "<", ">", "[", "(", "=", "p", "P", "W", "w", "r", "R", "f", "F", "j", "J", "s", "S", "m", "M", "e", "E", "i", "I", "o", "O", "c", "C", "t", "T", "g", "G"],
     provideCompletionItems: async (model: any, position: any) => {
       const word = model.getWordUntilPosition(position);
       const range = {
@@ -1427,7 +1451,7 @@ function mergeCompletionSuggestions(primary: any[], fallback: any[]) {
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
-  }).slice(0, 60);
+  }).slice(0, 250);
 }
 
 function artifactPathFromModel(model: any) {
@@ -1510,6 +1534,51 @@ function completionGuideForLanguage(language: ArtifactLanguageKind) {
       { id: "json-result", label: "commandResult object", trigger: "{, command", detail: "Results가 읽는 기본 출력 계약입니다.", example: "{ \"schemaVersion\": 1, \"kind\": \"commandResult\" }", insertText: "{\n  \"schemaVersion\": 1,\n  \"kind\": \"commandResult\",\n  \"exitCode\": 0,\n  \"stdout\": \"ok\\n\",\n  \"stderr\": \"\"\n}" },
     ];
   }
+  if (language === "yaml") {
+    return [
+      { id: "yaml-schema", label: "schemaVersion", trigger: "sche, :", detail: "OSLAB YAML schema version입니다.", example: "schemaVersion: 1", insertText: "schemaVersion: 1" },
+      { id: "yaml-kind", label: "kind", trigger: "kind", detail: "artifact/result 종류를 표시합니다.", example: "kind: commandResult", insertText: "kind: ${1:commandResult}" },
+      { id: "yaml-command-result", label: "commandResult YAML", trigger: "command, result", detail: "Results가 읽는 출력 계약 YAML입니다.", example: "schemaVersion: 1\\nkind: commandResult", insertText: "schemaVersion: 1\nkind: commandResult\nexitCode: 0\nstdout: \"ok\\n\"\nstderr: \"\"\n" },
+      { id: "yaml-artifact-path", label: "artifact path", trigger: "artifact", detail: "artifact 경로를 YAML에 기록합니다.", example: "artifact:\\n  path: validation/artifacts/demo", insertText: "artifact:\n  path: validation/artifacts/${1:demo}" },
+    ];
+  }
+  if (language === "javascript" || language === "typescript") {
+    return [
+      { id: "js-console", label: "console.log", trigger: "con, log", detail: "Node/브라우저 표준 출력입니다.", example: "console.log(\"artifact executed\")", insertText: "console.log(${1:\"artifact executed\"});" },
+      { id: "js-json", label: "JSON.stringify", trigger: "JSON, str", detail: "객체를 JSON 문자열로 바꿉니다.", example: "JSON.stringify(result, null, 2)", insertText: "JSON.stringify(${1:result}, null, 2)" },
+      { id: "js-command-result", label: "commandResult object", trigger: "result, command", detail: "Results가 읽는 출력 계약 객체입니다.", example: "const result = { schemaVersion: 1, kind: \"commandResult\" }", insertText: "const result = {\n  schemaVersion: 1,\n  kind: \"commandResult\",\n  exitCode: 0,\n  stdout: \"ok\\n\",\n  stderr: \"\",\n};" },
+      { id: "js-fs", label: "fs.writeFileSync", trigger: "fs, write", detail: "OutputPath에 UTF-8 결과 파일을 씁니다.", example: "fs.writeFileSync(path, text, \"utf8\")", insertText: "fs.writeFileSync(${1:\"{{OutputPath}}\"}, ${2:text}, \"utf8\");" },
+    ];
+  }
+  if (language === "html") {
+    return [
+      { id: "html-doc", label: "<!doctype html>", trigger: "<, html", detail: "HTML 문서 골격입니다.", example: "<!doctype html>", insertText: "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <title>${1:OSLAB Artifact}</title>\n  </head>\n  <body>\n    ${2:artifact executed}\n  </body>\n</html>" },
+      { id: "html-script", label: "<script>", trigger: "<, script", detail: "스크립트 블록입니다.", example: "<script>...</script>", insertText: "<script>\n  ${1:console.log(\"artifact executed\")}\n</script>" },
+      { id: "html-link", label: "link stylesheet", trigger: "link, css", detail: "CSS 파일을 연결합니다.", example: "<link rel=\"stylesheet\" href=\"style.css\" />", insertText: "<link rel=\"stylesheet\" href=\"${1:style.css}\" />" },
+    ];
+  }
+  if (language === "css") {
+    return [
+      { id: "css-root", label: ":root", trigger: ":, root", detail: "CSS custom property root입니다.", example: ":root { --accent: #2563eb; }", insertText: ":root {\n  ${1:--accent}: ${2:#2563eb};\n}" },
+      { id: "css-body", label: "body", trigger: "body", detail: "기본 body 스타일입니다.", example: "body { font-family: system-ui; }", insertText: "body {\n  font-family: system-ui, sans-serif;\n  margin: 0;\n}" },
+      { id: "css-media", label: "@media", trigger: "@, media", detail: "반응형 media query입니다.", example: "@media (max-width: 768px)", insertText: "@media (max-width: ${1:768px}) {\n  ${2:.target} {\n    ${3:display: block;}\n  }\n}" },
+    ];
+  }
+  if (language === "markdown") {
+    return [
+      { id: "md-heading", label: "# Heading", trigger: "#", detail: "Markdown heading입니다.", example: "# Artifact Notes", insertText: "# ${1:Artifact Notes}" },
+      { id: "md-check", label: "- [ ] checklist", trigger: "-, [", detail: "검증 체크리스트입니다.", example: "- [ ] Verify output", insertText: "- [ ] ${1:Verify artifact output}" },
+      { id: "md-code", label: "code fence", trigger: "```", detail: "코드 블록입니다.", example: "```text", insertText: "```text\n${1:artifact executed}\n```" },
+    ];
+  }
+  if (language === "dockerfile") {
+    return [
+      { id: "docker-from", label: "FROM", trigger: "F, FROM", detail: "Base image 선언입니다.", example: "FROM alpine:3.20", insertText: "FROM ${1:alpine:3.20}" },
+      { id: "docker-workdir", label: "WORKDIR", trigger: "W, work", detail: "작업 디렉터리 설정입니다.", example: "WORKDIR /artifact", insertText: "WORKDIR ${1:/artifact}" },
+      { id: "docker-run", label: "RUN", trigger: "R, run", detail: "build 단계 명령입니다.", example: "RUN apk add --no-cache bash", insertText: "RUN ${1:apk add --no-cache bash}" },
+      { id: "docker-cmd", label: "CMD", trigger: "C, cmd", detail: "기본 실행 명령입니다.", example: "CMD [\"sh\", \"-c\", \"echo ok\"]", insertText: "CMD [\"${1:sh}\", \"${2:-c}\", \"${3:printf '%s\\\\n' artifact executed}\"]" },
+    ];
+  }
   if (language === "c") {
     return [
       { id: "c-printf", label: "printf", trigger: "p, pri, printf", detail: "C formatted stdout입니다.", example: "printf(\"%s\\n\", \"artifact executed\");", insertText: "printf(\"%s\\n\", ${1:\"artifact executed\"});" },
@@ -1518,6 +1587,15 @@ function completionGuideForLanguage(language: ArtifactLanguageKind) {
       { id: "c-main", label: "int main(void)", trigger: "m, main", detail: "C 프로그램 진입점입니다.", example: "int main(void) { return 0; }", insertText: "int main(void) {\n  puts(\"artifact executed\");\n  return 0;\n}" },
       { id: "c-stdio", label: "#include <stdio.h>", trigger: "#, stdio", detail: "printf/puts에 필요한 헤더입니다.", example: "#include <stdio.h>", insertText: "#include <stdio.h>" },
       { id: "c-return", label: "return 0", trigger: "r, return", detail: "성공 exit code입니다.", example: "return 0;", insertText: "return 0;" },
+    ];
+  }
+  if (language === "csharp") {
+    return [
+      { id: "cs-console", label: "Console.WriteLine", trigger: "C, Console, Write", detail: "C# 표준 출력입니다.", example: "Console.WriteLine(\"artifact executed\");", insertText: "Console.WriteLine(${1:\"artifact executed\"});" },
+      { id: "cs-json", label: "JsonSerializer.Serialize", trigger: "Json, serialize", detail: "객체를 commandResult JSON으로 직렬화합니다.", example: "JsonSerializer.Serialize(result)", insertText: "JsonSerializer.Serialize(${1:result})" },
+      { id: "cs-using-system", label: "using System", trigger: "using, System", detail: "Console과 기본 타입 namespace입니다.", example: "using System;", insertText: "using System;" },
+      { id: "cs-using-json", label: "using System.Text.Json", trigger: "using, Json", detail: "System.Text.Json namespace입니다.", example: "using System.Text.Json;", insertText: "using System.Text.Json;" },
+      { id: "cs-command-result", label: "commandResult object", trigger: "result, command", detail: "Results가 읽는 출력 계약 객체입니다.", example: "var result = new { schemaVersion = 1, kind = \"commandResult\" }", insertText: "var result = new {\n  schemaVersion = 1,\n  kind = \"commandResult\",\n  exitCode = 0,\n  stdout = \"ok\\n\",\n  stderr = \"\"\n};\nConsole.WriteLine(JsonSerializer.Serialize(result));" },
     ];
   }
   if (language === "bat") {
@@ -1541,7 +1619,15 @@ function minimumStructureForLanguage(language: ArtifactLanguageKind) {
   if (language === "powershell") return "param(\n  [string]$OutputPath = \"C:\\Oslab\\command-result.json\"\n)\n$result = @{ schemaVersion = 1; kind = \"commandResult\"; exitCode = 0; stdout = \"ok`n\"; stderr = \"\" }\n$result | ConvertTo-Json -Depth 8 | Set-Content -Encoding UTF8 -LiteralPath $OutputPath";
   if (language === "shell") return "#!/usr/bin/env sh\nset -eu\nprintf '%s\\n' \"artifact executed\"\n# write JSON to {{OutputPath}} when assertions need structured output";
   if (language === "json") return "{\n  \"schemaVersion\": 1,\n  \"kind\": \"commandResult\",\n  \"exitCode\": 0,\n  \"stdout\": \"ok\\n\",\n  \"stderr\": \"\"\n}";
+  if (language === "yaml") return "schemaVersion: 1\nkind: commandResult\nexitCode: 0\nstdout: \"ok\\n\"\nstderr: \"\"";
+  if (language === "javascript") return "const result = { schemaVersion: 1, kind: \"commandResult\", exitCode: 0, stdout: \"ok\\n\", stderr: \"\" };\nconsole.log(JSON.stringify(result, null, 2));";
+  if (language === "typescript") return "type CommandResult = { schemaVersion: number; kind: \"commandResult\"; exitCode: number; stdout: string; stderr: string };\nconst result: CommandResult = { schemaVersion: 1, kind: \"commandResult\", exitCode: 0, stdout: \"ok\\n\", stderr: \"\" };\nconsole.log(JSON.stringify(result, null, 2));";
+  if (language === "html") return "<!doctype html>\n<html lang=\"en\">\n  <body>artifact executed</body>\n</html>";
+  if (language === "css") return "body {\n  font-family: system-ui, sans-serif;\n}";
+  if (language === "markdown") return "# Artifact Notes\n\n- Purpose:\n- Expected output:\n";
+  if (language === "dockerfile") return "FROM alpine:3.20\nWORKDIR /artifact\nCMD [\"sh\", \"-c\", \"printf '%s\\\\n' artifact executed\"]";
   if (language === "c") return "#include <stdio.h>\n\nint main(void) {\n  puts(\"artifact executed\");\n  return 0;\n}";
+  if (language === "csharp") return "using System;\nusing System.Text.Json;\n\nvar result = new { schemaVersion = 1, kind = \"commandResult\", exitCode = 0, stdout = \"ok\\n\", stderr = \"\" };\nConsole.WriteLine(JsonSerializer.Serialize(result));";
   if (language === "bat") return "@echo off\necho artifact executed\nrem write JSON to {{OutputPath}} when assertions need structured output";
   return "Artifact purpose: describe what this file or folder proves.\nUse {{ArtifactDir}} and {{OutputPath}} when the scenario command needs runtime paths.";
 }
@@ -1551,7 +1637,14 @@ function autocompleteIntroForLanguage(language: ArtifactLanguageKind) {
   if (language === "powershell") return "`W`나 `Write`는 Write-Output, `$`와 `param`은 OutputPath 파라미터, `Convert`는 ConvertTo-Json을 우선 보여줍니다.";
   if (language === "shell") return "`pri`는 printf, `set`은 set -eu, `test`는 test -f 후보를 보여줍니다.";
   if (language === "json") return "`{` 또는 `sche`는 schemaVersion, `kind`는 commandResult kind, `command`는 전체 output contract를 보여줍니다.";
+  if (language === "yaml") return "`schema`, `kind`, `artifact` 입력 시 YAML LSP와 OSLAB YAML snippets가 함께 표시됩니다.";
+  if (language === "javascript" || language === "typescript") return "`console`, `JSON`, `result`, `fs` 입력 시 JS/TS LSP와 output contract snippets가 함께 표시됩니다.";
+  if (language === "html") return "`<`, `html`, `script`, `link` 입력 시 HTML LSP와 문서 snippets가 표시됩니다.";
+  if (language === "css") return "`:`, `body`, `@media` 입력 시 CSS LSP와 layout snippets가 표시됩니다.";
+  if (language === "markdown") return "`#`, `- [ ]`, code fence snippets와 Markdown LSP 후보가 표시됩니다.";
+  if (language === "dockerfile") return "`FROM`, `RUN`, `CMD`, `WORKDIR` 입력 시 Dockerfile LSP와 starter snippets가 표시됩니다.";
   if (language === "c") return "`p`나 `pri`는 printf, `main`은 int main(void), `#`은 include 후보를 보여줍니다.";
+  if (language === "csharp") return "`Console`, `Json`, `using`, `result` 입력 시 C# LSP 또는 내부 C# snippets가 표시됩니다.";
   if (language === "bat") return "`e` 또는 `echo`는 echo, `%`는 %~dp0, `error`는 errorlevel 분기를 보여줍니다.";
   return "`{{` 또는 Ctrl+Space로 ArtifactDir, OutputPath 같은 OSLAB placeholder를 확인할 수 있습니다.";
 }
@@ -1681,6 +1774,18 @@ function localSnippets(language: ArtifactLanguageKind) {
       ...common,
     ];
   }
+  if (language === "csharp") {
+    return [
+      {
+        id: "csharp-command-result",
+        label: "C# commandResult writer",
+        detail: "Serialize a commandResult object to stdout.",
+        language,
+        insertText: "using System;\nusing System.Text.Json;\n\nvar result = new {\n  schemaVersion = 1,\n  kind = \"commandResult\",\n  exitCode = 0,\n  stdout = \"artifact executed\\n\",\n  stderr = \"\"\n};\n\nConsole.WriteLine(JsonSerializer.Serialize(result));\n",
+      },
+      ...common,
+    ];
+  }
   if (language === "json") {
     return [
       {
@@ -1689,6 +1794,78 @@ function localSnippets(language: ArtifactLanguageKind) {
         detail: "Stable result object for assertions.",
         language,
         insertText: "{\n  \"schemaVersion\": 1,\n  \"kind\": \"commandResult\",\n  \"exitCode\": 0,\n  \"stdout\": \"ok\\n\",\n  \"stderr\": \"\"\n}\n",
+      },
+      ...common,
+    ];
+  }
+  if (language === "yaml") {
+    return [
+      {
+        id: "yaml-command-result",
+        label: "commandResult YAML",
+        detail: "Stable result object in YAML form.",
+        language,
+        insertText: "schemaVersion: 1\nkind: commandResult\nexitCode: 0\nstdout: \"ok\\n\"\nstderr: \"\"\n",
+      },
+      ...common,
+    ];
+  }
+  if (language === "javascript" || language === "typescript") {
+    return [
+      {
+        id: "js-command-result",
+        label: "JS/TS commandResult",
+        detail: "Create a result object and print JSON.",
+        language,
+        insertText: "const result = {\n  schemaVersion: 1,\n  kind: \"commandResult\",\n  exitCode: 0,\n  stdout: \"artifact executed\\n\",\n  stderr: \"\",\n};\nconsole.log(JSON.stringify(result, null, 2));\n",
+      },
+      ...common,
+    ];
+  }
+  if (language === "html") {
+    return [
+      {
+        id: "html-document",
+        label: "HTML document",
+        detail: "Minimal HTML document.",
+        language,
+        insertText: "<!doctype html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <title>OSLAB Artifact</title>\n  </head>\n  <body>\n    artifact executed\n  </body>\n</html>\n",
+      },
+      ...common,
+    ];
+  }
+  if (language === "css") {
+    return [
+      {
+        id: "css-base",
+        label: "CSS base",
+        detail: "Small CSS starter.",
+        language,
+        insertText: ":root {\n  color-scheme: light dark;\n}\n\nbody {\n  font-family: system-ui, sans-serif;\n}\n",
+      },
+      ...common,
+    ];
+  }
+  if (language === "markdown") {
+    return [
+      {
+        id: "markdown-notes",
+        label: "Artifact notes",
+        detail: "Markdown notes scaffold.",
+        language,
+        insertText: "# Artifact Notes\n\n- Purpose:\n- Expected output:\n- Run Launcher path:\n",
+      },
+      ...common,
+    ];
+  }
+  if (language === "dockerfile") {
+    return [
+      {
+        id: "dockerfile-starter",
+        label: "Dockerfile starter",
+        detail: "Minimal Dockerfile starter.",
+        language,
+        insertText: "FROM alpine:3.20\nWORKDIR /artifact\nCMD [\"sh\", \"-c\", \"printf '%s\\\\n' artifact executed\"]\n",
       },
       ...common,
     ];
@@ -1705,8 +1882,15 @@ function firstRunTipsForLanguage(language: ArtifactLanguageKind) {
   if (language === "powershell") return ["Start with param([string]$OutputPath = ...).", "ConvertTo-Json + Set-Content is the safest result writer.", ...common];
   if (language === "python") return ["Use the json module for result files.", "Avoid packages that are not installed in the VM unless your artifact includes setup.", ...common];
   if (language === "shell") return ["Use set -eu to fail early.", "Quote paths because VM paths can include spaces.", ...common];
+  if (language === "yaml") return ["Keep indentation stable; YAML completion is provided by the repo-managed YAML language server.", "Use YAML for metadata or scenario-adjacent artifact descriptors.", ...common];
+  if (language === "javascript" || language === "typescript") return ["Use JSON.stringify for machine-readable stdout.", "If writing files, prefer explicit UTF-8 writes and avoid shell-based child_process.exec.", ...common];
+  if (language === "html") return ["Use this for small report/fixture assets; generated run reports still live under runs/.", ...common];
+  if (language === "css") return ["Keep CSS assets paired with an HTML or project artifact folder.", ...common];
+  if (language === "markdown") return ["Use Markdown for artifact operator notes and expected behavior.", ...common];
+  if (language === "dockerfile") return ["Pin base images and document network downloads.", "Prefer vendored assets or checksum-verified downloads.", ...common];
   if (language === "bat") return ["Use @echo off for readable logs.", "Quote output paths and check ERRORLEVEL when needed.", ...common];
   if (language === "c") return ["Compile separately or include a build step before executing.", ...common];
+  if (language === "csharp") return ["Use System.Text.Json for commandResult JSON.", "Prepare the VM with dotnet SDK/runtime or include an explicit publish/build step.", ...common];
   return common;
 }
 

@@ -54,6 +54,14 @@ test("WorkspaceService authoring policy allows only expected authoring roots and
     await workspace.createText("validation/artifacts/windows/web-demo.ps1", "Write-Output artifact");
     const artifact = await workspace.readText("validation/artifacts/windows/web-demo.ps1");
     assert.equal(artifact, "Write-Output artifact");
+    await workspace.createText("validation/artifacts/windows/web-metadata.yaml", "schemaVersion: 1\n");
+    assert.equal(await workspace.readText("validation/artifacts/windows/web-metadata.yaml"), "schemaVersion: 1\n");
+    await workspace.createText("validation/artifacts/windows/web-script.ts", "console.log('ok');\n");
+    assert.equal(await workspace.readText("validation/artifacts/windows/web-script.ts"), "console.log('ok');\n");
+    await workspace.createText("validation/artifacts/windows/web-script.cs", "Console.WriteLine(\"ok\");\n");
+    assert.equal(await workspace.readText("validation/artifacts/windows/web-script.cs"), "Console.WriteLine(\"ok\");\n");
+    await workspace.createText("validation/artifacts/windows/Dockerfile", "FROM alpine:3.20\n");
+    assert.equal(await workspace.readText("validation/artifacts/windows/Dockerfile"), "FROM alpine:3.20\n");
     await assert.rejects(() => workspace.createText("validation/fixtures/windows/demo.txt", "nope"), /fixture files must end with/);
     await assert.rejects(() => workspace.createText("validation/artifacts/windows/installer.exe", "nope"), /artifactText files must end with/);
     await assert.rejects(() => workspace.writeText(".web-artifacts/uploaded.ps1", "nope"), /outside authoring roots/);

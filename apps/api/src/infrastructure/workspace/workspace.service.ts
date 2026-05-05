@@ -15,6 +15,8 @@ const WINDOWS_RESERVED_DEVICE_NAMES = new Set([
   ...Array.from({ length: 9 }, (_, index) => `COM${index + 1}`),
   ...Array.from({ length: 9 }, (_, index) => `LPT${index + 1}`),
 ]);
+const ARTIFACT_TEXT_EXTENSIONS = new Set([".ps1", ".sh", ".py", ".c", ".cs", ".json", ".yaml", ".yml", ".js", ".mjs", ".cjs", ".ts", ".html", ".htm", ".css", ".md", ".markdown", ".dockerfile", ".txt", ".cmd", ".bat"]);
+const ARTIFACT_CATALOG_EXTENSIONS = new Set([".ps1", ".sh", ".zip", ".exe", ".msi", ".cmd", ".bat", ".py", ".c", ".cs", ".json", ".yaml", ".yml", ".js", ".mjs", ".cjs", ".ts", ".html", ".htm", ".css", ".md", ".markdown", ".dockerfile", ".txt"]);
 
 type AuthoringRule = {
   root: string;
@@ -31,7 +33,7 @@ export class WorkspaceService {
     scenario: { root: "scenarios", extensions: new Set([".yaml", ".yml"]) },
     suite: { root: path.join("validation", "suites"), extensions: new Set([".yaml", ".yml"]) },
     fixture: { root: path.join("validation", "fixtures"), extensions: new Set([".ps1", ".sh"]) },
-    artifactText: { root: path.join("validation", "artifacts"), extensions: new Set([".ps1", ".sh", ".py", ".c", ".json", ".txt", ".cmd", ".bat"]) },
+    artifactText: { root: path.join("validation", "artifacts"), extensions: ARTIFACT_TEXT_EXTENSIONS },
   };
   private readonly editableRoots = Object.values(this.authoringRules).map((rule) => rule.root);
   private readonly readableRoots = [...this.editableRoots, "runs"];
@@ -59,8 +61,8 @@ export class WorkspaceService {
     }
     const extension = path.extname(normalized).toLowerCase();
     const rule = this.authoringRules[kind];
-    if (!rule.extensions.has(extension)) {
-      throw new BadRequestException(`${kind} files must end with ${Array.from(rule.extensions).join(" or ")}`);
+    if (!rule.extensions.has(extension) && !(kind === "artifactText" && isDockerfilePath(normalized))) {
+      throw new BadRequestException(`${kind} files must end with ${Array.from(rule.extensions).join(" or ")}${kind === "artifactText" ? " or Dockerfile" : ""}`);
     }
     const target = this.resolveAllowed(normalized, operation === "read" ? this.readableRoots : this.editableRoots);
     return { kind, path: target };
@@ -126,7 +128,7 @@ export class WorkspaceService {
       scenario: new Set([".yaml", ".yml"]),
       suite: new Set([".yaml", ".yml"]),
       fixture: new Set([".ps1", ".sh"]),
-      artifact: new Set([".ps1", ".sh", ".zip", ".exe", ".msi", ".cmd", ".bat", ".py", ".c", ".json", ".txt"]),
+      artifact: ARTIFACT_CATALOG_EXTENSIONS,
     };
     if (kind === "artifact") {
       const artifactRoots = [path.join(this.root, rootByKind.artifact), this.artifactDir];
@@ -300,7 +302,7 @@ export class WorkspaceService {
       if (entry.isDirectory()) {
         results.push(full);
         results.push(...(await this.walkArtifacts(full, extensions)));
-      } else if (extensions.has(path.extname(entry.name).toLowerCase())) {
+      } else if (extensions.has(path.extname(entry.name).toLowerCase()) || isDockerfilePath(entry.name)) {
         results.push(full);
       }
     }
@@ -349,6 +351,10 @@ function findRepoRoot(start: string): string {
     if (parent === current) return path.resolve(start);
     current = parent;
   }
+}
+
+function isDockerfilePath(value: string): boolean {
+  return path.basename(value).toLowerCase() === "dockerfile";
 }
 
 function existsSync(target: string): boolean {

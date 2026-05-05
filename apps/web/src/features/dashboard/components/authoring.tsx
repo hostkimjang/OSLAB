@@ -1,9 +1,24 @@
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { CatalogItem, SyntaxValidationResult } from "@oslab/shared";
+import type { ArtifactAssistCompletionResponse, ArtifactAssistDiagnosticsResponse, ArtifactLanguageKind, CatalogItem, SyntaxValidationResult } from "@oslab/shared";
+import { apiPost } from "../lib";
 import type { DashboardText, EditorState, ScenarioAssertionModel, ScenarioBuilderModel, ScenarioFixtureModel, ScenarioProductStepModel, SuiteBuilderModel, SuiteBuilderRun } from "../model";
 import { InfoTooltip } from "./common";
 
+const MonacoEditor = dynamic(() => import("@monaco-editor/react").then((module) => module.Editor), {
+  ssr: false,
+  loading: () => <div className="artifactMonacoLoading">Loading editor...</div>,
+});
+
 type DiffRow = { index: number; before?: string; after?: string };
+type AuthoringFallbackCompletion = {
+  label: string;
+  detail: string;
+  documentation?: string;
+  insertText: string;
+  source: "snippet";
+  kind: "snippet";
+};
 
 function buildDiffPreview(before: string, after: string, limit = 8) {
   const beforeLines = before.split(/\r?\n/);
@@ -87,6 +102,7 @@ export function CatalogEditor(props: {
     const lineCount = Math.max(1, props.editor.content.split(/\r\n|\r|\n/).length);
     return Array.from({ length: lineCount }, (_, index) => index + 1);
   }, [props.editor.content]);
+  const editorLanguage = useMemo(() => authoringLanguageForPath(props.editor.selectedPath), [props.editor.selectedPath]);
   const syncEditorScroll = useCallback(() => {
     if (lineNumberGutterRef.current && editorTextareaRef.current) {
       lineNumberGutterRef.current.scrollTop = editorTextareaRef.current.scrollTop;
@@ -125,21 +141,33 @@ export function CatalogEditor(props: {
           onClose={closeDiffDialog}
         />
       )}
-      <div className="codeEditorShell">
-        <div className="lineNumberGutter" ref={lineNumberGutterRef} aria-hidden="true">
-          {editorLineNumbers.map((line) => <span key={line}>{line}</span>)}
-        </div>
-        <textarea
-          ref={editorTextareaRef}
-          className={!props.editor.isEditing ? "readOnlyEditor" : ""}
-          value={props.editor.content}
-          onChange={(event) => props.onContent(event.target.value)}
-          onScroll={syncEditorScroll}
-          readOnly={!props.editor.isEditing}
-          aria-readonly={!props.editor.isEditing}
-          spellCheck={false}
-          wrap="off"
-        />
+      <div className={`codeEditorShell ${editorLanguage ? "monacoCodeEditorShell" : ""}`}>
+        {editorLanguage ? (
+          <AuthoringMonacoEditor
+            pathValue={props.editor.selectedPath || "scenarios/draft.yaml"}
+            language={editorLanguage}
+            content={props.editor.content}
+            readOnly={!props.editor.isEditing}
+            onContent={props.onContent}
+          />
+        ) : (
+          <>
+            <div className="lineNumberGutter" ref={lineNumberGutterRef} aria-hidden="true">
+              {editorLineNumbers.map((line) => <span key={line}>{line}</span>)}
+            </div>
+            <textarea
+              ref={editorTextareaRef}
+              className={!props.editor.isEditing ? "readOnlyEditor" : ""}
+              value={props.editor.content}
+              onChange={(event) => props.onContent(event.target.value)}
+              onScroll={syncEditorScroll}
+              readOnly={!props.editor.isEditing}
+              aria-readonly={!props.editor.isEditing}
+              spellCheck={false}
+              wrap="off"
+            />
+          </>
+        )}
       </div>
     </div>
   );
@@ -209,14 +237,27 @@ export function CatalogEditor(props: {
           <div className="editorTitle">
             <code>{props.editor.selectedPath || props.t.selectFile}</code>
             {props.editor.selectedPath && (
-              <span className={`editorMode ${props.editor.isEditing ? "editing" : ""}`}>
-                {props.editor.isEditing ? (dirty ? props.t.unsavedChanges : props.t.edit) : props.t.readOnly}
-              </span>
+              props.editor.isEditing ? (
+                <span className={`editorMode editing`}>
+                  {dirty ? props.t.unsavedChanges : props.t.edit}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  className="editorMode editorModeReadOnly"
+                  onClick={props.onEdit}
+                  title={props.t.editorModeEnterEdit}
+                  aria-label={props.t.editorModeEnterEdit}
+                >
+                  {props.t.readOnly}
+                  <span className="editorModeReadOnlyHint" aria-hidden="true">→ {props.t.edit}</span>
+                </button>
+              )
             )}
           </div>
           <div className="actions">
             {props.onValidate && props.editor.selectedPath && !props.editor.isEditing && <button className="secondary" onClick={() => props.onValidate!(props.editor.selectedPath)}>{props.t.validate}</button>}
-            {props.editor.selectedPath && !props.editor.isEditing && <button onClick={props.onEdit}>{props.t.edit}</button>}
+            {props.editor.selectedPath && !props.editor.isEditing && <button className="primaryEditCta" onClick={props.onEdit} title={props.t.editorModeEnterEdit}>{props.t.edit}</button>}
             {props.editor.selectedPath && props.editor.isEditing && <button className="secondary" onClick={props.onCancel}>{props.t.cancel}</button>}
             {props.editor.selectedPath && props.editor.isEditing && (
               <button disabled={!canSave} onClick={() => (diff ? setDiffDialogOpen(true) : props.onSave())}>
@@ -239,6 +280,228 @@ export function CatalogEditor(props: {
       </div>
     </section>
   );
+}
+
+function AuthoringMonacoEditor({
+  pathValue,
+  language,
+  content,
+  readOnly,
+  onContent,
+}: {
+  pathValue: string;
+  language: ArtifactLanguageKind;
+  content: string;
+  readOnly: boolean;
+  onContent: (content: string) => void;
+}) {
+  const editorRef = useRef<any>(null);
+  const monacoRef = useRef<any>(null);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || editor.getValue?.() === content) return;
+    editor.setValue?.(content);
+  }, [content, pathValue]);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    const monaco = monacoRef.current;
+    if (!editor || !monaco || !pathValue) return;
+    const handle = window.setTimeout(async () => {
+      try {
+        const response = await apiPost<ArtifactAssistDiagnosticsResponse>("/api/artifacts/assist/diagnostics", {
+          path: pathValue,
+          language,
+          content: editor.getValue?.() ?? content,
+        });
+        const markers = response.issues.map((issue) => ({
+          severity: issue.severity === "error" ? monaco.MarkerSeverity.Error : issue.severity === "warning" ? monaco.MarkerSeverity.Warning : monaco.MarkerSeverity.Info,
+          message: issue.message,
+          startLineNumber: issue.line || 1,
+          startColumn: issue.column || 1,
+          endLineNumber: issue.endLine || issue.line || 1,
+          endColumn: issue.endColumn || issue.column || 1,
+          code: issue.code,
+        }));
+        const model = editor.getModel?.();
+        if (model) monaco.editor.setModelMarkers(model, "oslab-authoring", markers);
+      } catch {
+        const model = editor.getModel?.();
+        if (model) monaco.editor.setModelMarkers(model, "oslab-authoring", []);
+      }
+    }, 350);
+    return () => window.clearTimeout(handle);
+  }, [content, language, pathValue]);
+
+  return (
+    <div className="authoringMonacoShell">
+      <MonacoEditor
+        key={pathValue}
+        path={pathValue}
+        height="100%"
+        language={monacoLanguageForAuthoring(language)}
+        theme="vs-dark"
+        defaultValue={content}
+        options={{
+          readOnly,
+          minimap: { enabled: false },
+          fontSize: 13,
+          lineNumbers: "on",
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+          wordWrap: "off",
+          quickSuggestions: { other: true, comments: false, strings: false },
+          quickSuggestionsDelay: 220,
+          suggestOnTriggerCharacters: true,
+          acceptSuggestionOnCommitCharacter: false,
+          fixedOverflowWidgets: true,
+        }}
+        onMount={(editor: any, monaco: any) => {
+          editorRef.current = editor;
+          monacoRef.current = monaco;
+          configureAuthoringMonaco(monaco, language);
+        }}
+        onChange={(value) => onContent(value ?? "")}
+      />
+    </div>
+  );
+}
+
+function configureAuthoringMonaco(monaco: any, language: ArtifactLanguageKind) {
+  const providerLanguage = monacoLanguageForAuthoring(language);
+  const configuredKey = `__oslabAuthoringMonacoConfigured_${providerLanguage}`;
+  if ((window as any)[configuredKey]) return;
+  (window as any)[configuredKey] = true;
+  monaco.languages.registerCompletionItemProvider(providerLanguage, {
+    triggerCharacters: [":", "-", ".", "/", "\\", "\"", "'", "[", "{", "$", "@", "s", "S", "i", "I", "r", "R", "p", "P", "a", "A", "g", "G"],
+    provideCompletionItems: async (model: any, position: any) => {
+      const word = model.getWordUntilPosition(position);
+      const range = {
+        startLineNumber: position.lineNumber,
+        endLineNumber: position.lineNumber,
+        startColumn: word.startColumn,
+        endColumn: word.endColumn,
+      };
+      const fallbackSuggestions = rankAuthoringFallbackItems(authoringFallbackCompletions(language), word.word).map((item) => ({
+        label: item.label,
+        kind: monacoCompletionKind(monaco, item.kind, item.source),
+        insertText: item.insertText,
+        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        detail: item.detail,
+        documentation: item.documentation || item.detail,
+        range,
+      }));
+      try {
+        const response = await apiPost<ArtifactAssistCompletionResponse>("/api/artifacts/assist/complete", {
+          path: authoringPathFromModel(model),
+          language,
+          content: model.getValue(),
+          line: position.lineNumber,
+          column: position.column,
+        });
+        const apiSuggestions = response.items.map((item) => ({
+          label: item.label,
+          kind: monacoCompletionKind(monaco, item.kind, item.source),
+          insertText: item.insertText,
+          insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          detail: `${item.source.toUpperCase()} · ${item.detail}`,
+          documentation: item.documentation || item.detail,
+          range,
+        }));
+        return { suggestions: mergeAuthoringSuggestions(apiSuggestions, fallbackSuggestions) };
+      } catch {
+        return { suggestions: fallbackSuggestions };
+      }
+    },
+  });
+}
+
+function authoringLanguageForPath(pathValue: string | null | undefined): ArtifactLanguageKind | null {
+  const lower = (pathValue || "").toLowerCase();
+  if (lower.endsWith(".yaml") || lower.endsWith(".yml")) return "yaml";
+  if (lower.endsWith(".ps1")) return "powershell";
+  if (lower.endsWith(".sh")) return "shell";
+  return null;
+}
+
+function monacoLanguageForAuthoring(language: ArtifactLanguageKind) {
+  if (language === "powershell") return "powershell";
+  if (language === "shell") return "shell";
+  if (language === "yaml") return "yaml";
+  return "plaintext";
+}
+
+function authoringPathFromModel(model: any) {
+  const rawPath = String(model?.uri?.path || "scenarios/draft.yaml").replaceAll("\\", "/");
+  const normalized = rawPath.replace(/^\/+/, "");
+  return normalized || "scenarios/draft.yaml";
+}
+
+function authoringFallbackCompletions(language: ArtifactLanguageKind): AuthoringFallbackCompletion[] {
+  if (language === "yaml") {
+    return [
+      { label: "schemaVersion", detail: "OSLAB document schema version", insertText: "schemaVersion: 1", source: "snippet", kind: "snippet" },
+      { label: "scenario", detail: "Suite run scenario path", insertText: "scenario: scenarios/${1:windows/demo.example.yaml}", source: "snippet", kind: "snippet" },
+      { label: "runs", detail: "Suite runs list", insertText: "runs:\n  - id: ${1:smoke}\n    scenario: ${2:scenarios/windows/demo.example.yaml}\n    tier: ${3:ci}\n    allowFailure: false\n    enabled: true", source: "snippet", kind: "snippet" },
+      { label: "assertions", detail: "Scenario assertions list", insertText: "assertions:\n  - id: ${1:exit-zero}\n    type: command.exitCode\n    expected: 0", source: "snippet", kind: "snippet" },
+      { label: "provider", detail: "Scenario provider block", insertText: "provider:\n  type: proxmox\n  template: ${1:windows11-template-qga-9101}\n  vmIdRange:\n    start: ${2:9102}\n    end: ${3:9199}", source: "snippet", kind: "snippet" },
+      { label: "guest", detail: "Scenario guest access mode", insertText: "guest:\n  mode: auto", source: "snippet", kind: "snippet" },
+      { label: "artifact", detail: "Scenario artifact path block", insertText: "artifact:\n  path: validation/artifacts/${1:demo}", source: "snippet", kind: "snippet" },
+    ];
+  }
+  if (language === "powershell") {
+    return [
+      { label: "param OutputPath", detail: "OutputPath parameter block", insertText: "param(\n  [string]$OutputPath = \"C:\\\\Oslab\\\\command-result.json\"\n)", source: "snippet", kind: "snippet" },
+      { label: "ConvertTo-Json", detail: "Write JSON result", insertText: "$result | ConvertTo-Json -Depth 8 | Set-Content -Encoding UTF8 -LiteralPath $OutputPath", source: "snippet", kind: "snippet" },
+    ];
+  }
+  if (language === "shell") {
+    return [
+      { label: "set -eu", detail: "Fail fast shell prelude", insertText: "set -eu", source: "snippet", kind: "snippet" },
+      { label: "printf json", detail: "Write simple JSON output", insertText: "printf '{\"schemaVersion\":1,\"kind\":\"commandResult\",\"exitCode\":0,\"stdout\":\"ok\\\\n\",\"stderr\":\"\"}\\n' > \"$OutputPath\"", source: "snippet", kind: "snippet" },
+    ];
+  }
+  return [];
+}
+
+function monacoCompletionKind(monaco: any, kind: string | undefined, source: string | undefined) {
+  if (source === "snippet" || kind === "snippet") return monaco.languages.CompletionItemKind.Snippet;
+  if (kind === "function") return monaco.languages.CompletionItemKind.Function;
+  if (kind === "keyword") return monaco.languages.CompletionItemKind.Keyword;
+  if (kind === "variable") return monaco.languages.CompletionItemKind.Variable;
+  if (kind === "module") return monaco.languages.CompletionItemKind.Module;
+  if (kind === "property") return monaco.languages.CompletionItemKind.Property;
+  if (kind === "file") return monaco.languages.CompletionItemKind.File;
+  return monaco.languages.CompletionItemKind.Text;
+}
+
+function rankAuthoringFallbackItems<T extends { label: string }>(items: T[], prefix: string) {
+  const needle = prefix.trim().toLowerCase();
+  return items
+    .map((item) => {
+      const label = item.label.toLowerCase();
+      let score = 3;
+      if (!needle) score = 2;
+      else if (label === needle) score = 0;
+      else if (label.startsWith(needle)) score = 1;
+      else if (label.includes(needle)) score = 2;
+      else score = 4;
+      return { item, score };
+    })
+    .filter((entry) => entry.score < 4 || needle.length < 2)
+    .sort((a, b) => a.score - b.score || a.item.label.localeCompare(b.item.label))
+    .map((entry) => entry.item);
+}
+
+function mergeAuthoringSuggestions(primary: any[], fallback: any[]) {
+  const seen = new Set<string>();
+  return [...primary, ...fallback].filter((item) => {
+    const key = String(item.label).toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 250);
 }
 
 export type ScenarioCreateDraft = {
@@ -1096,6 +1359,7 @@ export function ScenarioBuilderPanel({
   editable,
   onChange,
   onApply,
+  dirty = false,
   expanded: controlledExpanded,
   onExpandedChange,
 }: {
@@ -1105,6 +1369,7 @@ export function ScenarioBuilderPanel({
   editable: boolean;
   onChange: (next: ScenarioBuilderModel | null) => void;
   onApply: () => void;
+  dirty?: boolean;
   expanded?: boolean;
   onExpandedChange?: (next: boolean) => void;
 }) {
@@ -1265,7 +1530,10 @@ export function ScenarioBuilderPanel({
                 </div>
               </div>
               <div className="actions builderApplyActions">
-                <button type="button" className="secondary builderApplyButton" disabled={!editable} onClick={onApply}>{t.applyBuilder}</button>
+                <span className={`builderApplyStatus ${dirty ? "dirty" : "synced"}`} aria-live="polite">
+                  {dirty ? t.builderApplyPending : t.builderApplySynced}
+                </span>
+                <button type="button" className={dirty ? "builderApplyButton primary" : "secondary builderApplyButton"} disabled={!editable} onClick={onApply} title={t.builderApplyTooltip}>{t.applyBuilder}</button>
               </div>
             </>
           )}
@@ -1339,13 +1607,56 @@ function ScenarioProductStepsEditor({ t, editable, model, onChange, open = false
   );
 }
 
+const ASSERTION_TYPES = [
+  "command.exitCode",
+  "command.stdoutContains",
+  "command.stderrContains",
+  "file.exists",
+  "file.notExists",
+  "directory.exists",
+  "process.exists",
+  "service.exists",
+  "package.exists",
+  "inventory.contains",
+  "inventory.sourcePresent",
+  "inventory.sourceAbsent",
+  "inventory.evidencePresent",
+] as const;
+
+const ASSERTION_BODY_TEMPLATES: Record<string, string> = {
+  "command.exitCode": '{\n  "exitCode": 0\n}',
+  "command.stdoutContains": '{\n  "text": ""\n}',
+  "command.stderrContains": '{\n  "text": ""\n}',
+  "file.exists": '{\n  "path": ""\n}',
+  "file.notExists": '{\n  "path": ""\n}',
+  "directory.exists": '{\n  "path": ""\n}',
+  "process.exists": '{\n  "name": ""\n}',
+  "service.exists": '{\n  "name": ""\n}',
+  "package.exists": '{\n  "name": ""\n}',
+  "inventory.contains": '{\n  "field": "",\n  "value": ""\n}',
+  "inventory.sourcePresent": '{\n  "source": ""\n}',
+  "inventory.sourceAbsent": '{\n  "source": ""\n}',
+  "inventory.evidencePresent": '{\n  "source": ""\n}',
+};
+
 function ScenarioAssertionsEditor({ t, editable, model, onChange, open = true, stageNumber = "5" }: { t: DashboardText; editable: boolean; model: ScenarioBuilderModel; onChange: (next: ScenarioBuilderModel | null) => void; open?: boolean; stageNumber?: string }) {
   const assertions = model.assertions || [];
   const updateAssertion = (index: number, patch: Partial<ScenarioAssertionModel>) => {
     onChange({ ...model, assertions: assertions.map((assertion, assertionIndex) => (assertionIndex === index ? { ...assertion, ...patch } : assertion)) });
   };
+  const updateAssertionType = (index: number, nextType: string) => {
+    const current = assertions[index];
+    if (!current) return;
+    // If body looks like the prior default, swap to the new type's template
+    const priorTemplate = ASSERTION_BODY_TEMPLATES[current.type];
+    const nextTemplate = ASSERTION_BODY_TEMPLATES[nextType];
+    const bodyJson = nextTemplate && (current.bodyJson === priorTemplate || !current.bodyJson?.trim())
+      ? nextTemplate
+      : current.bodyJson;
+    updateAssertion(index, { type: nextType, bodyJson });
+  };
   const addAssertion = () => {
-    onChange({ ...model, assertions: [...assertions, { id: "exit-zero", type: "command.exitCode", bodyJson: "{\n  \"exitCode\": 0\n}" }] });
+    onChange({ ...model, assertions: [...assertions, { id: "exit-zero", type: "command.exitCode", bodyJson: ASSERTION_BODY_TEMPLATES["command.exitCode"] }] });
   };
   const removeAssertion = (index: number) => {
     onChange({ ...model, assertions: assertions.filter((_, assertionIndex) => assertionIndex !== index) });
@@ -1355,14 +1666,27 @@ function ScenarioAssertionsEditor({ t, editable, model, onChange, open = true, s
       <summary><span className="builderStageTitle"><b>{stageNumber}</b>{t.scenarioBuilderAssertions}</span><span>{assertions.length}</span></summary>
       <div className="builderList">
         {assertions.length === 0 && <p className="builderEmptyState">{t.scenarioBuilderAssertionsEmpty}</p>}
-        {assertions.map((assertion, index) => (
+        {assertions.map((assertion, index) => {
+          const isKnownType = ASSERTION_TYPES.includes(assertion.type as typeof ASSERTION_TYPES[number]);
+          return (
           <div key={`${assertion.id}-${index}`} className="builderListRow assertionRow">
             <label><BuilderLabel label="id" info={t.scenarioFieldAssertionIdTooltip} t={t} /><input value={assertion.id} disabled={!editable} onChange={(event) => updateAssertion(index, { id: event.target.value })} /></label>
-            <label><BuilderLabel label="type" info={t.scenarioFieldAssertionTypeTooltip} t={t} /><input value={assertion.type} disabled={!editable} onChange={(event) => updateAssertion(index, { type: event.target.value })} /></label>
+            <label>
+              <BuilderLabel label="type" info={t.scenarioFieldAssertionTypeTooltip} t={t} />
+              <select value={isKnownType ? assertion.type : "__custom"} disabled={!editable} onChange={(event) => {
+                const value = event.target.value;
+                if (value === "__custom") return;
+                updateAssertionType(index, value);
+              }}>
+                {ASSERTION_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
+                {!isKnownType && <option value="__custom">{assertion.type || "(custom)"}</option>}
+              </select>
+            </label>
             <label className="span2"><BuilderLabel label="body JSON" info={t.scenarioFieldAssertionBodyTooltip} t={t} /><textarea rows={4} value={assertion.bodyJson} disabled={!editable} onChange={(event) => updateAssertion(index, { bodyJson: event.target.value })} /></label>
             <button type="button" className="secondary iconBuilderButton dangerBuilderButton" disabled={!editable} onClick={() => removeAssertion(index)} aria-label={t.remove} title={t.remove}>×</button>
           </div>
-        ))}
+          );
+        })}
         <button type="button" className="secondary builderAddButton" disabled={!editable} onClick={addAssertion}>{t.scenarioBuilderAddAssertion}</button>
       </div>
     </details>

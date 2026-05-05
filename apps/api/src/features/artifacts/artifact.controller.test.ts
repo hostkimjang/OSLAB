@@ -48,6 +48,13 @@ test("ArtifactController manages repo and uploaded artifacts with safe text auth
     const created = await controller.template({ kind: "json", path: "validation/artifacts/new-result.json" });
     assert.equal(created.path, "validation/artifacts/new-result.json");
     await assert.rejects(() => controller.template({ kind: "json", path: "validation/artifacts/new-result.json" }), /already exists/);
+    const yamlArtifact = await controller.template({ kind: "yaml", path: "validation/artifacts/new-metadata.yaml" });
+    assert.equal(yamlArtifact.path, "validation/artifacts/new-metadata.yaml");
+    assert.match(yamlArtifact.content, /schemaVersion: 1/);
+    const tsArtifact = await controller.template({ kind: "typescript", path: "validation/artifacts/new-script.ts" });
+    assert.match(tsArtifact.content, /type CommandResult/);
+    const csharpArtifact = await controller.template({ kind: "csharp", path: "validation/artifacts/new-script.cs" });
+    assert.match(csharpArtifact.content, /JsonSerializer/);
     const project = await controller.projectTemplate({ kind: "script-project", path: "validation/artifacts/web-project", shell: "powershell", name: "QA project" });
     assert.equal(project.path, "validation/artifacts/web-project");
     assert.ok(project.files.includes("validation/artifacts/web-project/run-artifact.ps1"));
@@ -104,15 +111,59 @@ test("ArtifactController manages repo and uploaded artifacts with safe text auth
       column: 8,
     });
     assert.ok(jsonCompletion.items.some((item) => item.label === "schemaVersion"));
+    const yamlCompletion = await controller.assistComplete({
+      path: "validation/artifacts/result.yaml",
+      content: "sche",
+      line: 1,
+      column: 5,
+    });
+    assert.ok(yamlCompletion.items.some((item) => item.label === "schemaVersion"));
+    const scenarioYamlCompletion = await controller.assistComplete({
+      path: "scenarios/windows/demo-authoring.yaml",
+      language: "yaml",
+      content: "sche",
+      line: 1,
+      column: 5,
+    });
+    assert.ok(scenarioYamlCompletion.items.some((item) => item.label === "schemaVersion"));
+    const suiteYamlCompletion = await controller.assistComplete({
+      path: "validation/suites/demo-authoring.yaml",
+      language: "yaml",
+      content: "runs:\n  - scen",
+      line: 2,
+      column: 9,
+    });
+    assert.ok(suiteYamlCompletion.items.some((item) => item.label === "scenario"));
+    const tsCompletion = await controller.assistComplete({
+      path: "validation/artifacts/result.ts",
+      content: "con",
+      line: 1,
+      column: 4,
+    });
+    assert.ok(tsCompletion.items.some((item) => item.label === "console.log"));
+    const csharpCompletion = await controller.assistComplete({
+      path: "validation/artifacts/result.cs",
+      content: "Con",
+      line: 1,
+      column: 4,
+    });
+    assert.equal(csharpCompletion.language, "csharp");
+    assert.ok(csharpCompletion.items.some((item) => item.label === "Console.WriteLine"));
     const diagnostics = await controller.assistDiagnostics({ path: "validation/artifacts/result.json", content: "{ nope" });
     assert.equal(diagnostics.ok, false);
     assert.ok(diagnostics.issues.some((issue) => issue.code === "json.parse"));
+    const yamlDiagnostics = await controller.assistDiagnostics({ path: "validation/artifacts/result.yaml", content: "key: [nope" });
+    assert.equal(yamlDiagnostics.ok, false);
+    assert.ok(yamlDiagnostics.issues.some((issue) => issue.code === "yaml.parse"));
     await assert.rejects(() => controller.assistComplete({ path: "config/oslab.local.env", content: "x", line: 1, column: 1 }), /Secret files|outside authoring roots|Only validation\/artifacts/);
     await assert.rejects(() => controller.saveContent({ path: ".web-artifacts/uploaded/tool.exe", content: "nope" }), /outside authoring roots|Only validation\/artifacts/);
     await assert.rejects(() => controller.content("validation/artifacts/installer.exe"), /artifactText files must end with|Only validation\/artifacts/);
     await assert.rejects(() => controller.content(".web-artifacts/uploaded/tool.exe"), /outside authoring roots|Only validation\/artifacts/);
     const languageTools = await controller.languageTools();
     assert.ok(languageTools.some((tool) => tool.language === "python"));
+    assert.ok(languageTools.some((tool) => tool.language === "yaml" && tool.mode === "lsp"));
+    assert.ok(languageTools.some((tool) => tool.language === "typescript" && tool.mode === "lsp"));
+    assert.ok(languageTools.some((tool) => tool.language === "csharp" && ["lsp", "setupNeeded"].includes(tool.mode || "")));
     const pythonInstall = await controller.installLanguageTool({ language: "python" });
     assert.equal(pythonInstall.ok, false);
     assert.equal(pythonInstall.language, "python");

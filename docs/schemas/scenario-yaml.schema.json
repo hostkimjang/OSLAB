@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oslab.local/schemas/scenario-yaml.schema.json",
+  "title": "OSLAB Scenario YAML",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": {
+      "const": 1,
+      "description": "Scenario document schema version."
+    },
+    "id": {
+      "type": "string",
+      "description": "Stable scenario id used in runs and reports."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable scenario name."
+    },
+    "description": {
+      "type": "string"
+    },
+    "os": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "family": {
+          "type": "string",
+          "enum": ["windows", "linux"]
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["proxmox"]
+        },
+        "template": {
+          "type": "string"
+        },
+        "vmIdRange": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "integer" },
+            "end": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "guest": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["auto", "qemuAgent", "winrm", "ssh"]
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Repository-relative artifact path, usually under validation/artifacts."
+        }
+      }
+    },
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "expected": {},
+          "path": { "type": "string" }
+        }
+      }
+    },
+    "cleanup": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "destroyVm": { "type": "boolean" },
+        "keepVmOnFailure": { "type": "boolean" }
+      }
+    },
+    "reports": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["junit", "json", "html"]
+          }
+        }
+      }
+    }
+  },
+  "required": ["schemaVersion", "id", "os", "provider", "guest", "assertions"]
+}

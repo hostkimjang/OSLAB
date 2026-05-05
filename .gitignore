@@ -72,3 +72,6 @@ Thumbs.db
 Desktop.ini
 /.playwright-cli
 /.playwright-mcp
+/.claude
+/.codex
+.mcp.json

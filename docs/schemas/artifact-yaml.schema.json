@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oslab.local/schemas/artifact-yaml.schema.json",
+  "title": "OSLAB Artifact Metadata",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "default": 1,
+      "description": "Version of the artifact metadata or result contract."
+    },
+    "kind": {
+      "type": "string",
+      "enum": ["artifact", "commandResult", "inventory", "installProfile", "notes"],
+      "description": "Artifact metadata or result payload kind."
+    },
+    "exitCode": {
+      "type": "integer",
+      "description": "Process exit code when this YAML describes a commandResult."
+    },
+    "stdout": {
+      "type": "string",
+      "description": "Captured stdout when this YAML describes a commandResult."
+    },
+    "stderr": {
+      "type": "string",
+      "description": "Captured stderr when this YAML describes a commandResult."
+    },
+    "artifact": {
+      "type": "object",
+      "description": "Artifact path metadata for scenario-adjacent notes.",
+      "additionalProperties": true,
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^validation/artifacts/",
+          "description": "Repository-relative artifact path."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["file", "directory", "binary", "text"],
+          "description": "Artifact payload type."
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Free-form metadata consumed by a scenario, suite, or human review.",
+      "additionalProperties": true
+    }
+  }
+}
