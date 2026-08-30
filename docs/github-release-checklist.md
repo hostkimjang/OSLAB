@@ -1,52 +1,65 @@
 # GitHub Release Checklist
 
-이 문서는 `oslab`을 처음 GitHub에 공개하기 전에 확인할 항목입니다.
+Language: English | [한국어](github-release-checklist.ko.md)
+
+Use this checklist before publishing `oslab` on GitHub for the first time.
 
 ## Public Positioning
 
-- [x] `README.md`는 private product 중심이 아니라 generic OS/VM integration test platform 중심으로 설명한다.
-- [x] `docs/oslab-platform-plan.md`는 public generic platform plan으로 정리한다.
-- [x] 첫 실행 예시는 generic demo suite를 사용한다.
-- [x] Product-specific 관련 내용은 product-owned/private docs로 분리한다.
-- [x] 기존 product-specific 중심 platform plan은 private/product-owned docs에 보관한다.
-- [x] 로컬 lab run id, 실제 Proxmox IP, 실제 node 이름은 공개 문서에 남기지 않는다.
+- [x] Position `README.md` around a generic OS/VM integration test platform rather than a private product.
+- [x] Present `docs/oslab-platform-plan.md` as the public, generic platform plan.
+- [x] Use the generic demo suite for the first-run example.
+- [x] Keep product-specific content in product-owned or private documentation.
+- [x] Preserve the previous product-specific platform plan in private or product-owned documentation.
+- [ ] Complete a final audit to remove local lab run IDs, real Proxmox IP addresses, and real node names from public Markdown and media.
 
 ## Onboarding
 
-- [x] 초기 설치 명령을 제공한다.
-- [x] `config/oslab.local.example.yaml`과 `config/oslab.local.example.env` 복사 흐름을 설명한다.
-- [x] Proxmox API token 생성 위치와 token id 형식을 설명한다.
-- [x] Proxmox token은 lab demo 기준이며 production/shared cluster 전 least-privilege 검토가 필요하다고 명시한다.
-- [x] staged preflight 흐름을 제공한다.
-- [x] PowerShell/Python/C demo 실행 명령과 demo catalog를 제공한다.
-- [x] `runs/<run-id>/` 결과 확인 방법을 설명한다.
-- [x] JUnit/JSON/HTML report의 용도를 설명한다.
-- [x] Stale VM/VMID range 수동 복구 runbook을 제공한다.
-- [x] CI에서 실패 시에도 `runs/**` artifact를 보존하는 pattern을 설명한다.
+- [x] Provide the initial installation commands.
+- [x] Explain how to copy `config/oslab.local.example.yaml` and `config/oslab.local.example.env`.
+- [x] Explain where to create a Proxmox API token and how its token ID is formatted.
+- [x] State that the Proxmox token guidance is intended for a lab demo and requires a least-privilege review before use on a production or shared cluster.
+- [x] Provide the staged preflight flow.
+- [x] Provide PowerShell, Python, and C demo commands and a demo catalog.
+- [x] Explain how to inspect results under `runs/<run-id>/`.
+- [x] Explain the purposes of the JUnit, JSON, and HTML reports.
+- [x] Provide a manual recovery runbook for stale VMs and VMID ranges.
+- [x] Explain the CI pattern that preserves `runs/**` artifacts even when a job fails.
+- [x] Organize the README as a 30-second overview, overview animation, one step-by-step video covering Dashboard → 10-step workflow → real Proxmox and Windows footage → cleanup → Results, quick start, current support, and detailed documentation.
+- [x] Keep the key message, commands, and supported scope aligned between the English and Korean READMEs.
+- [x] Validate the README links, language switches, and all 14 English/Korean public document pairs with `scripts/check-doc-links.ps1`.
 
 ## Repository Hygiene
 
-- [x] `config/oslab.local.yaml`과 `config/oslab.local.env`는 ignore 대상이다.
-- [x] `runs/`는 ignore 대상이다.
-- [x] Demo artifact files under `validation/artifacts/` are not ignored.
-- [x] Example env files do not contain real secrets.
-- [x] 개발/브라우저/authoring smoke 중 생성되는 timestamp 더미 산출물은 ignore 대상이다.
-- [x] 공개 repo에 포함하면 안 되는 product-specific overlay는 `private/`, `*.local.*`, `*.private.yaml` 계열로 분리한다.
-- [ ] `config/public-release-blocklist.local.txt`에 사내용 product marker와 private domain marker를 추가한다.
-- [ ] `scripts/check-public-release.ps1 -IncludeUntracked`로 tracked/untracked 공개 차단 marker와 더미 산출물을 확인한다.
-- [ ] 최종 commit 전에 secret scan을 한 번 더 실행한다.
+- [x] Ignore `config/oslab.local.yaml` and `config/oslab.local.env`.
+- [x] Ignore `runs/`.
+- [x] Do not ignore demo artifact files under `validation/artifacts/`.
+- [x] Keep real secrets out of example environment files.
+- [x] Ignore timestamped dummy outputs produced by development, browser, and authoring smoke tests.
+- [x] Separate product-specific overlays that must not be included in the public repository under `private/`, `*.local.*`, or `*.private.yaml` conventions.
+- [x] Track README media under `docs/media/` and document its regeneration procedure in `docs/media/DEMO_SCRIPT.md`.
+- [x] Use only deterministic fixtures for the overview, workflow, and Dashboard demos.
+- [x] Verify in a fresh Chromium/Playwright capture that Dashboard recording blocks service workers and blocks HTTP and WebSocket traffic using an allowlist.
+- [x] Record real lab footage only during a dedicated run, crop the resource tree, node, account, IP address, and unrelated task history, and clean up the recording VM afterward.
+- [x] Revalidate the SHA-256 hashes of the four real-lab source images and two run-evidence records, along with `sameRun`, `guestPowerShellMatchesRun`, `sensitiveRegionsReviewed`, `cleanupVerified`, and cleanup `resourceAbsent`, against `source-approval.json`.
+- [x] Compare the final real-lab MP4, GIF, and poster hashes, private run-evidence hashes, execution summary, `cleanup.resourceAbsent`, and `privacy.manualPublicFrameReview` against the public attestation.
+- [x] Mark the boundaries between the Dashboard fixture, explainer fixture, separately recorded real footage, and fixture Results in the single step-by-step video with source badges; record its title and lower-third, source and output hashes, 11-segment EDL, 10 transitions, inherited cleanup status, and independent visual review in a separate attestation.
+- [ ] Add internal product markers and private domain markers to `config/public-release-blocklist.local.txt`.
+- [x] Run `scripts/check-public-release.ps1 -IncludeUntracked` to check tracked and untracked files for the default public-blocking markers and dummy outputs. (Adding the local private-marker blocklist remains incomplete.)
+- [ ] Exclude the modified `apps/api/prisma/prisma/dev.db` from the public commit and replace it with a distribution fixture database that contains no session tokens, password hashes, or execution metadata.
+- [ ] Run one more secret scan before the final commit.
 
 ## Validation
 
 - [x] Demo scenario schema validation passes.
-- [x] Local unit test suite passes.
-- [ ] Public release audit script passes with the local private marker blocklist.
-- [ ] GitHub Actions workflow를 추가한다.
-- [ ] README에 CI badge를 추가한다.
+- [ ] Rerun the local unit test suite successfully against the public candidate. (Tests that reference removed product-specific scenarios still need cleanup.)
+- [ ] Pass the public release audit script with the local private-marker blocklist.
+- [ ] Add a GitHub Actions workflow.
+- [ ] Add a CI badge to the README.
 
 ## Known Limits For First Release
 
-- Windows/Proxmox/QEMU Guest Agent path is the implemented path.
+- The Windows/Proxmox/QEMU Guest Agent path is the implemented path.
 - Linux support is documented as a target, but not the first complete implementation path.
 - WinRM/SSH credentials in config are reserved for future guest channels.
 - Proxmox least-privilege role guidance should be tightened before production cluster use.

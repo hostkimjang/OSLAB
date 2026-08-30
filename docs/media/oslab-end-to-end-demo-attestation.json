@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "compositionType": "dashboard-fixture-bookends-with-separately-captured-sanitized-live-lab",
+  "generatedAt": "2026-08-30T12:44:00.5855158Z",
+  "sources": {
+    "oslab-dashboard-demo.mp4": {
+      "bytes": 1725633,
+      "sha256": "206a2ddaa0de2fa72454364073f618a4dc552c6722292a9e1629bcff3f1f9517",
+      "contract": "Actual Dashboard UI driven by fixed fixture data; the capture blocks external network access and does not contact Proxmox.",
+      "actualDashboardUi": true,
+      "apiData": "deterministicFixture",
+      "proxmoxContacted": false,
+      "externalNetworkBlocked": true
+    },
+    "oslab-live-lab.mp4": {
+      "bytes": 1979438,
+      "sha256": "b92f184e1151a5b529e186bfd7c9af8513afb06d0906f7119ca1b2ae0dcff031",
+      "contract": "Separately captured sanitized live lab footage with passing privacy, public-alias, and cleanup attestation gates.",
+      "attestation": "oslab-live-lab-attestation.json",
+      "attestationSha256": "89726c169cbf1d9566d537c28a0f6ec9f2468c4a0509e0a74ef226f9136ad1ba",
+      "liveOutputHashMatched": true,
+      "sameCaptureSessionAsDashboard": false,
+      "infrastructureAndGuestPowerShellSameRun": false
+    }
+  },
+  "compositionScript": {
+    "path": "apps/web/scripts/compose-readme-end-to-end.mjs",
+    "sha256": "1f82443131e42db2d97e4b219d7ea03b3a39bed20f885308b1ccb3d794347c0d"
+  },
+  "editDecisionList": [
+    {
+      "source": "oslab-dashboard-demo.mp4",
+      "startSeconds": 0,
+      "endSeconds": 13.2,
+      "role": "Dashboard scenario preparation and launch"
+    },
+    {
+      "source": "oslab-live-lab.mp4",
+      "startSeconds": 0,
+      "endSeconds": 22.4,
+      "role": "Sanitized Proxmox, QGA, and actual guest PowerShell footage",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding"
+    },
+    {
+      "source": "oslab-dashboard-demo.mp4",
+      "startSeconds": 22.6,
+      "endSeconds": 27.52,
+      "role": "Dashboard result and evidence return"
+    }
+  ],
+  "transitions": {
+    "type": "crossfade",
+    "durationSeconds": 0.32,
+    "count": 2,
+    "disclosureOverlayAppliedAfterCrossfade": true,
+    "liveLabDisclosureCoversTransitions": true
+  },
+  "disclosures": {
+    "dashboard": "ACTUAL DASHBOARD UI · FIXTURE DATA · NO PROXMOX CONTACTED",
+    "liveLab": "SEPARATELY CAPTURED LIVE LAB FOOTAGE · NOT ONE CONTINUOUS RUN",
+    "fixedForEntireSegment": true
+  },
+  "privacy": {
+    "sourceSha256Pinned": true,
+    "segmentBoundariesDisclosed": true,
+    "liveLabAttestationRequired": true,
+    "liveSourceAttestationVerified": true,
+    "liveLabPublicAliasGateRequired": true,
+    "taskIdentifiersReplacedWithPublicAliases": true,
+    "liveLabCleanupGateRequired": true,
+    "compositorReadsOnlyReviewedPublicMp4Sources": true,
+    "newPrivateCaptureInputsRead": false,
+    "newUnreviewedTextIntroduced": false
+  },
+  "review": {
+    "contactSheetGenerated": true,
+    "contactSheetPath": "output/readme-media/oslab-end-to-end-demo-contact-sheet.png",
+    "contactSheetSha256": "af163745999ed4061325fce30b6ab9bc7e6ed7b192e951ea3bc5eb595a05d876",
+    "sampledFrameReview": true,
+    "fullFrameReview": true,
+    "reviewMethod": "Independent visual review of the complete timeline at one-second intervals, both exact crossfade boundaries, the disclosure card, contact sheet, GIF label samples, and final poster; the live source had already passed its own public-frame review.",
+    "reviewer": "Codex root",
+    "requiredBeforeReadmeSwap": true
+  },
+  "cleanup": {
+    "resourceAbsent": true,
+    "inheritedFromVerifiedLiveSourceAttestation": true
+  },
+  "media": {
+    "durationSeconds": 39.88,
+    "width": 1280,
+    "height": 800,
+    "frameRate": 25,
+    "codec": "h264",
+    "pixelFormat": "yuv420p",
+    "audioStreams": 0
+  },
+  "outputs": {
+    "oslab-end-to-end-demo.mp4": {
+      "bytes": 3276620,
+      "sha256": "39e3996b0582b737edf3187a910d8756a64fe8f88a9499055543575eb09cbf62"
+    },
+    "oslab-end-to-end-demo.gif": {
+      "bytes": 7193218,
+      "sha256": "1f40cf442998f233436893b3b3ed7e10817e3eb300c093464de0b134aab27418"
+    },
+    "oslab-end-to-end-demo-poster.png": {
+      "bytes": 420860,
+      "sha256": "850509d77f62b19ac4d9d4f61b1e1527bee3ae7f947bdb920b5567a50c94deeb"
+    }
+  }
+}

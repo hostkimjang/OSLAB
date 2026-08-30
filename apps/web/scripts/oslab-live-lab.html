@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, "Segoe UI", sans-serif;
+        --bg: #101214;
+        --panel: #171b1f;
+        --text: #edf2f4;
+        --muted: #8f9da8;
+        --line: #2d363d;
+        --green: #45d483;
+        --blue: #72a7ff;
+        --amber: #e4b247;
+        --duration: 24s;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { width: 1280px; height: 720px; margin: 0; overflow: hidden; color: var(--text); background: var(--bg); }
+      body::before {
+        position: fixed; inset: 0; content: ""; opacity: .26;
+        background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 48px 48px; mask-image: linear-gradient(to bottom, black 0%, transparent 88%);
+      }
+
+      .shell { position: relative; z-index: 1; height: 100%; padding: 30px 44px 26px; }
+      header { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+      .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .16em; }
+      .brand img { width: 30px; height: 30px; }
+      .live-label { padding: 8px 12px; border: 1px solid #42515b; color: #b7c4cc; font: 700 11px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .08em; }
+      .live-dot { display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px var(--green); }
+
+      .scene { position: absolute; top: 96px; right: 44px; bottom: 34px; left: 44px; opacity: 0; }
+      .intro { animation: intro var(--duration) linear both; }
+      .proxmox { animation: proxmox var(--duration) linear both; }
+      .windows { animation: windows var(--duration) linear both; }
+      .powershell { animation: powershell var(--duration) linear both; }
+      .final { animation: final var(--duration) linear both; }
+      @keyframes intro { 0%, 8% { opacity: 1; } 10%, 100% { opacity: 0; } }
+      @keyframes proxmox { 0%, 8% { opacity: 0; } 10%, 32% { opacity: 1; } 34%, 100% { opacity: 0; } }
+      @keyframes windows { 0%, 32% { opacity: 0; } 34%, 55% { opacity: 1; } 57%, 100% { opacity: 0; } }
+      @keyframes powershell { 0%, 55% { opacity: 0; } 57%, 82% { opacity: 1; } 84%, 100% { opacity: 0; } }
+      @keyframes final { 0%, 82% { opacity: 0; } 84%, 100% { opacity: 1; } }
+
+      .eyebrow { margin: 0 0 12px; color: var(--green); font: 700 11px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .12em; }
+      h1 { max-width: 950px; margin: 0; font-size: 46px; line-height: 1.05; letter-spacing: -.05em; }
+      h1 em { color: var(--green); font-style: normal; }
+      .lede { max-width: 780px; margin: 18px 0 0; color: #9eabb4; font-size: 17px; line-height: 1.55; }
+
+      .intro { display: grid; place-items: center; text-align: center; }
+      .intro .eyebrow { margin-bottom: 18px; }
+      .intro h1 { font-size: 58px; }
+      .intro .chips { display: flex; justify-content: center; gap: 8px; margin-top: 28px; }
+      .chip { padding: 9px 12px; border: 1px solid #354149; background: #171b1f; color: #aab6bd; font: 700 11px/1 ui-monospace, "Cascadia Mono", monospace; }
+
+      .scene-head { display: flex; align-items: flex-end; justify-content: space-between; height: 72px; }
+      .scene-head h1 { font-size: 33px; }
+      .scene-head .step { color: var(--blue); font: 800 12px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .1em; }
+
+      .capture-grid { display: grid; grid-template-columns: 1fr 1.45fr; gap: 14px; height: 455px; margin-top: 18px; }
+      .capture-panel { overflow: hidden; border: 1px solid #39454e; background: #171b1f; }
+      .capture-panel header { height: 48px; padding: 0 15px; border-bottom: 1px solid #303a41; color: #a9b5bd; font: 700 11px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .1em; }
+      .capture-panel header span { color: var(--green); }
+      .capture-panel img { display: block; max-width: none; }
+      .task-table { margin: 22px 14px; overflow: hidden; border: 1px solid #434e55; background: #111416; }
+      .task-table img { display: block; width: 100%; height: 18px; object-fit: cover; object-position: top; }
+      .task-row { display: grid; grid-template-columns: 1fr 54px; min-height: 28px; align-items: center; padding: 0 8px; border-top: 1px solid #373f44; color: #dbe2e6; font: 11px/1 ui-monospace, "Cascadia Mono", monospace; }
+      .task-row:nth-child(2) { background: #4d4f50; }
+      .task-row span:last-child { color: #d8f3e3; text-align: center; }
+      .task-copy { margin: 28px 18px 0; }
+      .task-copy strong { display: block; font-size: 23px; }
+      .task-copy p { color: var(--muted); font: 12px/1.65 ui-monospace, "Cascadia Mono", monospace; }
+      .task-copy b { color: var(--green); font-weight: 700; }
+      .cpu-image { width: 100%; height: 405px; object-fit: cover; object-position: center; animation: breathe 6s ease-in-out infinite alternate; }
+      @keyframes breathe { to { transform: scale(1.025); } }
+
+      .guest-grid { display: grid; grid-template-columns: 1.42fr .8fr; gap: 14px; height: 478px; margin-top: 18px; }
+      .vm-frame { position: relative; height: 478px; overflow: hidden; border: 1px solid #3d4a52; background: black; box-shadow: 0 28px 70px rgba(0,0,0,.35); }
+      .vm-frame::before { position: absolute; z-index: 2; top: 14px; left: 16px; padding: 8px 10px; content: "PROXMOX CONSOLE · DISPOSABLE WINDOWS VM"; color: white; background: rgba(12,15,17,.8); font: 700 10px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .08em; }
+      .vm-frame img { width: 100%; height: 100%; object-fit: cover; animation: vm-zoom 6s ease-out both; }
+      @keyframes vm-zoom { from { transform: scale(1.035); } to { transform: scale(1); } }
+      .trace { padding: 18px; border: 1px solid #3d4a52; background: #13171a; }
+      .trace h2 { margin: 0 0 6px; color: #dbe4e9; font-size: 17px; }
+      .trace > p { margin: 0 0 18px; color: var(--muted); font: 10px/1.5 ui-monospace, "Cascadia Mono", monospace; }
+      .trace-item { display: grid; grid-template-columns: 18px 1fr; gap: 9px; align-items: start; margin: 0 0 14px; opacity: 0; animation: trace-in .35s ease-out forwards; }
+      .trace-item:nth-of-type(2) { animation-delay: .4s; }
+      .trace-item:nth-of-type(3) { animation-delay: 1.1s; }
+      .trace-item:nth-of-type(4) { animation-delay: 1.8s; }
+      .trace-item:nth-of-type(5) { animation-delay: 2.5s; }
+      .trace-item:nth-of-type(6) { animation-delay: 3.2s; }
+      .trace-item i { display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; color: #102017; background: var(--green); font: 900 11px/1 sans-serif; font-style: normal; }
+      .trace-item strong { display: block; color: #dbe4e9; font: 700 11px/1.3 ui-monospace, "Cascadia Mono", monospace; }
+      .trace-item small { color: #83929b; font: 10px/1.5 ui-monospace, "Cascadia Mono", monospace; }
+      @keyframes trace-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+
+      .powershell-grid { display: grid; grid-template-columns: 1.7fr .62fr; gap: 14px; height: 478px; margin-top: 18px; }
+      .powershell-frame { position: relative; overflow: hidden; border: 1px solid #3d4a52; background: #050607; box-shadow: 0 28px 70px rgba(0,0,0,.35); }
+      .powershell-frame::before { position: absolute; z-index: 2; top: 14px; left: 16px; padding: 8px 10px; content: "ACTUAL GUEST DESKTOP · SANITIZED CROP"; color: white; background: rgba(12,15,17,.86); font: 700 10px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .08em; }
+      .powershell-frame img { width: 100%; height: 100%; object-fit: contain; animation: terminal-zoom 6s ease-out both; }
+      @keyframes terminal-zoom { from { transform: scale(1.025); } to { transform: scale(1); } }
+      .proof { display: flex; flex-direction: column; padding: 19px; border: 1px solid #3d4a52; background: #13171a; }
+      .proof .eyebrow { margin-bottom: 15px; }
+      .proof-item { padding: 14px 0; border-top: 1px solid #303a41; }
+      .proof-item:first-of-type { border-top: 0; }
+      .proof-item small { display: block; margin-bottom: 6px; color: #7f8e97; font: 700 9px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .1em; }
+      .proof-item strong { color: #dbe4e9; font: 800 15px/1.3 ui-monospace, "Cascadia Mono", monospace; }
+      .proof-item strong.ok { color: var(--green); }
+      .proof-note { margin-top: auto; color: #83929b; font: 10px/1.55 ui-monospace, "Cascadia Mono", monospace; }
+
+      .final-grid { display: grid; grid-template-columns: .82fr 1.35fr; gap: 14px; height: 446px; margin-top: 20px; }
+      .final-card { position: relative; overflow: hidden; border: 1px solid #36434a; background: #171b1f; }
+      .final-card .label { position: absolute; z-index: 2; top: 13px; left: 14px; padding: 7px 9px; color: white; background: rgba(12,15,17,.82); font: 700 10px/1 ui-monospace, "Cascadia Mono", monospace; }
+      .final-card img { width: 100%; height: 100%; object-fit: cover; }
+      .final-card .task-table { margin-top: 72px; }
+      .final-card .task-table img { height: 18px; object-fit: cover; object-position: top; }
+      .final-card img.powershell-image { object-fit: contain; background: #050607; }
+      .pass { display: flex; align-items: center; justify-content: space-between; margin: 26px 14px 0; padding: 18px; border-left: 3px solid var(--green); background: #14221a; }
+      .pass strong { color: var(--green); font-size: 32px; }
+      .pass span { color: #b5c1c8; font: 12px/1.55 ui-monospace, "Cascadia Mono", monospace; text-align: right; }
+
+      .progress { position: absolute; right: 44px; bottom: 16px; left: 44px; height: 2px; background: #263038; }
+      .progress::after { display: block; width: 0; height: 100%; content: ""; background: var(--green); animation: progress var(--duration) linear forwards; }
+      @keyframes progress { to { width: 100%; } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div class="brand"><img src="{{OSLAB_ICON_DATA_URL}}" alt="" /> OSLAB</div>
+        <div class="live-label"><span class="live-dot"></span>LIVE LAB CAPTURE · SENSITIVE REGIONS CROPPED</div>
+      </header>
+
+      <section class="scene intro">
+        <div>
+          <p class="eyebrow">REAL WINDOWS · REAL PROXMOX · DISPOSABLE CLONE</p>
+          <h1>A real OSLAB run,<br /><em>recorded safely.</em></h1>
+          <p class="lede">Actual infrastructure and guest-execution footage comes from two passing PowerShell demo sessions. Other VM names, node details, account names, and IP addresses were cropped before publication.</p>
+          <div class="chips"><span class="chip">PROXMOX TASKS</span><span class="chip">WINDOWS CONSOLE</span><span class="chip">2 / 2 ASSERTIONS</span></div>
+        </div>
+      </section>
+
+      <section class="scene proxmox">
+        <div class="scene-head"><div><p class="eyebrow">PROXMOX VE · ACTUAL RUN</p><h1>Clone and start the disposable VM</h1></div><div class="step">01 / 03</div></div>
+        <div class="capture-grid">
+          <div class="capture-panel">
+            <header>PROXMOX TASK HISTORY <span>OK</span></header>
+            <div class="task-table">
+              <img src="{{PROXMOX_TASKS_DATA_URL}}" alt="Proxmox task table header" />
+              <div class="task-row"><span>VM CAPTURE-01 · Start</span><span>OK</span></div>
+              <div class="task-row"><span>Windows template · Clone</span><span>OK</span></div>
+            </div>
+            <div class="task-copy"><strong>Template → disposable clone</strong><p><b>Clone OK</b><br /><b>Start OK</b><br />Public aliases replace the source VM identifiers.</p></div>
+          </div>
+          <div class="capture-panel">
+            <header>LIVE VM CPU GRAPH <span>RUNNING</span></header>
+            <img class="cpu-image" src="{{PROXMOX_CPU_DATA_URL}}" alt="" />
+          </div>
+        </div>
+      </section>
+
+      <section class="scene windows">
+        <div class="scene-head"><div><p class="eyebrow">WINDOWS 11 · ACTUAL VM CONSOLE + RUN TRACE</p><h1>The guest is alive; QGA carries the work inside</h1></div><div class="step">02 / 03</div></div>
+        <div class="guest-grid">
+          <div class="vm-frame"><img src="{{WINDOWS_VM_DATA_URL}}" alt="Windows 11 guest console" /></div>
+          <aside class="trace">
+            <h2>QGA execution trace</h2>
+            <p>VALUES FROM THE CAPTURE RUN · NOT A GUEST TERMINAL RECORDING</p>
+            <div class="trace-item"><i>✓</i><div><strong>Guest preflight</strong><small>6 / 6 checks passed</small></div></div>
+            <div class="trace-item"><i>✓</i><div><strong>Artifact uploaded</strong><small>1 file · 700 bytes</small></div></div>
+            <div class="trace-item"><i>✓</i><div><strong>PowerShell command</strong><small>exit code 0</small></div></div>
+            <div class="trace-item"><i>✓</i><div><strong>Output collected</strong><small>684 bytes · normalized</small></div></div>
+            <div class="trace-item"><i>✓</i><div><strong>Assertions</strong><small>2 / 2 passed</small></div></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="scene powershell">
+        <div class="scene-head"><div><p class="eyebrow">WINDOWS 11 · ACTUAL GUEST POWERSHELL</p><h1>The delivered artifact runs inside the VM</h1></div><div class="step">03 / 03</div></div>
+        <div class="powershell-grid">
+          <div class="powershell-frame"><img src="{{WINDOWS_POWERSHELL_DATA_URL}}" alt="Actual Windows 11 guest PowerShell showing the delivered artifact and passing result" /></div>
+          <aside class="proof">
+            <p class="eyebrow">VISIBLE IN CAPTURE</p>
+            <div class="proof-item"><small>GUEST OS</small><strong>Windows 11 Pro</strong></div>
+            <div class="proof-item"><small>COMMAND RESULT</small><strong class="ok">exitCode 0</strong></div>
+            <div class="proof-item"><small>OPERATOR CHECK</small><strong class="ok">OSLAB-DEMO-PASS</strong></div>
+            <p class="proof-note">The desktop pixels are an actual guest capture. The labels summarize only values visible in that capture.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="scene final">
+        <div class="scene-head"><div><p class="eyebrow">ACTUAL LAB FOOTAGE · SANITIZED</p><h1>Infrastructure, guest execution, and verified evidence</h1></div><div class="step">PASS</div></div>
+        <div class="final-grid">
+          <div class="final-card"><span class="label">PROXMOX TASKS · PUBLIC ALIASES</span><div class="task-table"><img src="{{PROXMOX_TASKS_DATA_URL}}" alt="Proxmox task table header" /><div class="task-row"><span>VM CAPTURE-01 · Start</span><span>OK</span></div><div class="task-row"><span>Windows template · Clone</span><span>OK</span></div></div><div class="pass"><strong>PASS</strong><span>2 / 2 assertions<br />capture VMs removed</span></div></div>
+          <div class="final-card"><span class="label">ACTUAL WINDOWS POWERSHELL · EXIT CODE 0</span><img class="powershell-image" src="{{WINDOWS_POWERSHELL_DATA_URL}}" alt="" /></div>
+        </div>
+      </section>
+      <div class="progress"></div>
+    </main>
+  </body>
+</html>

@@ -30,8 +30,8 @@ README:
 | Document | Purpose |
 | --- | --- |
 | [Platform Plan](oslab-platform-plan.md) | Architecture and longer-term platform direction |
-| [Expert Review](oslab-expert-review.md) | Pre-implementation architecture review record |
-| [Developer Working Docs](devs/README.md) | Internal working docs, implementation checklist, and maintainer task tracking |
+| [Expert Review (Korean)](oslab-expert-review.md) | Pre-implementation architecture review record |
+| [Developer Working Docs (Korean)](devs/README.md) | Internal working docs, implementation checklist, and maintainer task tracking |
 | [GitHub Release Checklist](github-release-checklist.md) | First public release readiness checks |
 
 The implementation checklist is useful for maintainers, but it is an internal working log, not a first-read public guide.

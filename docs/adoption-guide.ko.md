@@ -1,4 +1,4 @@
-# Adoption Guide
+# 도입 가이드
 
 언어: [English](adoption-guide.md) | 한국어
 
@@ -36,7 +36,9 @@
 
 이렇게 시작하면 실패 원인이 명확합니다. Fixture가 실패하면 VM 환경 준비 문제이고, artifact command가 실패하면 제품 실행 문제이며, assertion이 실패하면 결과가 기대와 다르다는 뜻입니다.
 
-## Fixture vs Artifact
+<a id="fixture-vs-artifact"></a>
+
+## Fixture와 Artifact 구분
 
 Fixture는 “시험장 준비”입니다. VM 안에서 테스트 전에 필요한 조건을 만듭니다.
 
@@ -51,7 +53,9 @@ Artifact는 “시험 대상”입니다. 실제로 설치하거나 실행해서
 
 Product 실행을 fixture에 넣으면 실패가 “환경 문제”인지 “제품 문제”인지 흐려집니다. 그래서 product signal은 artifact command 또는 product steps에 두는 것이 좋습니다.
 
-## Adapter vs Assertion
+<a id="adapter-vs-assertion"></a>
+
+## Adapter와 Assertion 구분
 
 Adapter는 번역기입니다. 제품마다 제각각인 raw output을 `oslab`이 공통으로 이해하는 canonical model로 바꿉니다.
 
@@ -79,7 +83,9 @@ raw product output
 | 6. Result 확인 | stdout, reports, normalized JSON 확인 | `uv run oslab inspect-result --run-dir runs\<run-id>` |
 | 7. CI로 승격 | `runs/**` publish, JUnit 읽기 | `runs/<run-id>/reports/result.junit.xml` |
 
-## Folder Artifact Pattern
+<a id="folder-artifact-pattern"></a>
+
+## 폴더 아티팩트 패턴
 
 Product가 folder 상태로 테스트 가능할 때 사용합니다.
 
@@ -127,7 +133,9 @@ Script는 `{OutputPath}`에 다음 형태의 result를 써야 합니다.
 }
 ```
 
-## Installer Artifact Pattern
+<a id="installer-artifact-pattern"></a>
+
+## 설치 파일 아티팩트 패턴
 
 설치 자체도 검증해야 할 때 사용합니다.
 
@@ -150,7 +158,9 @@ outputs:
 
 `installCommand`는 setup/install 동작을 검증합니다. `command`는 설치된 product의 실제 동작을 검증합니다.
 
-## Fixture Pattern
+<a id="fixture-pattern"></a>
+
+## Fixture 작성 패턴
 
 Fixture는 artifact upload/execution 전에 guest OS state를 준비합니다.
 
@@ -164,7 +174,9 @@ Fixture에 적합한 작업:
 
 Product 실행은 fixture에 넣지 않는 것이 좋습니다. Product 실행은 `artifact.command` 또는 `product.steps`에 두어야 failure classification과 report가 정확해집니다.
 
-## Fast-Fail Checks And Smoke Commands
+<a id="fast-fail-checks-and-smoke-commands"></a>
+
+## 빠른 실패 확인과 Smoke 명령
 
 `preflight`와 `*-smoke` command는 제품을 검증하려는 최종 명령이 아닙니다. 비싼 full run을 돌리기 전에 고장 위치를 좁히기 위한 진단 도구입니다.
 
@@ -179,7 +191,9 @@ Product 실행은 fixture에 넣지 않는 것이 좋습니다. Product 실행�
 
 Full `oslab run`이 실패했을 때 바로 코드를 고치기보다, 실패 단계에 맞는 smoke command로 경계를 좁히는 편이 빠릅니다.
 
-## Failure Triage
+<a id="failure-triage"></a>
+
+## 실패 원인 분류
 
 첫 run이 실패하면 다음 순서로 확인하세요.
 
@@ -195,7 +209,9 @@ Full `oslab run`이 실패했을 때 바로 코드를 고치기보다, 실패 �
 
 VM-level debugging이 필요하면 `--keep-vm`으로 재실행하고 `qga-exec`로 guest 내부를 확인한 뒤, 수동 cleanup 후 `preflight --provider-resource-check`로 `usedInRange`를 확인하세요.
 
-## CI Contract
+<a id="ci-contract"></a>
+
+## CI 계약
 
 CI는 보통 다음 흐름을 사용합니다.
 

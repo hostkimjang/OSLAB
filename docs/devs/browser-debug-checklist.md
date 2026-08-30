@@ -368,7 +368,7 @@
   - API URL: `http://127.0.0.1:3001`
   - Web/API auth 후 `GET /api/lab/status`가 Web proxy와 API direct 양쪽 모두 `200`, `status=ready`
   - Dashboard/Scenario/Run/Results/mobile 화면 렌더링 확인
-  - Lab Status는 화면에서도 `준비됨`, Proxmox `9.1.1`, node `softverse`, VMID pool `9102-9199 · free 97`로 갱신됨
+  - Lab Status는 화면에서도 `준비됨`, Proxmox `9.1.1`, node `<lab-node>`, VMID pool `9102-9199 · free 97`로 갱신됨
   - Info tooltip smoke: desktop/mobile clipping 없음, server/runtime errors `0`
   - Results preview/file discovery smoke: discovered JSON preview modal 열림, missing expected file은 dead link/preview button 없음, server/runtime errors `0`
   - Smoke report: `output/web-dashboard/restart-visual-smoke.json`
@@ -416,7 +416,7 @@
 - [x] 큰 Release 폴더 업로드 500 회귀 수정 smoke 진행
   - 원인: Web `:3000`의 Next rewrite proxy 경유 대용량 multipart 업로드가 `100%` 전송 뒤 `Internal Server Error`로 끝날 수 있음
   - 수정: Web upload helper가 `/api/artifacts/upload*` 요청을 `getApiBaseUrl()` 기반 API server `:3001`로 직접 전송
-  - 실제 폴더: `C:\Users\kysky\Documents\gitlab\agent-windows\ProductAgent\bin\Release`
+  - 실제 폴더: `<artifact-source>\ProductAgent\bin\Release`
   - 결과: `POST http://127.0.0.1:3001/api/artifacts/upload-directory`, status `201`
   - 저장 경로: `.web-artifacts/1777272853999-Release`
   - 파일 수/크기: `156` files, `72,749,326` bytes
@@ -424,10 +424,10 @@
   - Screenshot: `output/web-dashboard/artifact-release-folder-direct-upload.png`
 - [x] product-specific 실행 묶음 Web smoke 진행
   - Web에서 실행 묶음: `validation/suites/product-specific-windows-v1.example.yaml`
-  - Artifact 직접 경로: `C:\Users\kysky\Documents\gitlab\agent-windows\ProductAgent\bin\Release`
-  - Job: `cmognt5bg000usmmg6u6uvktu`
+  - Artifact 직접 경로: `<artifact-source>\ProductAgent\bin\Release`
+  - Job: `<recorded-job-id>`
   - 결과: `failed`, total `5`, passed `3`, requiredFailed `1`, allowedFailed `1`
-  - `path-profile` required entry에서 `Proxmox API request failed: GET /nodes/softverse/qemu/9102/agent/exec-status` transient failure 확인
+  - `path-profile` required entry에서 `Proxmox API request failed: GET /nodes/<lab-node>/qemu/9102/agent/exec-status` transient failure 확인
   - `appx-readonly`은 `allowFailure: true`인 gap-probe로 assertion failure가 허용 실패로 표시됨
   - Server errors: `0`
   - Runtime errors: `0`
@@ -612,7 +612,7 @@
   - Screenshot: `output/web-dashboard/run-launcher-artifact-upload-desktop.png`
   - Screenshot: `output/web-dashboard/run-launcher-artifact-upload-mobile.png`
 - [x] Run Launcher 디렉터리 artifact path smoke 진행
-  - 대상 path: `C:\Users\kysky\Documents\gitlab\agent-windows\ProductAgent\bin\Release`
+  - 대상 path: `<artifact-source>\ProductAgent\bin\Release`
   - API check: `exists=true`, `kind=directory`
   - UI: `직접 입력 - 파일/폴더 경로`, path input enabled, artifact status `테스트 파일 확인됨 · directory`
   - 시나리오 실행 준비 문구: `실행 준비가 완료되었습니다.`

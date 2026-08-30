@@ -1,4 +1,4 @@
-# Reports And Results
+# 보고서와 결과
 
 언어: [English](reports.md) | 한국어
 
@@ -11,7 +11,9 @@ Report 관련 파일은 두 종류로 나눠서 보면 쉽습니다.
 
 실패를 조사할 때는 evidence를 보고, 결과를 공유하거나 CI gate로 사용할 때는 reports를 봅니다.
 
-## Layout
+<a id="layout"></a>
+
+## 디렉터리 구성
 
 ```text
 runs/<run-id>/
@@ -50,7 +52,9 @@ runs/<run-id>/
 | Adapter/assertion이 이상함 | `raw/actual-output.json` 다음 `normalized/*.json` | Raw collected data와 canonical data 비교 |
 | Step-based product 실패 | `raw/product-steps.json`와 `logs/product-step-*.stderr.log` | Step별 result 확인 |
 
-## File Roles
+<a id="file-roles"></a>
+
+## 파일별 역할
 
 | File or directory | Primary reader | Role |
 | --- | --- | --- |
@@ -65,7 +69,9 @@ runs/<run-id>/
 | `reports/result.json` | Automation | Machine-readable report |
 | `reports/result.html` | Human reviewer | Static report |
 
-## Live Logs
+<a id="live-logs"></a>
+
+## 실시간 로그
 
 Run 진행 상황 보기:
 
@@ -79,7 +85,9 @@ Get-Content runs\<run-id>\logs\progress.log -Wait
 {"phase":"vm.boot.done","status":"done","message":"VM is running","details":{"vmId":9102}}
 ```
 
-## Inspect Result
+<a id="inspect-result"></a>
+
+## 결과 확인
 
 ```powershell
 uv run oslab inspect-result --run-dir runs\<run-id>
@@ -97,7 +105,9 @@ HTML report 열기:
 Invoke-Item runs\<run-id>\reports\result.html
 ```
 
-## JUnit
+<a id="junit"></a>
+
+## JUnit 보고서
 
 CI system은 다음 file을 읽으면 됩니다.
 
@@ -120,7 +130,9 @@ Infrastructure/execution failure는 JUnit error로, assertion mismatch는 JUnit 
 
 JUnit 생성은 scenario의 `reports.formats`에 `junit`이 있을 때 `oslab run`과 `artifact-smoke`에서 구현되어 있습니다. 검증 계층과 정확한 command 흐름은 [검증과 JUnit](validation.ko.md)을 참고하세요.
 
-## CI Artifact Pattern
+<a id="ci-artifact-pattern"></a>
+
+## CI 아티팩트 패턴
 
 Job이 실패해도 항상 `runs/**`를 publish하세요. 그렇지 않으면 JUnit에는 실패만 남고, 원인 분석에 필요한 logs, raw output, normalized output, HTML report가 사라질 수 있습니다.
 

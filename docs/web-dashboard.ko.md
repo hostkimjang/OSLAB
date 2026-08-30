@@ -1,8 +1,12 @@
 # oslab Web Dashboard
 
+언어: [English](web-dashboard.md) | 한국어
+
 Web dashboard는 `oslab`을 LAN/team 환경에서 더 편하게 쓰기 위한 control surface입니다. Python runner를 새로 대체하지 않습니다. 기존 CLI command를 감싸고, job history는 SQLite에 저장하며, 시나리오(Scenario), 실행 묶음(Suite), 환경 준비 스크립트(Fixture) 정의는 Git-friendly file로 유지합니다.
 
-## Architecture
+<a id="architecture"></a>
+
+## 아키텍처
 
 ```text
 apps/web   Next.js dashboard
@@ -53,7 +57,9 @@ apps/api/src/
     lab/proxmox-lab.client.ts  # Lab Status/cleanup용 Proxmox HTTP 정책
 ```
 
-## Setup
+<a id="setup"></a>
+
+## 설치와 실행
 
 서버 실행, LAN 접근, production-like start command, smoke check, troubleshooting은 [Web Dashboard 서버 실행 가이드](web-dashboard-server.ko.md)를 봅니다.
 
@@ -73,7 +79,7 @@ Copy-Item apps/web/.env.example apps/web/.env
 최소한 아래 값은 설정합니다.
 
 ```text
-OSLAB_REPO_ROOT=C:/Users/kysky/Documents/gitlab/product-specific_autorun_test
+OSLAB_REPO_ROOT=C:/path/to/OSLAB
 OSLAB_WEB_ADMIN_USERNAME=admin
 OSLAB_WEB_ADMIN_PASSWORD=<strong-password>
 ```
@@ -104,18 +110,20 @@ Web local URL: http://127.0.0.1:3000
 Web bind: 0.0.0.0:3000
 ```
 
-## Safety
+<a id="safety"></a>
+
+## 안전 원칙
 
 - 시나리오(Scenario), 실행 묶음(Suite), 환경 준비 스크립트(Fixture) 편집은 `scenarios/**`, `validation/fixtures/**`, `validation/suites/**`로 제한됩니다.
 - Authoring API는 read뿐 아니라 create/write에서도 root와 extension 정책을 강제합니다. Scenario/Suite는 `.yaml/.yml`, Fixture는 `.ps1/.sh`만 허용하고, env/secret 성격의 경로는 차단합니다.
-- Artifact text authoring은 Artifact Studio에서 `validation/artifacts/**/*.{ps1,sh,py,c,json,txt,cmd,bat}`로 제한됩니다. `.web-artifacts/**`, binary 파일, directory artifact는 실행 선택/read-only만 허용합니다.
+- Artifact text authoring은 `validation/artifacts/**` 아래의 안전한 text-like 파일로 제한됩니다. PowerShell, shell, Python, C, C#, JSON, YAML, JavaScript, TypeScript, HTML, CSS, Markdown, Dockerfile, txt, cmd, bat를 지원합니다. `.web-artifacts/**`, binary 파일, directory artifact는 실행 선택과 read-only 열람만 허용합니다.
 - Artifact archive/delete는 2단계 confirm 흐름입니다. `validation/artifacts/**` repo artifact는 직접 삭제하지 않고 `.artifact-archive/**`로 먼저 보관하며, `.web-artifacts/**`와 `.artifact-archive/**`만 confirm 후 삭제할 수 있습니다.
 - Artifact Studio의 Script Assist는 스크립트를 실행하지 않습니다. 자동완성/진단은 API의 LSP Assist 표면을 통해 제공하며, JSON parse, placeholder 오타, 위험 경로 힌트, 파괴적 명령 패턴 같은 정적 검사만 수행합니다.
 - 파일 authoring 화면은 기본 `읽기 전용`입니다. `수정` 버튼을 누른 뒤에만 YAML/PowerShell 내용을 바꿀 수 있고, `저장` 또는 `취소` 후 다시 읽기 전용으로 돌아갑니다.
 - 수정된 내용은 저장 전에 변경/추가/삭제 line count와 상위 변경 preview를 표시합니다.
 - 저장 전 현재 editor buffer 기준으로 YAML/PowerShell 문법을 검사합니다. 정상/검증중 상태는 레이아웃을 밀지 않는 toast로 표시하고, 문법 오류만 inline으로 남겨 `저장` 버튼을 차단합니다.
 - 시나리오 저장은 파일 쓰기 전에 가벼운 scenario 계약 검증도 수행합니다. 잘못된 `schemaVersion`, OS 계열, guest mode, report format, cleanup 타입, assertion 누락은 대시보드에서 저장을 차단합니다.
-- 실행 묶음 저장도 파일 쓰기 전에 가벼운 suite 계약 검증을 수행합니다. 빈 runs, 중복 run id, 잘못된 scenario path, 잘못된 `tier`/`allowFailure` 형태는 대시보드에서 저장을 차단합니다.
+- 실행 묶음 저장도 파일 쓰기 전에 가벼운 suite 계약 검증을 수행합니다. 빈 runs, 중복 run id, 잘못된 scenario path, 잘못된 `tier`/`allowFailure`/`enabled` 형태와 `maxParallel` 값은 대시보드에서 저장을 차단합니다.
 - 새 시나리오/환경 준비/실행 묶음 생성은 create-only입니다. API는 이미 존재하는 authoring 파일을 덮어쓰지 않습니다.
 - 저장하지 않은 변경이 있는 상태에서 다른 파일을 열면 discard confirm을 표시합니다.
 - Env file은 Web API로 읽을 수 없습니다.
@@ -127,7 +135,9 @@ Web bind: 0.0.0.0:3000
 - LAN에서 실시간 job event나 대용량 artifact upload까지 확인하려면 API도 LAN에서 접근 가능해야 합니다. `apps/api/.env`의 `OSLAB_WEB_HOST`를 `0.0.0.0`으로 바꾸고, `OSLAB_WEB_ORIGIN`은 실제 Web origin 예: `http://<dashboard-host-ip>:3000`에 맞춥니다.
 - LAN 접근을 열 때는 OS 방화벽, 사설망 범위, 계정/password, reverse proxy 정책을 같이 확인합니다.
 
-## Current V1 Features
+<a id="current-v1-features"></a>
+
+## 현재 V1 기능
 
 - Local account login
 - English/Korean language switch
@@ -168,14 +178,14 @@ Web bind: 0.0.0.0:3000
 - Artifact Studio는 단일 파일, 폴더형 프로젝트, product-specific starter를 create-only 방식으로 생성
 - Artifact Studio의 `새 아티팩트 제작`은 검색/필터 상단에 있고, 누르면 왼쪽 선택 artifact를 해제한 뒤 제작 가이드 화면으로 전환합니다. 생성 완료 후에는 새 artifact가 자동 선택되고 Run Launcher/Scenario Builder에 적용할 수 있습니다.
 - Artifact Studio 독립 화면은 desktop/FHD/QHD에서 viewport 높이를 채우는 작업형 layout을 사용합니다. 좌측 목록, 상세 editor, Script Assist는 page 밖으로 밀리지 않고 각 영역 내부에서 scroll됩니다. mobile/tablet에서는 자연스러운 세로 문서 흐름을 유지합니다.
-- text artifact는 lazy-loaded Monaco editor로 편집하며 OSLAB placeholder, output contract, PowerShell/shell/Python template, product-specific agent-cli wrapper snippet, Python `print`/`range` 같은 언어 기본 추천을 제공
+- text artifact는 lazy-loaded Monaco editor로 편집하며 OSLAB placeholder, output contract, PowerShell/shell/Python template, product-specific agent-cli wrapper snippet과 언어별 기본 추천을 제공합니다. 지원 범위에는 C#, YAML, JavaScript, TypeScript, HTML, CSS, Markdown, Dockerfile도 포함됩니다.
 - binary artifact와 folder artifact는 `실행 전용` 상세 화면으로 표시합니다. binary는 hash/size/modified time을 보여주고, folder는 file count/total bytes와 제한된 내부 tree preview를 보여주며 둘 다 editor를 노출하지 않습니다.
 - Artifact Studio에서 repo/uploaded artifact를 archive할 수 있고, uploaded/archive artifact는 confirm modal을 거쳐 삭제할 수 있습니다. Repo artifact hard delete는 막고 archive-first 정책을 적용합니다. 보관된 leaf artifact를 삭제하면 빈 archive 부모 폴더도 정리해 목록에 0-byte 잔여 폴더가 남지 않게 합니다.
 - `validation/artifacts/<folder>/<script>`처럼 폴더 안에 있는 text artifact를 선택했을 때, 시나리오가 `{ArtifactDir}\...` 형태를 기대하면 `상위 폴더를 실행에서 사용`으로 Run Launcher artifact path를 폴더 경로에 맞출 수 있습니다.
-- Script Assist 자동완성은 `POST /api/artifacts/assist/complete`를 통해 backend LSP/internal provider에서 받아옵니다. Python, shell, JSON은 repo에 설치된 공개 language server(`pyright-langserver`, `bash-language-server`, `vscode-json-language-server`)에 먼저 요청하고, 부족한 제작 스니펫은 OSLAB internal fallback dataset으로 보강합니다. PowerShell/C는 project-local LSP tool cache 준비 상태와 internal fallback을 함께 보여줍니다. BAT/CMD/txt는 OSLAB internal LSP-compatible provider를 사용합니다. `Ctrl+Space`, `.`, `{`, `$`, `p`, `W`, `r`, `f` 같은 언어별 trigger에서 자연스럽게 후보를 요청합니다.
+- Script Assist 자동완성은 `POST /api/artifacts/assist/complete`를 통해 backend LSP/internal provider에서 받아옵니다. Python, shell, JSON, YAML, JavaScript, TypeScript, HTML, CSS, Markdown, Dockerfile은 repo에 설치된 공개 language server를 먼저 사용하고 OSLAB 제작 스니펫으로 보강합니다. Scenario/Suite YAML과 Fixture PowerShell/Shell 작성 화면도 같은 Monaco/LSP 진단 표면을 사용하며 기존 diff/save 흐름은 유지합니다. PowerShell, C, C#은 project-local toolchain 준비 상태와 internal fallback을 함께 보여주고, BAT/CMD/txt는 OSLAB internal LSP-compatible provider를 사용합니다. `Ctrl+Space`, `.`, `{`, `$`, `:`, `/`, `<`, `@`, `p`, `W`, `r`, `f` 같은 언어별 trigger에서 후보를 요청합니다.
 - Monaco editor는 `fixedOverflowWidgets`를 사용해 suggest/hover/warning popup이 editor box 밖으로 나가도 잘리지 않도록 했고, path 기반 model/defaultValue로 유지해 Assist 갱신 중 React가 입력값을 되돌려 쓰지 않게 했습니다. Snippet 삽입은 plain text edit operation으로 처리해 PowerShell `$OutputPath`, `$result` 같은 변수가 Monaco snippet parser와 충돌하지 않게 합니다.
-- Script Assist는 현재 artifact 확장자에 맞춰 PowerShell, shell, Python, JSON, CMD/BAT, C, txt language mode와 static check를 적용합니다. Static lint dataset은 공통 secret pattern 외에 PowerShell `Invoke-Expression`/elevation, shell `curl | sh`/`chmod -R 777`, Python `shell=True`/`os.system`, BAT `del /s`/`reg delete`, C `gets`/`system` 같은 위험 패턴을 언어별로 경고합니다. Monaco model은 artifact path 기준으로 유지해 검사 결과가 갱신되어도 cursor/focus가 튀지 않게 했습니다.
-- Script Assist panel은 `처음 만들기`, `도움`, `자동완성`, `검사`, `출력 계약`, `AI 도움` 흐름을 제공하며, 언어 도구 상태(Python/PowerShell/shell/C 등)와 언어별 추천 항목 설명을 표시합니다. `도움` 탭에는 artifact가 VM에 복사/실행되는 흐름, output contract가 필요한 이유, Run Launcher 사용 순서, 언어별 최소 구조와 “무엇을 입력하면 어떤 추천이 뜨는지” 안내가 같이 표시됩니다. 추천 항목은 표시 이름, 설명, 예시 코드, 삽입 버튼을 가진 compact list로 표시합니다. `AI 도움`은 이번 단계에서 실제 모델 호출 없이 확장 지점만 표시합니다.
+- Script Assist는 artifact 확장자에 맞춰 PowerShell, shell, Python, JSON, YAML, JavaScript/TypeScript, HTML, CSS, Markdown, Dockerfile, CMD/BAT, C, C#, txt language mode와 static check를 적용합니다. Static lint dataset은 공통 secret pattern 외에 YAML parse 오류, PowerShell `Invoke-Expression`/elevation, shell `curl | sh`/`chmod -R 777`, Python `shell=True`/`os.system`, JavaScript/TypeScript `eval`/shell 기반 `child_process.exec`, Dockerfile remote `ADD`, BAT `del /s`/`reg delete`, C `gets`/`system`, C# `Process.Start`/`File.Delete` 같은 위험 패턴을 언어별로 경고합니다. Monaco model은 artifact path 기준으로 유지해 검사 결과가 갱신되어도 cursor/focus가 튀지 않게 했습니다.
+- Script Assist panel은 `처음 만들기`, `도움`, `자동완성`, `검사`, `출력 계약`, `AI 도움` 흐름을 제공하며, 지원 언어별 도구 상태와 추천 항목 설명을 표시합니다. `도움` 탭에는 artifact가 VM에 복사·실행되는 흐름, output contract가 필요한 이유, Run Launcher 사용 순서, 언어별 최소 구조와 입력 trigger 안내가 같이 표시됩니다. 추천 항목은 표시 이름, 설명, 예시 코드, 삽입 버튼을 가진 compact list로 표시합니다. `AI 도움`은 이번 단계에서 실제 모델 호출 없이 확장 지점만 표시합니다.
 - Artifact path read-only existence check
 - 최근 Artifact preset
 - Scenario Builder V2는 기본 상태를 compact summary chip과 `빌더 열기` action으로 표시합니다.
@@ -184,16 +194,18 @@ Web bind: 0.0.0.0:3000
   - 환경 준비(Fixture), 제품 실행 단계(Product step), 결과 체크(Assertion)를 추가/삭제/편집하고 YAML로 round-trip 반영할 수 있습니다.
   - Scenario Builder V3 세로축 화면에서는 단계 버튼 폭/높이를 균일하게 유지하고, 선택 상태는 색과 outline만으로 구분합니다.
   - compact horizontal stepper에서는 첫 번째 단계 버튼만 큰 공간을 차지하지 않도록 버튼 track 간격을 고정합니다.
+  - desktop/FHD/QHD에서 `빌더 숨기기`를 누르면 builder column 자체가 56px rail로 접히고, 확보된 폭을 YAML editor가 바로 사용합니다.
   - mobile/tablet에서 시나리오 목록 접힘은 상단 bar의 위/아래 방향 CSS chevron으로 표시하고, builder detail/list는 내부 Y scroll에 갇히지 않고 화면 흐름으로 펼쳐집니다.
   - 1366/FHD/QHD 넓은 화면에서는 builder panel과 YAML editor가 작업 영역 높이를 채우고, FHD/QHD에서는 builder 폭을 더 넓혀 좌측 조립 화면이 답답해 보이지 않게 합니다.
   - Scenario list row는 제목과 경로가 잘리지 않도록 mobile/tablet `64px`, desktop 이상 `70px` 기준으로 표시합니다.
 - 실행 묶음(Suite) visual builder는 기본 상태를 compact summary chip과 `빌더 열기` action으로 표시하고, 필요할 때만 충분한 높이의 builder 작업 영역을 열어 YAML editor가 주 작업공간으로 남도록 조정
-- 실행 묶음(Suite) builder의 run 항목은 순서, id, 시나리오, tier, 실패 허용, 이동/삭제 action을 한 줄로 스캔할 수 있는 compact list로 표시
+- 실행 묶음(Suite) builder의 run 항목은 순서, id, 시나리오, tier, 실패 허용, `enabled`, 이동/삭제 action을 한 줄로 스캔할 수 있는 compact list로 표시하며, 시나리오 다중 선택과 `maxParallel` 편집을 지원
 - scenario/results list row height 안정화와 title/path ellipsis 처리
 - 실행 묶음(Suite)의 entry 수와 `allowFailure` 수 요약
 - 고급 실행 옵션: `keepVm`, `fullClone`
 - 기본 동시 실행 수: `1`
 - 전역 실행 상태 배너
+- Dashboard에서 시작한 job이 최종 상태에 도달하면 수동 새로고침 없이 Results 목록, 선택 상세, timeline, 전역 실행 배너를 함께 동기화
 - running job cancel action
 - stopped/stale `oslab-*` VM dry-run/확인 기반 cleanup action
 - tab 이동 / logout / browser refresh 전 unsaved-change guard
@@ -231,7 +243,9 @@ Web bind: 0.0.0.0:3000
 - SSE 기반 live job log streaming
 - `runs/` result explorer와 generated HTML report 열기
 
-## Verified Browser Smoke
+<a id="verified-browser-smoke"></a>
+
+## 브라우저 검증 기록
 
 2026-04-23 기준으로 실제 dashboard에서 아래 흐름을 확인했습니다.
 
@@ -301,9 +315,9 @@ Web bind: 0.0.0.0:3000
 | Artifact Studio 생성 흐름/언어팩 | `새 아티팩트 제작` 클릭 시 선택 row가 해제되고 제작 가이드가 표시됨. 단일 PowerShell artifact 생성 후 새 artifact가 자동 선택되고, Script Assist의 언어 도구 상태/처음 만들기 안내가 표시됨. `output/web-dashboard/artifact-studio-create-flow.png`, `output/web-dashboard/artifact-studio-assist-language-tools.png`; 테스트: `corepack pnpm exec playwright test apps/web/tests/artifact-studio-create-assist.spec.js --config=playwright.web-dashboard.config.cjs` |
 | Artifact Studio LSP Assist | Python/shell/JSON은 repo-bundled 공개 language server에 먼저 completion을 요청하고, 제작용 OSLAB fallback dataset을 함께 병합함. Python artifact에서 `pri` 입력 후 `print`, `for i in ra` 입력 후 LSP `range`와 fallback `for i in range` 후보가 표시됨. JSON은 LSP `$schema`와 fallback `schemaVersion`, shell은 fallback `grep` smoke를 확인함. `도움`/`자동완성` 탭은 처음 만들기, 언어별 trigger, 설명, 예시 코드, 삽입 action을 한국어로 표시함. Monaco suggest popup overflow가 editor box에 잘리지 않도록 `fixedOverflowWidgets` 적용. 빠른 입력 후 Monaco model value가 입력 문자열과 일치하는지 회귀 테스트 추가. 사용자 화면에 보이는 Chrome FHD 수동 QA에서도 Artifact Studio 진입, Python artifact 편집, `pri` -> `print`, `for i in ra` -> `range`, 자동완성 안내 탭을 확인함. `output/web-dashboard/artifact-studio-lsp-open-service-smoke.json`, `output/web-dashboard/artifact-studio-python-lsp-print.png`, `output/web-dashboard/artifact-studio-python-lsp-range.png`, `output/web-dashboard/artifact-studio-python-typing-stability.png`, `output/web-dashboard/artifact-studio-visible-browser-smoke.json`, `output/web-dashboard/artifact-studio-visible-python-print.png`, `output/web-dashboard/artifact-studio-visible-python-range.png`; 테스트: `corepack pnpm exec playwright test apps/web/tests/artifact-studio-create-assist.spec.js --config=playwright.web-dashboard.config.cjs` |
 | Artifact Studio 생성 -> 자동완성 -> 실제 run | Web UI에서 `validation/artifacts/web-ui-demo-20260430123434/run-system-demo.ps1` 생성, Monaco 자동완성 popup에서 PowerShell/placeholder snippet 표시와 console error `0` 확인, `상위 폴더를 실행에서 사용`으로 Run Launcher에 `validation/artifacts/web-ui-demo-20260430123434` 적용, 실제 `demo-powershell-system` 실행 통과. job `cmokxp8su0003smrog10l9yo1`, run `20260430-123836-demo-powershell-system-windows`, assertions `2/0`, preflight `6/0`, cleanup 완료. 산출물: `output/web-dashboard/artifact-studio-demo-created.png`, `output/web-dashboard/artifact-studio-autocomplete-trigger.png`, `output/web-dashboard/artifact-studio-assist-check.png`, `output/web-dashboard/artifact-studio-run-launcher-linked.png`, `output/web-dashboard/artifact-studio-demo-run-complete.png`, `output/web-dashboard/artifact-studio-demo-result-detail.png` |
-| product-specific 실행 묶음 Web smoke | Web에서 `validation/suites/product-specific-windows-v1.example.yaml`와 `C:\Users\kysky\Documents\gitlab\agent-windows\ProductAgent\bin\Release`로 실행, job `cmognt5bg000usmmg6u6uvktu`가 실제 VM 실행까지 진행, 3개 entry 통과, `appx-readonly`는 허용 실패, `path-profile`에서 필수 QGA `exec-status` 일시 실패 발견, `output/web-dashboard/product-specific-suite-web-ui-smoke.json`, `output/web-dashboard/product-specific-suite-web-final-console.png`, server/runtime errors `0` |
+| product-specific 실행 묶음 Web smoke | Web에서 `validation/suites/product-specific-windows-v1.example.yaml`와 `C:/path/to/OSLAB/validation/artifacts/product-release`로 실행한 기록이 실제 VM 실행까지 진행, 3개 entry 통과, `appx-readonly`는 허용 실패, `path-profile`에서 필수 QGA `exec-status` 일시 실패 발견, `output/web-dashboard/product-specific-suite-web-ui-smoke.json`, `output/web-dashboard/product-specific-suite-web-final-console.png`, server/runtime errors `0` |
 | product-specific path-profile Web 재검증 | QGA `exec-status` retry 추가 후 Web에서 `scenarios/windows/product-specific/product-specific-agent-path-profile.example.yaml` 재실행 통과, job `cmogpdv9r002gsmmg4f7b062i`, run `20260427-133443-product-specific-agent-path-profile-windows`, normalized records `9`, assertions `8`, cleanup 완료, `output/web-dashboard/product-specific-path-profile-web-regression.json`, `output/web-dashboard/product-specific-path-profile-web-final-console.png`, server/runtime errors `0` |
-| Run Launcher 디렉터리 artifact 경로 | `직접 입력 - 파일/폴더 경로`로 `C:\Users\kysky\Documents\gitlab\agent-windows\ProductAgent\bin\Release` 입력 시 API/UI 모두 `kind=directory`로 확인, 시나리오 실행 준비 활성화, `output/web-dashboard/artifact-directory-path-smoke.json`, `output/web-dashboard/artifact-directory-path-direct-input.png`, server/runtime errors `0` |
+| Run Launcher 디렉터리 artifact 경로 | `직접 입력 - 파일/폴더 경로`로 `C:/path/to/OSLAB/validation/artifacts/product-release` 입력 시 API/UI 모두 `kind=directory`로 확인, 시나리오 실행 준비 활성화, `output/web-dashboard/artifact-directory-path-smoke.json`, `output/web-dashboard/artifact-directory-path-direct-input.png`, server/runtime errors `0` |
 | Run Launcher 단일 스크롤 | 실행 화면에서 실행 폼/실시간 콘솔 내부 스크롤과 page 스크롤이 겹치지 않게 수정. `.workspace-run` 하나만 스크롤을 담당하고, `1500px` 이하에서는 실행 폼과 실시간 콘솔이 1열로 배치됩니다. FHD wide 화면에서도 콘솔 panel/pre가 grid stretch와 내부 scrollbar를 만들지 않습니다. 검증: `output/web-dashboard/run-scroll-single-flow-smoke.json`, `output/web-dashboard/run-console-single-flow-smoke.json`, `output/web-dashboard/run-console-single-flow-fhd.png`, panel/pre `scrollTop=0` |
 | Results 사람이 읽는 시간 | `20260426-174301-demo-python-hello-windows` 결과에서 리스트 절대 시간과 상세 `결과 시간` 섹션 확인, 시작/완료/소요 시간 표시, `output/web-dashboard/results-human-time-smoke.json`, console/server errors `0` |
 | Results 발견/누락 run 파일 | `20260426-174301-demo-python-hello-windows`에서 `raw/fixture-demo-python-runtime.expected-output.json`은 `추가 발견` 파일로 표시되고, `normalized/inventory.json`/`raw/product-steps.json`은 dead link 없는 `누락` 기대 파일로 표시됨, 발견 JSON preview modal 확인, `output/web-dashboard/results-run-files-api-smoke.json`, `output/web-dashboard/results-run-files-missing-api-smoke.json`, `output/web-dashboard/results-run-files-ui-smoke.json`, server/runtime errors `0` |
@@ -317,8 +331,12 @@ Web bind: 0.0.0.0:3000
 | 새 시나리오 생성 UAT | 전문가 리뷰와 브라우저 인수테스트로 create-only 흐름 확인. dialog는 “파일만 생성, 실행은 나중”을 안내하고, 기본 저장 경로는 기존 파일과 충돌하면 자동 회피하며, `id` 변경 시 저장 경로도 동기화됩니다. 저장하지 않은 scenario/builder 변경은 생성 전 confirm으로 보호하고, 생성 후 새 파일이 선택/편집 상태로 열리며 builder가 로드됩니다. `output/web-dashboard/scenario-create-uat-smoke.json`, `output/web-dashboard/scenario-create-uat-dialog.png`, `output/web-dashboard/scenario-create-uat-after-create.png`, `output/web-dashboard/scenario-create-uat-mobile-dialog.png` |
 | Scenario Builder V3 세로축 | 시나리오 작성 화면에서 세로 stepper builder와 오른쪽 YAML editor 구조를 지원합니다. 선택한 단계는 compact detail panel로 열리고 YAML은 오른쪽에 계속 보입니다. 실행 단계는 `4A Artifact 실행 명령`과 `4B 제품 실행 단계`로 나눠 4번 중복 혼란을 줄였습니다. desktop/mobile overflow smoke 통과, `output/web-dashboard/scenario-builder-v3-vertical-smoke.json`, `output/web-dashboard/scenario-builder-v3-vertical-desktop.png`, `output/web-dashboard/scenario-builder-v3-vertical-mobile.png`, `output/web-dashboard/scenario-builder-vertical-axis-mockup.png` |
 | Viewport design matrix | 브라우저 검증 범위에 390x844, 768x1024, 1366x768, Full HD 1920x1080, QHD 2560x1440을 포함했습니다. 각 viewport에서 Scenario/Scenario collapsed/Run/Results 스크린샷을 남겼고 console/page errors `0`, horizontal overflow `false`입니다. Scenario Builder V3는 빌더 폭을 넓히고 YAML 좌측 줄번호 gutter를 추가했으며, mobile/tablet scenario list는 5-7개 높이의 scroll 영역으로 제한했습니다. mobile/tablet 접힘 상태는 왼쪽 rail이 아니라 상단 가로 bar로 표시합니다. 1366 open list builder/YAML은 `420px/379px`, collapsed YAML은 `546px`, FHD/QHD builder는 `591px`/`860px`, 1366/FHD/QHD builder/YAML height delta는 `0`, list text clipping은 `false`입니다. `output/web-dashboard/viewport-design-matrix-smoke.json`, `output/web-dashboard/viewport-matrix-mobile-scenario-collapsed.png`, `output/web-dashboard/viewport-matrix-qhd-scenario.png` |
+| Artifact Studio npm LSP 언어팩 확장 | 기존 Python/shell/JSON에 더해 YAML, JavaScript, TypeScript, HTML, CSS, Markdown, Dockerfile을 repo-managed language pack으로 지원합니다. 확장자별 public LSP completion과 YAML schema 연결, invalid YAML의 `yaml.parse` 진단을 API smoke로 확인했습니다. 근거: `output/web-dashboard/artifact-studio-language-pack-smoke.json`; 테스트: `corepack pnpm --filter @oslab/api lint`, `corepack pnpm --filter @oslab/web lint`, `corepack pnpm --filter @oslab/api build`, `corepack pnpm --filter @oslab/api test` |
+| Authoring Monaco YAML LSP | Scenario/Suite YAML과 Fixture PowerShell/Shell 작성 화면이 기존 textarea 대신 Monaco를 사용합니다. Scenario/Suite schema 기반 completion, internal fallback, LSP diagnostics와 static check 병합을 확인했고, 기존 diff/save 흐름은 유지됩니다. FHD visible smoke에서 `sche` 입력 후 `schemaVersion` completion과 schema-invalid YAML squiggle을 확인했으며 console/page errors는 `0`이었습니다. 근거: `output/web-dashboard/authoring-yaml-lsp-smoke.json`, `output/web-dashboard/authoring-yaml-monaco-visible-smoke.json`, `output/web-dashboard/authoring-yaml-monaco-visible-completion.png`, `output/web-dashboard/authoring-yaml-monaco-visible-diagnostics.png` |
 
-## Korean UI Terminology
+<a id="korean-ui-terminology"></a>
+
+## 한국어 UI 용어
 
 한국어 UI에서는 단순 음역을 피합니다. 필요한 경우 한국어 의미 표현 뒤에 원 영어 용어를 괄호로 병기합니다.
 
@@ -334,7 +352,9 @@ Web bind: 0.0.0.0:3000
 | Lab Status | 랩 상태 |
 | Live Console | 실시간 콘솔 또는 실시간 로그 |
 
-## UX Roadmap
+<a id="ux-roadmap"></a>
+
+## UX 개선 계획
 
 전문가 리뷰와 브라우저 smoke 결과, 다음 순서로 개선합니다.
 
@@ -343,6 +363,7 @@ Web bind: 0.0.0.0:3000
    - ZIP/EXE/MSI/script 단일 파일과 폴더 artifact upload는 `.web-artifacts/` 기반으로 구현했습니다. 폴더 선택은 브라우저 보안상 원본 절대 경로를 넘기지 않고, 선택한 폴더를 dashboard 서버의 생성 디렉터리로 복사해 사용합니다.
    - 큰 폴더 업로드는 Next rewrite proxy를 우회하고 API server에 직접 전송해 multipart 업로드 안정성을 확보합니다.
    - 직접 업로드 상태 카드는 선택됨/업로드 중/사용 중/실패와 진행률, 저장 경로를 보여주므로 큰 Release 폴더 업로드 중에도 사용자가 현재 상태를 바로 이해할 수 있습니다.
+   - 다음 단계로 OS template과 OS 상태/profile 조합을 계획하는 Matrix Run Planner를 추가합니다.
 2. Job 상태 표시 개선
    - long-running job의 마지막 log 수신 시각과 cancel 이후 cleanup 결과 반영을 추가합니다.
 3. Authoring safety 확장
@@ -353,7 +374,8 @@ Web bind: 0.0.0.0:3000
    - Scenario Builder V2는 사용자 설명 tooltip, enum control, cleanup toggle, fixture/product-step/assertion generic 편집까지 확장했습니다.
    - `새 환경 준비(Fixture)`와 `새 실행 묶음(Suite)` 생성도 `새 시나리오`와 같은 create-only 안전 흐름으로 확장했습니다.
    - Suite 저장은 `POST /api/validate/suite-content`로 최소 contract를 함께 검사합니다.
-   - 다음은 assertion type별 전용 form, fixture side-effect 요약, fixture reference flow, suite multi-select/maxParallel 작성 UX를 추가합니다.
+   - Suite 다중 선택, `enabled`, `maxParallel` 작성은 구현되었습니다.
+   - 다음은 assertion type별 전용 form, fixture side-effect 요약, fixture reference flow와 생성된 suite의 end-to-end 실행 smoke를 추가합니다.
 4. Artifact authoring/manager
    - 현재 upload flow는 파일/폴더를 `.web-artifacts/` 아래 저장하고 binary artifact는 upload-only로 둡니다.
    - Artifact Studio 독립 화면을 추가했습니다. `validation/artifacts/**`와 `.web-artifacts/**`를 browse하고 hash/size/provenance를 표시하며, text-like artifact, 폴더형 프로젝트, product-specific starter를 Web에서 생성/편집할 수 있습니다.
@@ -371,7 +393,9 @@ Web bind: 0.0.0.0:3000
 
 상세 개발 TODO는 [Web Dashboard Usability TODO](devs/web-dashboard-usability-todo.md)를 봅니다.
 
-## Known Gaps
+<a id="known-gaps"></a>
+
+## 알려진 제약
 
 - OIDC/SSO 없음
 - local admin 외 role 분리 없음

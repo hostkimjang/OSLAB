@@ -1,55 +1,57 @@
 # oslab Platform Plan
 
+Language: English | [한국어](oslab-platform-plan.ko.md)
+
 ## Executive Summary
 
 `oslab is a provider-driven, scenario-based OS integration test platform for validating software inside disposable Windows and Linux VMs.`
 
-`oslab`의 공개 목표는 특정 제품 전용 validation 도구가 아니라, 다양한 OS version, OS setting, runtime state, preinstalled software 조합에서 software artifact를 반복 검증하는 범용 OS/VM integration test platform입니다.
+The public goal of `oslab` is not to provide a validation tool for one specific product. It is a general-purpose OS/VM integration test platform for repeatedly validating software artifacts across combinations of OS versions, OS settings, runtime states, and preinstalled software.
 
-현재 공개 진입점은 Windows Proxmox template에서 실행되는 generic demo suite입니다. 이 demo suite는 제품 지식 없이도 다음 기능을 검증합니다.
+The current public entry point is a generic demo suite that runs on Windows Proxmox templates. It validates the following capabilities without requiring any product-specific knowledge:
 
-- Proxmox template에서 disposable VM clone 생성
-- QEMU Guest Agent 기반 guest readiness 확인
-- Fixture로 guest runtime/toolchain 준비
+- Create a disposable VM clone from a Proxmox template
+- Verify guest readiness through the QEMU Guest Agent
+- Prepare the guest runtime and toolchain with fixtures
 - Artifact folder upload
 - Guest command execution
 - Output collection
 - Canonical result normalization
 - Assertion evaluation
-- JSON, JUnit XML, HTML report 생성
-- Run progress log 실시간 기록
+- JSON, JUnit XML, and HTML report generation
+- Incremental run progress logging
 - VM cleanup
 
-제품별 adapter, private scenario, private credential 흐름은 public platform plan의 중심이 아닙니다. 이 문서는 `oslab` core가 어떤 경계와 계약을 가져야 하는지 설명합니다.
+Product-specific adapters, private scenarios, and private credential flows are not the focus of the public platform plan. This document defines the boundaries and contracts of the `oslab` core.
 
 ## Why It Exists
 
-Unit test, mock test, container test는 빠르고 중요하지만 실제 OS 환경에서만 드러나는 문제를 모두 잡지는 못합니다.
+Unit, mock, and container tests are fast and important, but they cannot detect every issue that appears only in a real OS environment.
 
-예시:
+Examples:
 
-- 같은 artifact가 Windows 10, Windows 11, Windows Server, Ubuntu 등에서 모두 동작하는가?
-- Clean image와 이미 여러 runtime이 설치된 image에서 동작이 같은가?
-- Registry, service, policy, firewall, user context, language pack, patch level 차이를 견디는가?
-- Runtime prerequisite이 없는 VM에서도 fixture가 환경을 준비하고 test를 안정적으로 실행하는가?
-- CI가 여러 OS/state 조합의 결과를 같은 report format으로 비교할 수 있는가?
+- Does the same artifact work on Windows 10, Windows 11, Windows Server, Ubuntu, and other target systems?
+- Does it behave consistently on both a clean image and an image with multiple runtimes already installed?
+- Can it tolerate differences in registry state, services, policy, firewalls, user context, language packs, and patch levels?
+- Can fixtures prepare the environment and run the test reliably even when the VM lacks the required runtime prerequisites?
+- Can CI compare results from multiple OS and state combinations in the same report format?
 
-`oslab`은 이 문제를 product마다 새로 풀지 않기 위해 만들어진 platform입니다. VM lifecycle, guest command/file transport, fixtures, artifact execution, assertions, reports를 core가 담당하고, 제품 고유 output 해석은 adapter/plugin으로 격리합니다.
+`oslab` is a platform for solving these problems once instead of reimplementing the same infrastructure for every product. The core handles the VM lifecycle, guest command and file transport, fixtures, artifact execution, assertions, and reports, while adapters and plugins isolate product-specific output interpretation.
 
 ## Public Documentation Boundary
 
-공개 문서는 generic demo와 product-neutral platform 개념을 중심으로 유지합니다.
+Public documentation remains focused on the generic demos and product-neutral platform concepts.
 
 | Content | Public docs role |
 | --- | --- |
-| Generic demo suite | 기본 학습 경로 |
-| Proxmox/QGA setup | lab 연결 및 template 준비 |
-| Scenario YAML | 범용 test recipe 작성법 |
-| Fixture | VM 안 test prerequisite 준비 |
-| Artifact | 테스트 대상 파일/folder/installer |
-| Canonical command result | 작은 executable/CLI smoke 결과 |
-| Canonical inventory result | inventory-producing product의 공통 결과 model |
-| Product-specific scenarios | 별도 private/product docs로 분리 |
+| Generic demo suite | Default learning path |
+| Proxmox/QGA setup | Lab connectivity and template preparation |
+| Scenario YAML | Authoring general-purpose test recipes |
+| Fixture | Preparing test prerequisites inside the VM |
+| Artifact | File, folder, or installer under test |
+| Canonical command result | Results from small executable and CLI smoke tests |
+| Canonical inventory result | Shared result model for inventory-producing products |
+| Product-specific scenarios | Kept in separate private or product documentation |
 
 ## Scope
 
@@ -272,8 +274,8 @@ Proxmox operations commonly return async task ids. The provider must poll comple
 ```yaml
 provider:
   type: proxmox
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
   vmIdRange:
     start: 9102
     end: 9199
@@ -448,8 +450,8 @@ os:
   version: "11"
 provider:
   type: proxmox
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
   vmIdRange:
     start: 9102
     end: 9199
@@ -504,8 +506,8 @@ os:
   family: windows
 provider:
   type: proxmox
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
 guest:
   mode: auto
 fixtures:

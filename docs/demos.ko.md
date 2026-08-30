@@ -48,8 +48,8 @@ Copy-Item scenarios/windows/demo-intentional-assertion-failure.example.yaml scen
 ```yaml
 provider:
   type: proxmox
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
   vmIdRange:
     start: 9102
     end: 9199

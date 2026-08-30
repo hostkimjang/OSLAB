@@ -8,7 +8,13 @@
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p 3000",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "test": "node --test"
+    "test": "node --test",
+    "readme:overview:capture": "node scripts/capture-marketing-intro.mjs",
+    "readme:workflow:capture": "node scripts/capture-run-workflow.mjs",
+    "readme:live:capture": "node scripts/capture-live-lab.mjs",
+    "readme:dashboard:capture": "node scripts/capture-readme-demo.mjs",
+    "readme:end-to-end:compose": "node scripts/compose-readme-end-to-end.mjs",
+    "readme:step-by-step:compose": "node scripts/compose-readme-step-by-step.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.7.0",

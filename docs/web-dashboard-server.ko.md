@@ -1,5 +1,7 @@
 # Web Dashboard 서버 실행 가이드
 
+언어: [English](web-dashboard-server.md) | 한국어
+
 이 문서는 `oslab` Web Dashboard 서버를 띄우는 방법을 정리합니다. 기능 범위와 UI 동작은 [Web Dashboard](web-dashboard.ko.md)를 봅니다.
 
 ## 무엇이 실행되나
@@ -27,7 +29,7 @@ corepack pnpm prisma:generate
 `apps/api/.env`에는 최소한 아래 값을 설정합니다.
 
 ```text
-OSLAB_REPO_ROOT=C:/Users/kysky/Documents/gitlab/product-specific_autorun_test
+OSLAB_REPO_ROOT=C:/path/to/OSLAB
 OSLAB_WEB_ADMIN_USERNAME=admin
 OSLAB_WEB_ADMIN_PASSWORD=<strong-password>
 ```
@@ -40,7 +42,9 @@ OSLAB_API_PROXY=http://127.0.0.1:3001
 
 API는 시작 시 local SQLite table이 없으면 자동 생성합니다. Development dashboard에서는 별도 migration step이 필요하지 않습니다.
 
-## Local 개발 서버 실행
+<a id="local-개발-서버-실행"></a>
+
+## 로컬 개발 서버 실행
 
 API와 Web을 같이 실행합니다.
 
@@ -93,7 +97,9 @@ http://<dashboard-host-ip>:3001
 
 원격 브라우저에서 이 기능까지 쓰려면 API가 `0.0.0.0:3001`에 listen해야 하고, `OSLAB_WEB_ORIGIN=http://<dashboard-host-ip>:3000`을 허용해야 하며, Windows 방화벽/private network에서 `3001` port가 열려 있어야 합니다. 계정 password, reverse proxy/WAF rule도 같이 확인합니다.
 
-## Production에 가까운 빌드 확인
+<a id="production에-가까운-빌드-확인"></a>
+
+## 프로덕션에 가까운 빌드 확인
 
 Workspace package 전체를 build합니다.
 
@@ -110,7 +116,9 @@ corepack pnpm --filter @oslab/web start
 
 Web start command는 `0.0.0.0:3000`에 listen합니다.
 
-## Smoke Check
+<a id="smoke-check"></a>
+
+## Smoke 점검
 
 API 응답 확인:
 
@@ -128,7 +136,9 @@ Invoke-WebRequest http://127.0.0.1:3000 -UseBasicParsing
 
 브라우저 회귀 검증이 필요하면 [Browser Debug Checklist](devs/browser-debug-checklist.md)를 기준으로 진행합니다.
 
-## Troubleshooting
+<a id="troubleshooting"></a>
+
+## 문제 해결
 
 | 증상 | 가능성 높은 원인 | 조치 |
 | --- | --- | --- |

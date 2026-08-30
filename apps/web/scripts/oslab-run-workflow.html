@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, "Segoe UI", sans-serif;
+        --bg: #101214;
+        --panel: #171b1f;
+        --panel-2: #1e2429;
+        --text: #edf2f4;
+        --muted: #8f9da8;
+        --line: #2d363d;
+        --green: #45d483;
+        --blue: #72a7ff;
+        --amber: #e4b247;
+        --duration: 22s;
+      }
+
+      * { box-sizing: border-box; }
+
+      html,
+      body {
+        width: 1280px;
+        height: 720px;
+        margin: 0;
+        overflow: hidden;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      body::before {
+        position: fixed;
+        inset: 0;
+        content: "";
+        opacity: .28;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: linear-gradient(to bottom, black 0%, transparent 88%);
+      }
+
+      .shell {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        padding: 30px 44px 26px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 46px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        letter-spacing: .16em;
+      }
+
+      .brand img { width: 30px; height: 30px; }
+
+      .demo-label {
+        padding: 8px 12px;
+        border: 1px solid #3b4a54;
+        color: #b7c4cc;
+        font: 700 11px/1 ui-monospace, "Cascadia Mono", monospace;
+        letter-spacing: .08em;
+      }
+
+      .headline {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .headline p {
+        margin: 0 0 7px;
+        color: var(--green);
+        font: 700 11px/1 ui-monospace, "Cascadia Mono", monospace;
+        letter-spacing: .12em;
+      }
+
+      .headline h1 {
+        margin: 0;
+        font-size: 30px;
+        letter-spacing: -.04em;
+      }
+
+      .command {
+        width: 590px;
+        padding: 13px 16px;
+        border: 1px solid #39454e;
+        background: rgba(12,15,17,.92);
+        color: #c7d0d6;
+        font: 600 12px/1.45 ui-monospace, "Cascadia Mono", monospace;
+        white-space: nowrap;
+      }
+
+      .command .prompt { color: var(--green); }
+      .command .flag { color: var(--blue); }
+
+      .stage {
+        position: relative;
+        height: 504px;
+        margin-top: 22px;
+      }
+
+      .frame {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        animation: frame var(--duration) linear both;
+        animation-delay: calc(var(--step) * 2.2s);
+      }
+
+      .frame.final { animation-name: final-frame; }
+
+      @keyframes frame {
+        0% { opacity: 0; transform: translateY(6px); }
+        .8%, 8.8% { opacity: 1; transform: translateY(0); }
+        10%, 100% { opacity: 0; transform: translateY(-4px); }
+      }
+
+      @keyframes final-frame {
+        0% { opacity: 0; transform: translateY(6px); }
+        1%, 100% { opacity: 1; transform: translateY(0); }
+      }
+
+      .step-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        padding: 0 18px;
+        border-left: 3px solid var(--accent, var(--green));
+        background: linear-gradient(90deg, color-mix(in srgb, var(--accent, var(--green)) 12%, var(--panel)), var(--panel));
+      }
+
+      .step-heading strong { display: block; font-size: 22px; letter-spacing: -.025em; }
+      .step-heading span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+      .step-number { color: var(--accent, var(--green)); font: 800 12px/1 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .1em; }
+
+      .actors {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .actor {
+        position: relative;
+        height: 158px;
+        padding: 17px;
+        border: 1px solid var(--line);
+        background: rgba(23,27,31,.96);
+      }
+
+      .actor::after {
+        position: absolute;
+        top: 50%;
+        right: -15px;
+        width: 14px;
+        height: 1px;
+        content: "";
+        background: #47545d;
+      }
+
+      .actor:last-child::after { display: none; }
+
+      .actor.active {
+        border-color: var(--accent, var(--green));
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent, var(--green)) 30%, transparent), 0 0 28px color-mix(in srgb, var(--accent, var(--green)) 12%, transparent);
+      }
+
+      .actor-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--muted);
+        font: 700 10px/1 ui-monospace, "Cascadia Mono", monospace;
+        letter-spacing: .12em;
+      }
+
+      .actor.active .actor-label { color: var(--accent, var(--green)); }
+      .actor-label i { width: 7px; height: 7px; border-radius: 50%; background: #4b565d; }
+      .actor.active .actor-label i { background: var(--accent, var(--green)); box-shadow: 0 0 12px var(--accent, var(--green)); }
+      .actor h2 { margin: 24px 0 7px; font-size: 18px; }
+      .actor p { margin: 0; color: #9eabb4; font: 12px/1.5 ui-monospace, "Cascadia Mono", monospace; }
+
+      .event-log {
+        display: grid;
+        grid-template-columns: 88px 110px 1fr auto;
+        align-items: center;
+        gap: 12px;
+        height: 58px;
+        margin-top: 14px;
+        padding: 0 17px;
+        border: 1px solid #29343b;
+        background: #0c0f11;
+        font: 600 12px/1 ui-monospace, "Cascadia Mono", monospace;
+      }
+
+      .event-log .time { color: #778690; }
+      .event-log .phase { color: var(--accent, var(--green)); text-transform: uppercase; }
+      .event-log .message { color: #c6d0d6; }
+      .event-log .status { color: var(--green); }
+
+      .rail {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 6px;
+        margin-top: 14px;
+      }
+
+      .rail-step {
+        min-width: 0;
+        padding: 10px 8px 9px;
+        border-top: 2px solid #344048;
+        background: rgba(20,24,27,.78);
+      }
+
+      .rail-step.done { border-color: #287a4e; }
+      .rail-step.active { border-color: var(--accent, var(--green)); background: #1a2520; }
+      .rail-step b { display: block; color: #6f7e87; font: 700 9px/1 ui-monospace, "Cascadia Mono", monospace; }
+      .rail-step span { display: block; overflow: hidden; margin-top: 7px; color: #8d9aa3; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+      .rail-step.done b, .rail-step.active b { color: var(--green); }
+      .rail-step.active span { color: var(--text); }
+
+      .progress {
+        position: absolute;
+        right: 44px;
+        bottom: 16px;
+        left: 44px;
+        height: 2px;
+        background: #263038;
+      }
+
+      .progress::after {
+        display: block;
+        width: 0;
+        height: 100%;
+        content: "";
+        background: var(--green);
+        animation: progress var(--duration) linear forwards;
+      }
+
+      @keyframes progress { to { width: 100%; } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div class="brand"><img src="{{OSLAB_ICON_DATA_URL}}" alt="" /> OSLAB</div>
+        <div class="demo-label">ORCHESTRATED DEMO · NO PROXMOX CONTACTED</div>
+      </header>
+      <section class="headline">
+        <div>
+          <p>RUN WORKFLOW</p>
+          <h1>One command. A disposable VM. Reviewable evidence.</h1>
+        </div>
+        <div class="command"><span class="prompt">PS&gt;</span> uv run oslab run <span class="flag">--scenario</span> windows-demo.yaml <span class="flag">--artifact-path</span> powershell-system</div>
+      </section>
+      <section class="stage" id="stage"></section>
+      <div class="progress"></div>
+    </main>
+    <script>
+      const steps = [
+        { title: "Accept the run request", sub: "The CLI loads the scenario, config, and selected artifact.", accent: "#72a7ff", active: [0], phase: "cli", message: "run request accepted", actors: [
+          ["TERMINAL", "oslab run", "scenario + artifact"], ["OSLAB", "Waiting", "request not parsed"], ["PROXMOX API", "No request", "lab untouched"], ["WINDOWS VM", "Not created", "no VMID allocated"] ] },
+        { title: "Validate and preflight", sub: "OSLAB checks the schema, credentials, node, template, and safe VMID capacity.", accent: "#72a7ff", active: [1], phase: "preflight", message: "scenario valid · lab ready · VMID 9102 reserved", actors: [
+          ["TERMINAL", "Request queued", "job demo-job-001"], ["OSLAB", "Preflight", "schema · token · capacity"], ["PROXMOX API", "Read-only checks", "node · template · VMIDs"], ["WINDOWS VM", "Not created", "allocation reserved"] ] },
+        { title: "Ask Proxmox for a clone", sub: "The provider adapter translates the scenario into Proxmox lifecycle calls.", accent: "#e4b247", active: [1,2], phase: "provider", message: "clone windows11-template-qga-9200 → VM 9102", actors: [
+          ["TERMINAL", "Live progress", "provider.clone"], ["OSLAB", "Provider adapter", "clone request + task poll"], ["PROXMOX API", "Clone task", "template 9200 → VM 9102"], ["WINDOWS VM", "Creating", "linked clone"] ] },
+        { title: "Boot the disposable VM", sub: "OSLAB waits for the asynchronous Proxmox task and starts the new guest.", accent: "#e4b247", active: [1,2,3], phase: "provider", message: "VM 9102 started · lifecycle state recorded", actors: [
+          ["TERMINAL", "Live progress", "provider.start"], ["OSLAB", "Task polling", "clone complete → start"], ["PROXMOX API", "VM lifecycle", "status: running"], ["WINDOWS VM", "Booting", "clean Windows clone"] ] },
+        { title: "Wait for QEMU Guest Agent", sub: "The guest channel becomes the controlled bridge into Windows.", accent: "#45d483", active: [1,3], phase: "guest", message: "QGA ready · command and file channels available", actors: [
+          ["TERMINAL", "Live progress", "guest.wait"], ["OSLAB", "Guest adapter", "QGA ping + retry"], ["PROXMOX API", "Agent proxy", "guest-agent endpoint"], ["WINDOWS VM", "Guest ready", "QGA responding"] ] },
+        { title: "Prepare the guest with fixtures", sub: "Reusable setup runs before the software under test is introduced.", accent: "#45d483", active: [1,3], phase: "fixture", message: "prepare-demo.ps1 completed", actors: [
+          ["TERMINAL", "Live progress", "fixture.prepare"], ["OSLAB", "Fixture runner", "copy → execute → verify"], ["PROXMOX API", "QGA transport", "exec + file write"], ["WINDOWS VM", "Environment ready", "policy and runtime prepared"] ] },
+        { title: "Transfer the artifact", sub: "OSLAB packages the selected build output and verifies it inside the VM.", accent: "#45d483", active: [1,3], phase: "artifact", message: "powershell-system uploaded · checksum verified", actors: [
+          ["TERMINAL", "Live progress", "artifact.upload"], ["OSLAB", "Artifact pipeline", "archive + checksum"], ["PROXMOX API", "QGA transport", "chunked file transfer"], ["WINDOWS VM", "Artifact staged", "C:\\Oslab\\artifact"] ] },
+        { title: "Run the test and assertions", sub: "The command executes in Windows; raw output is normalized before assertions run.", accent: "#45d483", active: [1,3], phase: "test", message: "PowerShell exit 0 · assertion 1/1 passed", actors: [
+          ["TERMINAL", "Live progress", "command.execute"], ["OSLAB", "Normalize + assert", "raw → contract → PASS"], ["PROXMOX API", "QGA exec", "stdout · stderr · exit"], ["WINDOWS VM", "Test running", "run-system-demo.ps1"] ] },
+        { title: "Write reviewable evidence", sub: "Machine-readable and human-readable outputs share the same run identity.", accent: "#72a7ff", active: [1], phase: "evidence", message: "run.json · progress.jsonl · JUnit · HTML", actors: [
+          ["TERMINAL", "PASS", "run demo-run-001"], ["OSLAB", "Evidence writer", "raw · normalized · reports"], ["PROXMOX API", "VM still tracked", "cleanup pending"], ["WINDOWS VM", "Test complete", "outputs collected"] ] },
+        { title: "Destroy the clone, keep the evidence", sub: "Cleanup closes the lifecycle; the run directory remains for CI and diagnosis.", accent: "#45d483", active: [1,2], phase: "cleanup", message: "VM 9102 destroyed · evidence 7/7 present", actors: [
+          ["TERMINAL", "PASS", "exit code 0"], ["OSLAB", "Run complete", "reports retained"], ["PROXMOX API", "Destroy VM 9102", "VMID released"], ["WINDOWS VM", "Removed", "disposable by design"] ] },
+      ];
+      const labels = ["Request", "Preflight", "Clone", "Boot", "QGA", "Fixture", "Artifact", "Test", "Evidence", "Cleanup"];
+      const stage = document.querySelector("#stage");
+      stage.innerHTML = steps.map((step, index) => `
+        <article class="frame ${index === steps.length - 1 ? "final" : ""}" style="--step:${index};--accent:${step.accent}">
+          <div class="step-heading">
+            <div><strong>${step.title}</strong><span>${step.sub}</span></div>
+            <div class="step-number">${String(index + 1).padStart(2, "0")} / ${String(steps.length).padStart(2, "0")}</div>
+          </div>
+          <div class="actors">
+            ${step.actors.map((actor, actorIndex) => `
+              <div class="actor ${step.active.includes(actorIndex) ? "active" : ""}">
+                <div class="actor-label">${actor[0]} <i></i></div>
+                <h2>${actor[1]}</h2>
+                <p>${actor[2]}</p>
+              </div>`).join("")}
+          </div>
+          <div class="event-log"><span class="time">00:${String(index * 2).padStart(2, "0")}</span><span class="phase">${step.phase}</span><span class="message">${step.message}</span><span class="status">${index === steps.length - 1 ? "PASS" : "RUNNING"}</span></div>
+          <div class="rail">${labels.map((label, railIndex) => `<div class="rail-step ${railIndex < index ? "done" : ""} ${railIndex === index ? "active" : ""}"><b>${String(railIndex + 1).padStart(2, "0")}</b><span>${label}</span></div>`).join("")}</div>
+        </article>`).join("");
+    </script>
+  </body>
+</html>

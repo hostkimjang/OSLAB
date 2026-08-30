@@ -1,12 +1,14 @@
-# Getting Started
+# 시작하기
 
 언어: [English](getting-started.md) | 한국어
 
 이 문서는 generic demo를 실행하는 가장 짧은 경로를 설명합니다. Private product-specific 지식은 필요하지 않습니다.
 
-Demo가 통과한 뒤에는 [Adoption Guide](adoption-guide.ko.md)를 따라 demo artifact를 자신의 folder 또는 installer로 바꾸면 됩니다. 전체 demo 목록은 [Demo Catalog](demos.ko.md)를 참고하세요.
+데모가 통과한 뒤에는 [도입 가이드](adoption-guide.ko.md)를 따라 데모 artifact를 자신의 folder 또는 installer로 바꾸면 됩니다. 전체 데모 목록은 [데모 카탈로그](demos.ko.md)를 참고하세요.
 
-## Prerequisites
+<a id="prerequisites"></a>
+
+## 사전 요구 사항
 
 Local runner:
 
@@ -23,7 +25,9 @@ Proxmox lab:
 - Disposable clone을 위한 예약 VMID range
 - Demo fixture가 runtime/toolchain package를 다운로드해야 한다면 guest internet access
 
-## 1. Install Development Dependencies
+<a id="1-install-development-dependencies"></a>
+
+## 1. 개발 의존성 설치
 
 Repository root에서 실행합니다.
 
@@ -33,7 +37,9 @@ uv run oslab --help
 uv run pytest
 ```
 
-## 2. Create Local Config
+<a id="2-create-local-config"></a>
+
+## 2. 로컬 설정 만들기
 
 ```powershell
 Copy-Item config/oslab.local.example.yaml config/oslab.local.yaml
@@ -63,7 +69,9 @@ OSLAB_PROXMOX_TOKEN_SECRET=<token-secret>
 
 이 local files는 Git에서 ignore됩니다.
 
-## 3. Create Local Scenario Copies
+<a id="3-create-local-scenario-copies"></a>
+
+## 3. 로컬 시나리오 복사본 만들기
 
 Lab-specific template과 VMID 값을 수정하기 전에 demo scenario를 복사합니다.
 
@@ -85,8 +93,8 @@ Provider block 예시:
 
 ```yaml
 provider:
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
   vmIdRange:
     start: 9102
     end: 9199
@@ -94,7 +102,9 @@ provider:
 
 Template은 stopped 상태여야 하고, Proxmox template으로 변환되어 있어야 하며, QEMU Guest Agent가 설치 및 활성화되어 있어야 합니다.
 
-## 4. Prepare Windows Template VM
+<a id="4-prepare-windows-template-vm"></a>
+
+## 4. Windows 템플릿 VM 준비
 
 현재 Windows demo는 QEMU Guest Agent 경로를 사용합니다. Template으로 변환하기 전에 Windows base VM에서 아래 조건을 맞추세요.
 
@@ -133,7 +143,9 @@ Get-ChildItem WSMan:\localhost\Listener
 - `provider.templateVmId`: 실제 Proxmox template VMID
 - `provider.vmIdRange`: `oslab` disposable clone 전용 VMID range
 
-## 5. Check Proxmox Readiness
+<a id="5-check-proxmox-readiness"></a>
+
+## 5. Proxmox 준비 상태 확인
 
 ```powershell
 uv run oslab validate-scenario --scenario scenarios/windows/demo-python-hello.local.yaml
@@ -164,7 +176,9 @@ Template flag confirmed
 usedInRange: <none>
 ```
 
-## 6. Run PowerShell System Demo
+<a id="6-run-powershell-system-demo"></a>
+
+## 6. PowerShell 시스템 데모 실행
 
 의존성이 가장 낮은 demo입니다. Runtime/toolchain download가 필요 없습니다.
 
@@ -199,7 +213,9 @@ Expected output:
 oslab powershell system demo
 ```
 
-## 7. Run Python Demo
+<a id="7-run-python-demo"></a>
+
+## 7. Python 데모 실행
 
 ```powershell
 Test-Path validation/artifacts/hello-python/run-python-demo.ps1
@@ -226,13 +242,9 @@ Expected output:
      failureClass: <none>
 ```
 
-Command stdout preview는 `inspect-result`로 확인합니다.
+<a id="8-run-c-demo"></a>
 
-```powershell
-uv run oslab inspect-result --run-dir runs\<run-id>
-```
-
-## 8. Run C Demo
+## 8. C 데모 실행
 
 ```powershell
 Test-Path validation/artifacts/hello-c/run-c-demo.ps1
@@ -259,7 +271,11 @@ Expected output:
      failureClass: <none>
 ```
 
-## 9. Watch And Inspect
+<a id="9-watch-and-inspect"></a>
+
+## 9. 공통 실행 결과 확인
+
+앞에서 실행한 어떤 데모든 아래의 같은 절차로 결과를 확인할 수 있습니다.
 
 Run id는 `oslab run` 마지막 출력에 표시됩니다. `runs/` 아래 최신 timestamp folder로도 확인할 수 있습니다.
 

@@ -467,7 +467,7 @@ function buildScenarioTemplate(kind: string, id: string, name: string) {
     id,
     name,
     os: { family: "windows", version: "11" },
-    provider: { type: "proxmox", template: "windows11-template-qga-9101", templateVmId: 9101, vmIdRange: { start: 9102, end: 9199 } },
+    provider: { type: "proxmox", template: "windows11-template-qga-9200", templateVmId: 9200, vmIdRange: { start: 9102, end: 9199 } },
     isolation: { mode: "ephemeralClone" },
     guest: { mode: "auto", windowsOrder: ["qemuAgent", "winrm"] },
     artifact: { type: "folder", pathParam: "artifactPath", destination: "C:\\Oslab\\artifact", transfer: "archive" },

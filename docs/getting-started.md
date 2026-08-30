@@ -85,8 +85,8 @@ Set:
 
 ```yaml
 provider:
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
   vmIdRange:
     start: 9102
     end: 9199
@@ -226,8 +226,6 @@ Expected output:
      failureClass: <none>
 ```
 
-Run `inspect-result` to see the command stdout preview.
-
 ## 8. Run C Demo
 
 ```powershell
@@ -255,9 +253,9 @@ Expected output:
      failureClass: <none>
 ```
 
-Run `inspect-result` to see the command stdout preview.
-
 ## 9. Watch And Inspect
+
+Use the same result-inspection procedure for any demo above.
 
 The run id is printed near the end of `oslab run`. It is also the newest timestamped folder under `runs/`.
 

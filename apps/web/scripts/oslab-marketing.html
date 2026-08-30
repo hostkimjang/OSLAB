@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, ui-sans-serif, "Segoe UI", sans-serif;
+        --bg: #101214;
+        --panel: #171b1f;
+        --panel-2: #1e2429;
+        --text: #edf2f4;
+        --muted: #8f9da8;
+        --line: #2d363d;
+        --green: #45d483;
+        --blue: #72a7ff;
+        --amber: #e4b247;
+        --duration: 16s;
+      }
+
+      * { box-sizing: border-box; }
+
+      html,
+      body {
+        width: 1280px;
+        height: 720px;
+        margin: 0;
+        overflow: hidden;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      body::before {
+        position: fixed;
+        inset: 0;
+        content: "";
+        opacity: 0.34;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: linear-gradient(to bottom, #000 0%, transparent 82%);
+      }
+
+      .frame {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 34px 48px 42px;
+      }
+
+      .masthead {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text);
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .brand img { width: 36px; height: 36px; }
+
+      .demo-label {
+        border: 1px solid #486071;
+        padding: 8px 11px;
+        color: #b8c8d3;
+        background: rgba(16, 18, 20, 0.86);
+        font: 600 12px/1.1 Consolas, monospace;
+        letter-spacing: 0.06em;
+      }
+
+      .scene {
+        position: absolute;
+        z-index: 2;
+        inset: 112px 70px 74px;
+        display: grid;
+        align-content: center;
+        opacity: 0;
+        transform: translateY(12px);
+        animation-duration: var(--duration);
+        animation-timing-function: ease-in-out;
+        animation-fill-mode: both;
+      }
+
+      .scene h1,
+      .scene h2,
+      .scene p { margin: 0; }
+
+      .eyebrow {
+        margin-bottom: 14px !important;
+        color: var(--green);
+        font: 700 13px/1 Consolas, monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .hero { animation-name: hero-scene; text-align: center; }
+      .hero-icon {
+        width: 114px;
+        height: 114px;
+        margin: 0 auto 26px;
+        filter: drop-shadow(0 0 28px rgba(69, 212, 131, 0.22));
+        animation: icon-enter 16s ease both;
+      }
+      .hero h1 { font-size: 54px; line-height: 1.08; letter-spacing: -0.035em; }
+      .hero h1 span { color: var(--green); }
+      .hero .sub { margin-top: 18px; color: var(--muted); font-size: 19px; }
+
+      .define { animation-name: define-scene; grid-template-columns: 0.88fr 1.12fr; gap: 54px; }
+      .run { animation-name: run-scene; }
+      .evidence { animation-name: evidence-scene; grid-template-columns: 0.8fr 1.2fr; gap: 52px; }
+      .lockup { animation-name: lockup-scene; text-align: center; }
+
+      .copy h2 { max-width: 540px; font-size: 38px; line-height: 1.12; letter-spacing: -0.025em; }
+      .copy p:last-child { max-width: 520px; margin-top: 16px; color: var(--muted); font-size: 18px; line-height: 1.55; }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: rgba(23, 27, 31, 0.96);
+        box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+      }
+
+      .yaml-panel { padding: 22px; font: 15px/1.65 Consolas, monospace; }
+      .yaml-panel .key { color: var(--blue); }
+      .yaml-panel .value { color: #d9e7ec; }
+      .yaml-panel .ok { color: var(--green); }
+      .yaml-panel .indent { padding-left: 24px; }
+
+      .vm-stack { display: grid; gap: 12px; margin-top: 16px; }
+      .vm-tile {
+        display: grid;
+        grid-template-columns: 12px 1fr auto;
+        align-items: center;
+        gap: 12px;
+        min-height: 66px;
+        padding: 0 18px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+      }
+      .vm-tile::before { width: 9px; height: 9px; content: ""; background: var(--green); border-radius: 50%; }
+      .vm-tile strong { font-size: 16px; }
+      .vm-tile small { color: var(--muted); font: 12px Consolas, monospace; }
+
+      .pipeline {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin: 32px 0 20px;
+      }
+      .stage {
+        position: relative;
+        min-height: 112px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        animation: stage-progress 16s ease both;
+      }
+      .stage:nth-child(2) { animation-delay: 0.15s; }
+      .stage:nth-child(3) { animation-delay: 0.3s; }
+      .stage:nth-child(4) { animation-delay: 0.45s; }
+      .stage small { color: var(--muted); font: 12px Consolas, monospace; }
+      .stage strong { display: block; margin-top: 18px; font-size: 18px; }
+      .stage .check { position: absolute; top: 14px; right: 15px; color: var(--green); opacity: 0; animation: check-enter 16s ease both; }
+      .stage:nth-child(2) .check { animation-delay: 0.15s; }
+      .stage:nth-child(3) .check { animation-delay: 0.3s; }
+      .stage:nth-child(4) .check { animation-delay: 0.45s; }
+
+      .console {
+        padding: 18px 20px;
+        border: 1px solid #27343b;
+        background: #0b0e10;
+        font: 14px/1.65 Consolas, monospace;
+      }
+      .console .done { color: var(--green); }
+      .console .busy { color: var(--blue); }
+
+      .score {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        min-height: 290px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+      }
+      .score strong { color: var(--green); font-size: 72px; line-height: 1; }
+      .score span { margin-top: 12px; color: var(--muted); font: 14px Consolas, monospace; letter-spacing: 0.08em; }
+
+      .evidence-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .evidence-item { min-height: 82px; padding: 16px 18px; border: 1px solid var(--line); background: var(--panel); }
+      .evidence-item:last-child { grid-column: 1 / -1; }
+      .evidence-item small { color: var(--muted); font: 12px Consolas, monospace; }
+      .evidence-item strong { display: block; margin-top: 9px; font-size: 16px; }
+      .file-row { display: flex; gap: 10px; margin-top: 18px; }
+      .file { padding: 8px 10px; border: 1px solid #365142; color: #b9f2d0; background: #14231b; font: 12px Consolas, monospace; }
+
+      .lockup img { width: 104px; height: 104px; filter: drop-shadow(0 0 28px rgba(69, 212, 131, 0.2)); }
+      .lockup h2 { margin-top: 20px; font-size: 58px; letter-spacing: 0.08em; }
+      .lockup .tagline { margin-top: 16px; color: var(--text); font-size: 22px; }
+      .lockup .keywords { margin-top: 20px; color: var(--muted); font: 14px Consolas, monospace; letter-spacing: 0.06em; }
+
+      .timeline {
+        position: absolute;
+        z-index: 20;
+        right: 48px;
+        bottom: 35px;
+        left: 48px;
+        height: 2px;
+        overflow: hidden;
+        background: var(--line);
+      }
+      .timeline::after {
+        display: block;
+        width: 100%;
+        height: 100%;
+        content: "";
+        background: var(--green);
+        transform: scaleX(0);
+        transform-origin: left;
+        animation: timeline var(--duration) linear both;
+      }
+
+      @keyframes hero-scene { 0%, 2% { opacity: 0; transform: translateY(12px); } 5%, 16% { opacity: 1; transform: none; } 20%, 100% { opacity: 0; transform: translateY(-8px); } }
+      @keyframes define-scene { 0%, 16% { opacity: 0; transform: translateY(12px); } 20%, 36% { opacity: 1; transform: none; } 40%, 100% { opacity: 0; transform: translateY(-8px); } }
+      @keyframes run-scene { 0%, 36% { opacity: 0; transform: translateY(12px); } 40%, 61% { opacity: 1; transform: none; } 65%, 100% { opacity: 0; transform: translateY(-8px); } }
+      @keyframes evidence-scene { 0%, 61% { opacity: 0; transform: translateY(12px); } 65%, 82% { opacity: 1; transform: none; } 86%, 100% { opacity: 0; transform: translateY(-8px); } }
+      @keyframes lockup-scene { 0%, 82% { opacity: 0; transform: translateY(12px); } 87%, 100% { opacity: 1; transform: none; } }
+      @keyframes icon-enter { 0% { opacity: 0; transform: scale(0.82); } 5%, 16% { opacity: 1; transform: scale(1); } 20%, 100% { opacity: 0; transform: scale(1.04); } }
+      @keyframes stage-progress { 0%, 41% { border-color: var(--line); } 45%, 54% { border-color: var(--blue); } 58%, 100% { border-color: #365142; } }
+      @keyframes check-enter { 0%, 54% { opacity: 0; transform: scale(0.7); } 58%, 100% { opacity: 1; transform: scale(1); } }
+      @keyframes timeline { to { transform: scaleX(1); } }
+
+      @media (prefers-reduced-motion: reduce) {
+        .scene { display: none; animation: none; }
+        .lockup { display: grid; opacity: 1; transform: none; }
+        .timeline::after { animation: none; transform: scaleX(1); }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="frame">
+      <header class="masthead">
+        <div class="brand"><img src="{{OSLAB_ICON_DATA_URL}}" alt="" /> OSLAB</div>
+        <div class="demo-label">ILLUSTRATED DEMO · NO VM CREATED</div>
+      </header>
+
+      <section class="scene hero">
+        <img class="hero-icon" src="{{OSLAB_ICON_DATA_URL}}" alt="" />
+        <p class="eyebrow">OS integration testing</p>
+        <h1>From one scenario<br />to <span>reproducible evidence</span>.</h1>
+        <p class="sub">Disposable VM validation for software artifacts</p>
+      </section>
+
+      <section class="scene define">
+        <div class="copy">
+          <p class="eyebrow">01 · Define</p>
+          <h2>Keep the operating system, setup, artifact, and checks explicit.</h2>
+          <p>One YAML scenario describes the environment and the result that should pass.</p>
+        </div>
+        <div class="panel yaml-panel">
+          <div><span class="key">os:</span> <span class="value">windows</span></div>
+          <div><span class="key">provider:</span> <span class="value">proxmox</span></div>
+          <div><span class="key">fixtures:</span></div>
+          <div class="indent"><span class="value">- prepare-runtime</span></div>
+          <div><span class="key">artifact:</span> <span class="value">release-folder</span></div>
+          <div><span class="key">assertions:</span> <span class="ok">exitCode == 0</span></div>
+          <div class="vm-stack">
+            <div class="vm-tile"><strong>Clean Windows</strong><small>baseline</small></div>
+            <div class="vm-tile"><strong>Policy enabled</strong><small>fixture state</small></div>
+            <div class="vm-tile"><strong>Runtime ready</strong><small>repeatable</small></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="scene run">
+        <div class="copy">
+          <p class="eyebrow">02 · Run</p>
+          <h2>Clone. Prepare. Upload. Execute.</h2>
+        </div>
+        <div class="pipeline">
+          <div class="stage"><small>PROVIDER</small><strong>Clone VM</strong><span class="check">✓</span></div>
+          <div class="stage"><small>GUEST</small><strong>Prepare</strong><span class="check">✓</span></div>
+          <div class="stage"><small>ARTIFACT</small><strong>Upload</strong><span class="check">✓</span></div>
+          <div class="stage"><small>PRODUCT</small><strong>Execute</strong><span class="check">✓</span></div>
+        </div>
+        <div class="console">
+          <div><span class="busy">[..]</span> vm.clone.start — create disposable clone</div>
+          <div><span class="done">[OK]</span> artifact.upload.done — release folder uploaded</div>
+          <div><span class="done">[OK]</span> assertions.done — 8 checks passed</div>
+        </div>
+      </section>
+
+      <section class="scene evidence">
+        <div class="score"><strong>PASS</strong><span>8 / 8 ASSERTIONS</span></div>
+        <div>
+          <div class="copy">
+            <p class="eyebrow">03 · Evidence</p>
+            <h2>Separate the failure. Keep the proof.</h2>
+          </div>
+          <div class="evidence-list">
+            <div class="evidence-item"><small>CORE</small><strong>Run summary</strong></div>
+            <div class="evidence-item"><small>TIMELINE</small><strong>Lifecycle progress</strong></div>
+            <div class="evidence-item"><small>OUTPUTS</small><strong>Raw + normalized</strong></div>
+            <div class="evidence-item"><small>CLEANUP</small><strong>Clone destroyed</strong></div>
+            <div class="evidence-item">
+              <small>REPORTS</small><strong>Human and CI-ready results</strong>
+              <div class="file-row"><span class="file">result.json</span><span class="file">result.junit.xml</span><span class="file">result.html</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="scene lockup">
+        <img src="{{OSLAB_ICON_DATA_URL}}" alt="" />
+        <h2>OSLAB</h2>
+        <p class="tagline">Disposable VM validation for software artifacts</p>
+        <p class="keywords">SCENARIO · FIXTURE · ARTIFACT · ASSERTION · EVIDENCE</p>
+      </section>
+
+      <div class="timeline" aria-hidden="true"></div>
+    </main>
+  </body>
+</html>

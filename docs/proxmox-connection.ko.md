@@ -1,4 +1,4 @@
-# Proxmox Connection Guide
+# Proxmox 연결 가이드
 
 언어: [English](proxmox-connection.md) | 한국어
 
@@ -41,7 +41,9 @@ providerDefaults:
       secret: OSLAB_PROXMOX_TOKEN_SECRET
 ```
 
-## Local Config
+<a id="local-config"></a>
+
+## 로컬 설정
 
 ```powershell
 Copy-Item config/oslab.local.example.yaml config/oslab.local.yaml
@@ -66,7 +68,9 @@ OSLAB_PROXMOX_TOKEN_SECRET=<token-secret>
 
 현재 Windows QEMU Guest Agent demo에서는 `OSLAB_WINDOWS_USERNAME`과 `OSLAB_WINDOWS_PASSWORD`를 비워둡니다. 해당 값은 향후 WinRM/SSH guest channel용입니다.
 
-## Create API Token
+<a id="create-api-token"></a>
+
+## API 토큰 만들기
 
 Proxmox web UI에서 `root@pam` 또는 validation 전용 user 아래 API token을 만듭니다.
 
@@ -103,7 +107,9 @@ Validation node, template, storage, VMID range에 대해 가능한 좁은 token�
 
 개인 lab demo에서는 `root@pam!oslab`이 편하지만 권한이 큽니다. Shared lab이나 CI runner에서는 validation 전용 user/token을 만들고, 선택한 template, storage, node, clone VMID range에 필요한 권한만 부여하세요. Cluster별 least-privilege role이 문서화되기 전까지는 이 설정을 production Proxmox policy가 아니라 lab-demo setup으로 취급하는 편이 안전합니다.
 
-## Template Requirements
+<a id="template-requirements"></a>
+
+## 템플릿 요구 사항
 
 Windows demo scenario에는 다음 조건을 만족하는 template VM이 필요합니다.
 
@@ -182,8 +188,8 @@ Template을 만든 후 scenario provider field를 수정합니다.
 ```yaml
 provider:
   type: proxmox
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
   vmIdRange:
     start: 9102
     end: 9199
@@ -191,7 +197,9 @@ provider:
 
 `templateVmId`는 일반 VM이 아니라 stopped Proxmox template을 가리켜야 합니다.
 
-## Connectivity Checks
+<a id="connectivity-checks"></a>
+
+## 연결 확인
 
 Config/env만 확인:
 
@@ -231,7 +239,9 @@ Expected healthy cleanup state:
      usedInRange: <none>
 ```
 
-## Run A Small Demo
+<a id="run-a-small-demo"></a>
+
+## 작은 데모 실행
 
 ```powershell
 uv run oslab run `
@@ -255,7 +265,9 @@ Result 확인:
 uv run oslab inspect-result --run-dir runs\<run-id>
 ```
 
-## QEMU Guest Agent Debug Commands
+<a id="qemu-guest-agent-debug-commands"></a>
+
+## QEMU Guest Agent 디버깅 명령
 
 Clone을 유지한 경우:
 
@@ -296,7 +308,9 @@ uv run oslab qga-download `
   --local-path runs\qga-download-readme.md
 ```
 
-## Stale VM And VMID Range Recovery
+<a id="stale-vm-and-vmid-range-recovery"></a>
+
+## 남은 VM과 VMID 범위 복구
 
 정상적인 resource preflight 상태:
 
@@ -317,7 +331,9 @@ usedInRange: <none>
 
 CI에서는 제약 없는 parallel job들이 같은 VMID range를 공유하지 않게 합니다. CI concurrency/resource group을 쓰거나 runner/job family별로 별도 VMID range를 예약하세요.
 
-## Troubleshooting
+<a id="troubleshooting"></a>
+
+## 문제 해결
 
 | Symptom | Likely cause | Next check |
 | --- | --- | --- |
@@ -332,7 +348,9 @@ CI에서는 제약 없는 parallel job들이 같은 VMID range를 공유하지 �
 | Demo fixture download fails | Guest internet 없음 또는 package URL blocked | Tools preinstall 또는 internal package URL로 fixture 수정 |
 | `usedInRange` is not empty | 이전 run이 clone을 유지했거나 destroy 실패 | Proxmox VM list에서 `oslab-*` clone 확인 |
 
-## Code Map
+<a id="code-map"></a>
+
+## 코드 위치
 
 | Concept | Code |
 | --- | --- |

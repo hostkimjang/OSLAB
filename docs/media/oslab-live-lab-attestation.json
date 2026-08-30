@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 2,
+  "captureType": "real-proxmox-infrastructure-and-windows-guest-execution-with-sanitized-overlay",
+  "reviewedAt": "2026-08-30T12:11:33.6311579Z",
+  "captureSessions": {
+    "infrastructure": {
+      "status": "passed",
+      "contents": [
+        "Proxmox clone and start task crop",
+        "running VM CPU graph",
+        "Windows 11 boot console"
+      ],
+      "privateRunEvidenceSha256": "365b4226ff88988901f0fa5e96284288356e54fae736466210435427f2395a45"
+    },
+    "guestPowerShell": {
+      "status": "passed",
+      "template": "windows11-template-qga-9200",
+      "guestChannel": "qemuAgent",
+      "privateRunEvidenceSha256": "3631cac9cf427516c2d5c981e06566fabb50930cedc2b796a2b4d6f145ad1835",
+      "privateCommandResultSha256": "bdf9bd532b183a7cce7ff7c5195c3f4aa2595dcc567079540108ca88742fecb1"
+    }
+  },
+  "run": {
+    "status": "passed",
+    "guestChannel": "qemuAgent",
+    "guestPreflight": {
+      "passed": 6,
+      "total": 6
+    },
+    "artifact": {
+      "uploadedFiles": 1,
+      "uploadedBytes": 700
+    },
+    "collectedOutputBytes": 684,
+    "assertions": {
+      "passed": 2,
+      "total": 2
+    },
+    "reports": [
+      "json",
+      "junit",
+      "html"
+    ]
+  },
+  "guestPowerShell": {
+    "actualGuestDesktop": true,
+    "sourceImageSha256": "3c10694286330a4acb3a683a75bdfd12f5ee1338e867fbd7314f3830d89928ee",
+    "exitCode": 0,
+    "osCaption": "Microsoft Windows 11 Pro",
+    "powershellVersion": "5.1.26100.6584",
+    "visibleOperatorVerificationMarker": "OSLAB-DEMO-PASS",
+    "markerDisclosure": "The marker was printed by the operator after inspecting the command result; it is not artifact stdout."
+  },
+  "cleanup": {
+    "resourceAbsent": true,
+    "verifiedAt": "2026-08-30T12:02:16.5104755Z",
+    "method": "The Proxmox resource list was checked after both capture sessions. Both dedicated capture VMs were absent."
+  },
+  "privacy": {
+    "manualSourceReview": true,
+    "manualPublicFrameReview": true,
+    "sourceFilesPinnedBySha256": true,
+    "captureSessionsDisclosed": true,
+    "taskIdentifiersReplacedWithPublicAliases": true,
+    "excludedRegions": [
+      "resource tree",
+      "node and account identifiers",
+      "API address and private IP addresses",
+      "unrelated VM and task history",
+      "guest infrastructure chrome and account identity"
+    ],
+    "guestTraceDisclosure": "The boot image is an actual guest console. The QGA panel is derived from approved run evidence and is not a guest-terminal recording. The later PowerShell scene is an actual guest desktop from the separately disclosed passing validation run."
+  },
+  "outputs": {
+    "oslab-live-lab.mp4": {
+      "bytes": 1979438,
+      "sha256": "b92f184e1151a5b529e186bfd7c9af8513afb06d0906f7119ca1b2ae0dcff031"
+    },
+    "oslab-live-lab.gif": {
+      "bytes": 4907496,
+      "sha256": "871031ffbe9c0fa93c865d771407c04ccc93938d1c53ed84f03c8f5da46789b9"
+    },
+    "oslab-live-lab-poster.png": {
+      "bytes": 327808,
+      "sha256": "7018829a9cf78a5018054978bc6972a06b1474ffec142e30b1bc69f56c2c5259"
+    }
+  }
+}

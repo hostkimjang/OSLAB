@@ -73,7 +73,9 @@ reports:
 
 `reports.formats`를 생략하면 scenario model은 기본적으로 JSON만 사용합니다. CI에서 JUnit을 기대한다면 `junit`을 명시하세요.
 
-## JUnit Mapping
+<a id="junit-mapping"></a>
+
+## JUnit 매핑
 
 `oslab`은 scenario 하나를 하나의 test suite로 쓰고, run phase를 testcase로 나눕니다.
 
@@ -190,7 +192,9 @@ uv run oslab analyze-inventory `
 
 이 명령들은 VM/lab 문제가 아니라 adapter, normalized shape, assertion을 조정할 때 유용합니다.
 
-## 아직 Generic Validation Feature가 아닌 것
+<a id="아직-generic-validation-feature가-아닌-것"></a>
+
+## 아직 범용 검증 기능이 아닌 것
 
 아래 항목은 generic core에 넣기보다 product나 lab 쪽 책임으로 두는 것이 맞습니다.
 

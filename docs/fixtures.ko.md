@@ -16,7 +16,9 @@ Fixture는 main product validation을 실행하면 안 됩니다. Product 실행
 | 테스트 대상 product upload/run | No | `artifact` 사용 |
 | Normalized output pass/fail 확인 | No | `assertions` 사용 |
 
-## Scenario Contract
+<a id="scenario-contract"></a>
+
+## 시나리오 계약
 
 ```yaml
 fixtures:
@@ -33,7 +35,9 @@ fixtures:
 | `source` | Yes | Guest에 upload하고 실행할 local script |
 | `expectedOutput` | No | Fixture 실행 후 setup evidence로 수집할 guest file path |
 
-## PowerShell Fixture 규칙
+<a id="powershell-fixture-규칙"></a>
+
+## PowerShell Fixture 작성 규칙
 
 권장 형태:
 
@@ -66,7 +70,9 @@ $manifest |
 - Secret을 출력하지 않습니다.
 - Product command를 여기에서 실행하지 않습니다.
 
-## Demo Fixture 동작
+<a id="demo-fixture-동작"></a>
+
+## 데모 Fixture 동작
 
 ### Python Runtime Fixture
 
@@ -117,7 +123,9 @@ $manifest |
 }
 ```
 
-## Result Flow
+<a id="result-flow"></a>
+
+## 결과 처리 흐름
 
 `oslab run` 중 fixture 흐름:
 
@@ -151,7 +159,9 @@ runs/<run-id>/
 [OK] fixture.all.done - Scenario fixtures applied
 ```
 
-## Debugging
+<a id="debugging"></a>
+
+## 문제 해결
 
 Fixture setup이 실패하면 fixture 중심 smoke test를 먼저 실행합니다.
 

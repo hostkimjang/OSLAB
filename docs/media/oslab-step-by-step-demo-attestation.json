@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 1,
+  "compositionType": "paced-dashboard-fixture-bookends-with-interleaved-workflow-explainer-and-separately-captured-real-lab",
+  "generatedAt": "2026-08-30T14:11:38.509Z",
+  "compositionScript": {
+    "path": "apps/web/scripts/compose-readme-step-by-step.mjs",
+    "sha256": "552cc2447206b9e15f0f0e417aab3249edb5c991242bd9bb55fafbdcd0b57e8b"
+  },
+  "sources": {
+    "oslab-dashboard-demo.mp4": {
+      "bytes": 1725633,
+      "sha256": "206a2ddaa0de2fa72454364073f618a4dc552c6722292a9e1629bcff3f1f9517",
+      "contract": "Actual Dashboard UI driven by fixed fixture data; external network access is blocked and Proxmox is not contacted.",
+      "fixtureData": true,
+      "contactsProxmox": false
+    },
+    "oslab-run-workflow.mp4": {
+      "bytes": 1589077,
+      "sha256": "5a7b97ddd133c31125bfc779898b57e30d10b369af5c67c71a9f92afa577ac7a",
+      "contract": "Deterministic ten-step explainer rendered from fixed data; it is not live execution and does not contact Proxmox.",
+      "fixtureData": true,
+      "contactsProxmox": false,
+      "publicTemplateVmId": 9200,
+      "publicCloneVmId": 9102
+    },
+    "oslab-live-lab.mp4": {
+      "bytes": 1979438,
+      "sha256": "b92f184e1151a5b529e186bfd7c9af8513afb06d0906f7119ca1b2ae0dcff031",
+      "contract": "Separately captured sanitized real-lab footage with passing privacy, public-alias, and cleanup attestation gates.",
+      "attestation": "oslab-live-lab-attestation.json",
+      "attestationSha256": "89726c169cbf1d9566d537c28a0f6ec9f2468c4a0509e0a74ef226f9136ad1ba",
+      "separatelyCapturedRealLab": true
+    }
+  },
+  "provenanceModel": "A generated title and ten paced source segments cross-cut fixed-fixture UI and explanation with separately captured real-lab footage. Short source badges describe provenance; adjacency does not assert one continuous run or shared result record.",
+  "sameContinuousRun": false,
+  "dashboardFixtureResultMatchesLiveRunRecord": false,
+  "editDecisionList": [
+    {
+      "segment": "title",
+      "source": "generated-title-card",
+      "sourceStartSeconds": 0,
+      "sourceEndSeconds": 2.2,
+      "playbackSpeed": 1,
+      "endHoldSeconds": 0,
+      "chapterCaption": null,
+      "incomingDisclosureStartsAtOutputSeconds": 0,
+      "transitionToNextStartsAtOutputSeconds": 1.65,
+      "role": "Opening title that states the edited fixture and separate-capture provenance model",
+      "disclosure": "EDITED WALKTHROUGH · FIXTURE UI + SEPARATE REAL LAB CAPTURE"
+    },
+    {
+      "segment": "dashboardStart",
+      "source": "oslab-dashboard-demo.mp4",
+      "sourceStartSeconds": 2.92,
+      "sourceEndSeconds": 18.6,
+      "playbackSpeed": 1,
+      "endHoldSeconds": 0,
+      "chapterCaption": "SETUP  |  Select the scenario and launch the run",
+      "incomingDisclosureStartsAtOutputSeconds": 1.65,
+      "transitionToNextStartsAtOutputSeconds": 16.78,
+      "role": "Actual Dashboard scenario preparation and Run Launcher driven by fixed fixture data",
+      "disclosure": "FIXTURE DASHBOARD"
+    },
+    {
+      "segment": "workflowClone",
+      "source": "oslab-run-workflow.mp4",
+      "sourceStartSeconds": 0.18,
+      "sourceEndSeconds": 8.46,
+      "playbackSpeed": 0.75,
+      "endHoldSeconds": 0,
+      "chapterCaption": "STEPS 1-4  |  Validate  >  Clone VM 9102  >  Boot",
+      "incomingDisclosureStartsAtOutputSeconds": 16.78,
+      "transitionToNextStartsAtOutputSeconds": 27.27,
+      "role": "Fixed-data explainer: request, preflight, clone, and boot orchestration",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "WORKFLOW EXPLAINER · FIXTURE DATA"
+    },
+    {
+      "segment": "liveClone",
+      "source": "oslab-live-lab.mp4",
+      "sourceStartSeconds": 2.4,
+      "sourceEndSeconds": 7.6,
+      "playbackSpeed": 1,
+      "endHoldSeconds": 0,
+      "chapterCaption": "REAL LAB  |  Proxmox Clone and Start completed",
+      "incomingDisclosureStartsAtOutputSeconds": 27.27,
+      "transitionToNextStartsAtOutputSeconds": 31.92,
+      "role": "Separately captured real-lab Proxmox clone and boot evidence",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "REAL LAB · SEPARATE CAPTURE"
+    },
+    {
+      "segment": "workflowGuest",
+      "source": "oslab-run-workflow.mp4",
+      "sourceStartSeconds": 8.98,
+      "sourceEndSeconds": 15.06,
+      "playbackSpeed": 0.75,
+      "endHoldSeconds": 0,
+      "chapterCaption": "STEPS 5-7  |  QGA  >  Fixtures  >  Artifact transfer",
+      "incomingDisclosureStartsAtOutputSeconds": 31.92,
+      "transitionToNextStartsAtOutputSeconds": 39.48,
+      "role": "Fixed-data explainer: QGA readiness, fixture preparation, and artifact transfer",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "WORKFLOW EXPLAINER · FIXTURE DATA"
+    },
+    {
+      "segment": "liveGuest",
+      "source": "oslab-live-lab.mp4",
+      "sourceStartSeconds": 8.16,
+      "sourceEndSeconds": 13.12,
+      "playbackSpeed": 1,
+      "endHoldSeconds": 0,
+      "chapterCaption": "REAL LAB  |  Windows console and QGA trace",
+      "incomingDisclosureStartsAtOutputSeconds": 39.48,
+      "transitionToNextStartsAtOutputSeconds": 43.89,
+      "role": "Separately captured Windows console with evidence-derived QGA trace",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "REAL LAB · SEPARATE CAPTURE"
+    },
+    {
+      "segment": "workflowTest",
+      "source": "oslab-run-workflow.mp4",
+      "sourceStartSeconds": 15.58,
+      "sourceEndSeconds": 19.46,
+      "playbackSpeed": 0.75,
+      "endHoldSeconds": 0,
+      "chapterCaption": "STEPS 8-9  |  Execute  >  Assert  >  Write evidence",
+      "incomingDisclosureStartsAtOutputSeconds": 43.89,
+      "transitionToNextStartsAtOutputSeconds": 48.51,
+      "role": "Fixed-data explainer: test execution, assertions, and evidence writing",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "WORKFLOW EXPLAINER · FIXTURE DATA"
+    },
+    {
+      "segment": "livePowerShell",
+      "source": "oslab-live-lab.mp4",
+      "sourceStartSeconds": 13.68,
+      "sourceEndSeconds": 19.6,
+      "playbackSpeed": 1,
+      "endHoldSeconds": 0,
+      "chapterCaption": "REAL VM  |  PowerShell completed with exit code 0",
+      "incomingDisclosureStartsAtOutputSeconds": 48.51,
+      "transitionToNextStartsAtOutputSeconds": 53.88,
+      "role": "Separately captured actual guest PowerShell and verified evidence footage",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "REAL LAB · SEPARATE CAPTURE"
+    },
+    {
+      "segment": "workflowCleanup",
+      "source": "oslab-run-workflow.mp4",
+      "sourceStartSeconds": 20.02,
+      "sourceEndSeconds": 22.96,
+      "playbackSpeed": 0.75,
+      "endHoldSeconds": 0,
+      "chapterCaption": "STEP 10  |  Destroy the clone and keep the evidence",
+      "incomingDisclosureStartsAtOutputSeconds": 53.88,
+      "transitionToNextStartsAtOutputSeconds": 57.25,
+      "role": "Fixed-data explainer: cleanup and VMID return",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "WORKFLOW EXPLAINER · FIXTURE DATA"
+    },
+    {
+      "segment": "liveSummary",
+      "source": "oslab-live-lab.mp4",
+      "sourceStartSeconds": 20.2,
+      "sourceEndSeconds": 22.5,
+      "playbackSpeed": 1,
+      "endHoldSeconds": 1,
+      "chapterCaption": "VERIFIED  |  Test passed and capture VMs removed",
+      "incomingDisclosureStartsAtOutputSeconds": 57.25,
+      "transitionToNextStartsAtOutputSeconds": 60,
+      "role": "Separately captured real-lab summary with cleanup attestation inherited from the live source",
+      "layout": "1280x720 contained in 1280x800 with 40-pixel top and bottom padding",
+      "disclosure": "REAL LAB · SEPARATE CAPTURE"
+    },
+    {
+      "segment": "dashboardResult",
+      "source": "oslab-dashboard-demo.mp4",
+      "sourceStartSeconds": 22.6,
+      "sourceEndSeconds": 27.52,
+      "playbackSpeed": 1,
+      "endHoldSeconds": 1.5,
+      "chapterCaption": "RESULTS  |  Inspect JSON, JUnit, HTML, and logs",
+      "incomingDisclosureStartsAtOutputSeconds": 60,
+      "transitionToNextStartsAtOutputSeconds": null,
+      "role": "Dashboard Results Explorer driven by fixture data; not the result record from the real-lab footage",
+      "disclosure": "FIXTURE RESULTS"
+    }
+  ],
+  "transitions": {
+    "type": "fade-through-black",
+    "durationSeconds": 0.55,
+    "count": 10,
+    "disclosureOverlayAppliedAfterCrossfade": true,
+    "incomingSegmentDisclosureCoversEachTransition": true
+  },
+  "privacy": {
+    "sourceSha256AndByteLengthPinned": true,
+    "liveLabAttestationRequired": true,
+    "liveLabPublicAliasGateRequired": true,
+    "liveLabCleanupGateRequired": true,
+    "compositorReadsOnlyReviewedPublicMp4Sources": true,
+    "newPrivateCaptureInputsRead": false,
+    "introducedDisclosureTextMarkerGatePassed": true,
+    "forbiddenCompositionMarkers": [
+      "192.168.",
+      "C:\\Users\\",
+      "/Users/",
+      "@pam",
+      "root@"
+    ]
+  },
+  "review": {
+    "contactSheetGenerated": true,
+    "contactSheetPath": "output/readme-media/oslab-step-by-step-demo-contact-sheet.png",
+    "contactSheetSha256": "6316953787d712cb06a1bf5f08691da920b83da0947497b5b9ca1dd9f49af92a",
+    "sampledFrameReview": true,
+    "fullFrameReview": true,
+    "manualPublicFrameReview": true,
+    "reviewer": "Codex root",
+    "reviewedAt": "2026-08-30T14:15:44.6570153Z",
+    "method": [
+      "Reviewed the complete timeline at one-second intervals in output/readme-media/step-v2-full-review/.",
+      "Reviewed three frames around each of the ten fade-through-black boundaries in output/readme-media/oslab-step-v2-transition-review.png.",
+      "Reviewed the generated title card and the chapter lower-thirds in both MP4 and GIF samples.",
+      "Reviewed the final Results Explorer poster and the live PowerShell and cleanup summary frames."
+    ],
+    "transitionReview": {
+      "path": "output/readme-media/oslab-step-v2-transition-review.png",
+      "sha256": "c610b5d8d4c27bfb5a334fcc605b0a7226575beb39b150ef66f9235f89ebf57d",
+      "boundariesReviewed": 10
+    },
+    "titleReview": {
+      "path": "output/readme-media/oslab-step-v2-title.png",
+      "sha256": "99bd5b87edaf89cef6ca4201e965c06b693f14ca57cdc9465172850b3eddd06a"
+    },
+    "requiredBeforeReadmeSwap": true
+  },
+  "cleanup": {
+    "inheritedFromLiveLabAttestation": true,
+    "resourceAbsent": true
+  },
+  "media": {
+    "durationSeconds": 66.44,
+    "width": 1280,
+    "height": 800,
+    "frameRate": 25,
+    "codec": "h264",
+    "pixelFormat": "yuv420p",
+    "audioStreams": 0,
+    "gifPreview": {
+      "width": 720,
+      "height": 450,
+      "frameRate": 6,
+      "maximumPaletteColors": 64
+    }
+  },
+  "outputs": {
+    "oslab-step-by-step-demo.mp4": {
+      "bytes": 5150840,
+      "sha256": "15a08d83c11490068d74045366d64e17001186783027b013c271c109816d3b0e"
+    },
+    "oslab-step-by-step-demo.gif": {
+      "bytes": 6435178,
+      "sha256": "695400cf963b41cd2053853d1750a5ba799501dd7563ee18949f343593688746"
+    },
+    "oslab-step-by-step-demo-poster.png": {
+      "bytes": 400095,
+      "sha256": "7351c82cf881488e7a4718c0851a8492ab4480357a89d8359a406edcfe7f4535"
+    }
+  }
+}

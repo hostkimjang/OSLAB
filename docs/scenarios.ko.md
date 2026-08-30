@@ -1,4 +1,4 @@
-# Scenario Authoring
+# 시나리오 작성
 
 언어: [English](scenarios.md) | 한국어
 
@@ -21,7 +21,9 @@
 
 가장 흔한 작성 실수는 `artifact.command`와 `outputs.actual.path` 불일치입니다. Command는 성공했지만 `oslab`이 수집하지 않는 위치에 output을 쓰면 run은 실패합니다.
 
-## Minimal Shape
+<a id="minimal-shape"></a>
+
+## 최소 구성
 
 ```yaml
 schemaVersion: 1
@@ -32,8 +34,8 @@ os:
   version: "11"
 provider:
   type: proxmox
-  template: windows11-template-qga
-  templateVmId: 9101
+  template: windows11-template-qga-9200
+  templateVmId: 9200
   vmIdRange:
     start: 9102
     end: 9199
@@ -66,7 +68,9 @@ cleanup:
   keepVmOnFailure: false
 ```
 
-## Top-Level Fields
+<a id="top-level-fields"></a>
+
+## 최상위 필드
 
 | Field | Required | Description |
 | --- | --- | --- |
@@ -84,7 +88,9 @@ cleanup:
 | `reports` | Optional | Report formats |
 | `cleanup` | Optional | VM cleanup behavior |
 
-## Field Responsibilities
+<a id="field-responsibilities"></a>
+
+## 필드별 역할
 
 | Field | Run에서의 역할 | 흔한 실수 |
 | --- | --- | --- |
@@ -100,7 +106,9 @@ cleanup:
 | `reports` | Output format 선택 | `junit`을 켜지 않고 CI JUnit을 기대 |
 | `cleanup` | VM 삭제/유지 정책 | Failed VM을 남긴 뒤 VMID range 확인을 잊음 |
 
-## Fixture Example
+<a id="fixture-example"></a>
+
+## Fixture 예시
 
 Fixture는 artifact command 전에 실행됩니다. Guest setup에 사용하고, main product validation을 fixture에 넣지 않습니다.
 
@@ -123,7 +131,9 @@ Fixture가 실패하면 run은 `fixture_failure`로 멈추는 것이 맞습니�
 
 Fixture 전체 작성 규칙, manifest 예시, debugging command는 [Fixture 작성법](fixtures.ko.md)을 참고하세요.
 
-## Command Template Tokens
+<a id="command-template-tokens"></a>
+
+## 명령 템플릿 토큰
 
 | Token | Meaning |
 | --- | --- |
@@ -134,7 +144,9 @@ Fixture 전체 작성 규칙, manifest 예시, debugging command는 [Fixture 작
 
 Unknown token은 guest execution 전에 command template rendering 단계에서 거부됩니다. `validate-scenario`는 schema shape를 확인하지만 모든 command token의 full dry run은 아닙니다.
 
-## Product Step Stdout JSON Contract
+<a id="product-step-stdout-json-contract"></a>
+
+## 제품 실행 단계 stdout JSON 계약
 
 Agent-like scenario는 단일 `artifact.command` 대신 `product.steps`를 자주 사용합니다. Step에 `captureStdoutJson: true`가 있으면 stdout은 JSON object 하나여야 합니다. `expectStdoutJson`은 반드시 만족해야 하는 값을 선언합니다.
 
@@ -153,7 +165,9 @@ product:
 
 필수 field가 없거나 값이 다르면 해당 step은 product execution failure로 실패합니다. Dotted key를 사용하면 nested object도 확인할 수 있습니다.
 
-## Generic Demo Scenarios
+<a id="generic-demo-scenarios"></a>
+
+## 범용 데모 시나리오
 
 | Scenario | Purpose |
 | --- | --- |
@@ -170,7 +184,9 @@ product:
 | `scenarios/windows/fake-installer-smoke.example.yaml` | Fake installer 실행 후 product command |
 | `scenarios/linux/generic-smoke.example.yaml` | Linux schema/design example |
 
-## Minimal Custom Artifact Examples
+<a id="minimal-custom-artifact-examples"></a>
+
+## 최소 사용자 아티팩트 예시
 
 Folder artifact:
 
@@ -210,7 +226,9 @@ outputs:
 
 두 경우 모두 command는 `outputs.actual.path`에 machine-readable output을 써야 합니다. `canonical.command`를 쓰는 경우 `commandResult` JSON object를 작성합니다.
 
-## Artifact Command Output Contract
+<a id="artifact-command-output-contract"></a>
+
+## 아티팩트 명령 출력 계약
 
 `canonical.command`를 쓰는 경우 remote output file은 다음 형태를 권장합니다.
 
@@ -285,7 +303,9 @@ $result |
   Set-Content -Encoding UTF8 $OutputPath
 ```
 
-## Expected Run Flow
+<a id="expected-run-flow"></a>
+
+## 예상 실행 흐름
 
 Folder artifact scenario가 통과하면 보통 다음 lifecycle을 따릅니다.
 
@@ -347,6 +367,8 @@ runs/<run-id>/
     result.html
 ```
 
-## Product-Specific Scenarios
+<a id="product-specific-scenarios"></a>
+
+## 제품별 시나리오
 
 Product-specific scenario는 generic scenario authoring 경로가 아니라 product-owned docs에 둡니다. Generic docs는 특정 private product workflow가 아니라 platform contract를 설명해야 합니다.

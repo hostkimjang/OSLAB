@@ -2,7 +2,7 @@
 
 > 내부 작업 로그입니다. 공개 온보딩은 `README.md`와 `docs/index.md`에서 시작하고, 이 파일은 구현 진행 상황과 lab 검증 기록을 추적하기 위한 개발자용 문서입니다.
 
-최종 업데이트: 2026-04-29
+최종 업데이트: 2026-08-31
 
 ## 현재 상태 요약
 
@@ -12,15 +12,51 @@ Web dashboard v1은 NestJS API + Next.js UI 기반으로 추가되어 있으며,
 
 브라우저 기반 회귀 검증은 [Browser Debug Checklist](browser-debug-checklist.md)에 누적합니다.
 
+### 2026-08-31 공개 문서 영문·한국어 대응 감사
+
+- [x] README와 문서 인덱스에서 연결되는 공개 문서 14쌍의 영문·한국어 파일과 상호 언어 전환 링크 확인
+- [x] 누락됐던 한국어 플랫폼 계획 `docs/oslab-platform-plan.ko.md`를 추가하고 영문 계획의 한국어 본문을 기술 영어로 정리
+- [x] 한국어로만 작성돼 있던 공개 체크리스트를 `docs/github-release-checklist.md` 영문판과 `docs/github-release-checklist.ko.md` 한국어판으로 분리
+- [x] Web Dashboard 및 Dashboard Server 문서에 영문·한국어 전환 링크를 추가하고 구현 상태, LSP 지원, 실행 결과 동기화 설명을 맞춤
+- [x] 한국어 문서 제목을 자연스럽게 번역하면서 기존 영문 deep link 74개를 명시적 anchor로 보존
+- [x] 공개 문서와 개발 기록에 남은 사용자별 절대 경로를 `<artifact-source>` 또는 `C:/path/to/OSLAB` 예시로 중립화
+- [x] `scripts/check-doc-links.ps1`로 로컬 Markdown 링크, 14개 문서쌍, README와 문서 인덱스의 언어별 연결을 자동 검증
+- [x] 영문·한국어 문서쌍의 코드 블록 수와 주요 명령 예시 일치 여부 확인
+
+### 2026-08-30 README 단일 step-by-step 대표 영상
+
+- [x] 실제 Dashboard UI의 Dashboard → Scenario Studio → Run Launcher 구간을 Playwright 고정 fixture로 촬영
+- [x] 10단계 workflow explainer의 공개 template·VM 식별자를 Dashboard와 동일한 `9200`·`9102`로 맞춰 브라우저 재촬영
+- [x] workflow와 실제 Proxmox clone/start·CPU, Windows 콘솔, QGA trace, guest PowerShell을 단계별로 교차 편집
+- [x] 원본 fade 경계와 합성 전환이 겹쳐 장면이 스킵되는 듯 보이던 구간을 안정 프레임 cut, workflow 0.75배속, 0.55초 fade-through-black으로 교정
+- [x] 2.2초 title card와 구간별 2.65초 lower-third를 추가하고 상단 provenance는 짧은 source badge로 정리
+- [x] cleanup 뒤 실제 clone으로 되돌아가는 시간축 역행을 피하도록 title을 포함한 11개 EDL과 전환 10회 적용
+- [x] 마지막을 Dashboard Results Explorer의 fixture `PASSED`와 evidence `7/7` 화면으로 연결
+- [x] Dashboard fixture·workflow explainer·별도 실제 촬영·fixture Results의 provenance 고정 라벨 표시
+- [x] 66.44초, 1280×800, H.264/yuv420p/25fps/무음 MP4와 720×450/6fps/64색 GIF 생성
+- [x] 1초 간격 전체 타임라인, 전환 10개, title/lower-third/source badge, GIF 라벨과 Results poster를 독립 검수
+- [x] source/output SHA-256, 11개 EDL, 재생 속도·정지 여백, live attestation, cleanup 상태를 `docs/media/oslab-step-by-step-demo-attestation.json`에 기록
+- [x] 영문·한글 README의 `step by step` 아래에 대표 영상 하나만 표시하고 Web Dashboard 섹션은 기능 설명만 유지
+
+### 2026-08-30 Windows template 9200 전환
+
+- [x] Windows scenario의 기본 template을 `windows11-template-qga-9200`, VMID `9200`으로 전환
+- [x] README 진입 문서와 Windows scenario/Proxmox 예시를 새 기본값에 맞게 동기화
+- [x] 기존 VMID `9101`의 실제 검증 기록은 이전 template 이력으로 명시해 보존
+- [x] 수정 clone에서 `admin` 암호를 재설정하고 noVNC 실제 로그인을 확인한 뒤 full clone을 새 template `9200`으로 승격
+- [x] `9200`에서 만든 검증 clone `9103`으로 재로그인해 암호 반영과 QGA 준비 상태 확인
+- [x] `9200` 기반 `demo-powershell-system.windows` 실제 실행: artifact 전송, PowerShell 종료 코드 0, assertion 2/2, JSON/JUnit/HTML 보고서 생성 통과
+- [x] README 촬영 후 일회용 VM `9102`, `9103`, `9104`를 정상 종료·삭제하고 template `9101`, `9200` 보존 확인
+
 최근 실제 lab 결과:
 
 - Proxmox API 연결: 통과
 - Node `<lab-node>`: 통과
-- Windows template VMID `9101`: 통과
+- 기존 Windows template VMID `9101`: 과거 검증 통과, 보존
 - Template flag: 통과
 - Clone smoke: 통과
 - Clone smoke 이후 cleanup: 통과
-- Windows QEMU Guest Agent 수정 clone `9101`을 새 template `windows11-template-qga-9101`로 변환
+- Windows QEMU Guest Agent 수정 clone `9101`을 당시 새 template `windows11-template-qga-9101`로 변환
 - Boot smoke: `9101` template에서 `9102` clone 생성, boot, QEMU Guest Agent 확인, cleanup 통과
 - QGA file transfer: `README.md`를 `9102` clone에 upload/download하고 SHA256 hash 일치 확인
 - Windows guest preflight: PowerShell version, admin context, execution policy, `C:\Oslab` directory, file round-trip, cleanup check 통과
@@ -40,12 +76,16 @@ Web dashboard v1은 NestJS API + Next.js UI 기반으로 추가되어 있으며,
 - Generic C demo: clean Windows clone에서 TinyCC bootstrap 후 `hello from c` 검증 통과
 - External Cloudflare Tunnel Proxmox access: 기본 `Python-urllib/3.13` 시그니처는 Cloudflare `403 Error 1010`으로 차단되었고, explicit `User-Agent: oslab/0.1.0` 적용 후 `GET /version`, `GET /nodes`, `GET /cluster/resources?type=vm`, template config read가 다시 통과
 
-최근 로컬 테스트 결과:
+최근 로컬 테스트 상태:
 
 ```text
 uv run pytest
-155 passed
+156 collected
+110 passed
+46 failed
 ```
+
+실패 46건은 공개 저장소에서 제거된 product-specific scenario, suite, plugin fixture를 기존 테스트가 계속 참조해 발생합니다. 이번 README·문서 커밋의 링크 검사와 공개 Windows demo scenario 12개 검증은 별도로 통과했으며, 전체 단위 테스트의 generic fixture 이관은 공개 체크리스트의 후속 작업으로 남깁니다.
 
 ## 2026-04-22 product-specific Scan OS/Profile 검증 진행 결과
 
@@ -128,7 +168,7 @@ uv run pytest
   - Dashboard 상단 `랩 상태` 패널
   - Run Launcher 상단 `랩 상태` 패널
   - status badge: `준비됨`, `주의 필요`, `실행 차단`
-  - 실제 확인: Proxmox `9.1.1`, node `softverse`, template `9101`, VMID range `9102-9199`, free `98`, running/stale `0`
+  - 실제 확인: Proxmox `9.1.1`, node `<lab-node>`, template `9101`, VMID range `9102-9199`, free `98`, running/stale `0`
   - screenshot: `output/web-dashboard/lab-status-dashboard.png`
   - screenshot: `output/web-dashboard/lab-status-run-launcher.png`
 - [x] Run Launcher 최소 readiness gate 구현
@@ -257,7 +297,7 @@ uv run pytest
   - 자동완성 popup QA: PowerShell/placeholder snippet 표시, browser console errors `0`, API/Web server 유지
   - screenshots: `output/web-dashboard/artifact-studio-demo-created.png`, `output/web-dashboard/artifact-studio-autocomplete-trigger.png`, `output/web-dashboard/artifact-studio-assist-check.png`, `output/web-dashboard/artifact-studio-run-launcher-linked.png`, `output/web-dashboard/artifact-studio-demo-run-complete.png`, `output/web-dashboard/artifact-studio-demo-result-detail.png`
 - [x] Run Launcher 디렉터리 artifact 직접 경로 확인
-  - 대상 path: `C:\Users\kysky\Documents\gitlab\agent-windows\ProductAgent\bin\Release`
+  - 대상 path: `<artifact-source>\ProductAgent\bin\Release`
   - API artifact check: `exists=true`, `kind=directory`
   - Browser UI: `테스트 파일 확인됨 · directory`, 시나리오 실행 준비 활성화
   - smoke: `output/web-dashboard/artifact-directory-path-smoke.json`
@@ -592,7 +632,7 @@ uv run pytest
 - [x] Browser upload UX 보강: 단일 파일과 폴더 upload, `.web-artifacts` 저장, artifact path 자동 선택, 업로드 상태/진행률 카드, 좁은 panel responsive layout 검증
 - [x] QGA `exec-status` 일시 실패 retry: Proxmox `agent/exec-status` 조회가 한 번 실패해도 command timeout 안에서는 재시도하고 timeout diagnostic에 마지막 오류를 남김
 - [x] product-specific 제품 Release 폴더 Web 검증
-  - 실행 묶음 smoke: job `cmognt5bg000usmmg6u6uvktu`, 실제 VM 실행 확인, path-profile `exec-status` transient failure 발견, appx-readonly allowed failure 표시 확인
+  - 실행 묶음 smoke: 기록된 job에서 실제 VM 실행 확인, path-profile `exec-status` transient failure 발견, appx-readonly allowed failure 표시 확인
   - retry 패치 후 path-profile 단일 시나리오 Web 재실행: job `cmogpdv9r002gsmmg4f7b062i`, run `20260427-133443-product-specific-agent-path-profile-windows`, `passed`
 - [ ] Role split/OIDC 검토
 - [ ] TRX aggregate report 연동
@@ -820,7 +860,7 @@ uv run pytest
 - [x] `fake.agent-cli-smoke.windows` scenario validation 통과
 - [x] `generic.linux.smoke` scenario validation 통과
 - [x] Proxmox resource preflight 재확인 통과
-- [x] Template VMID `9101`, template name `windows11-template-qga-9101`, clone range `9102-9199` 확인
+- [x] 당시 Template VMID `9101`, template name `windows11-template-qga-9101`, clone range `9102-9199` 확인
 - [x] VMID range 안에 남은 clone 없음: `usedInRange: <none>`
 - [x] 기존 `runs/artifact-smoke/fake.artifact-smoke.windows/scan-result.json`에 `assert-result` 재평가 통과
 - [x] 실제 Proxmox `fake.agent-cli-smoke.windows` product step smoke 통과
@@ -928,8 +968,8 @@ uv run pytest
 - [x] YAML top-level 구조 검증
 - [x] Scenario schema version 검증
 - [x] Provider, guest, artifact, fixture, assertion, report, cleanup 검증
-- [x] Windows scenario의 현재 template VMID를 `9101`로 고정
-- [x] Windows scenario의 현재 template name을 `windows11-template-qga-9101`로 고정
+- [x] Windows scenario의 현재 template VMID를 `9200`으로 전환
+- [x] Windows scenario의 현재 template name을 `windows11-template-qga-9200`으로 전환
 - [x] Windows scenario의 현재 clone range를 `9102-9199`로 고정
 - [x] QEMU Guest Agent가 설치된 Windows template을 기준으로 scenario 갱신
 - [x] product-specific 없는 generic PowerShell/Python/C/fixture-state/agent-steps demo scenarios
@@ -1011,7 +1051,7 @@ uv run oslab preflight `
   --provider-resource-check
 ```
 
-최근 실제 출력 요약:
+9200 전환 전에 보존한 실제 출력 요약:
 
 ```text
 [OK] Proxmox API connectivity
@@ -1142,7 +1182,8 @@ recommendedVmId: 9101
 남은 주의점:
 
 - 기존 `9100` template은 legacy template으로 남아 있음
-- 현재 scenario는 QGA가 포함된 `9101` template을 사용함
+- 기존 QGA template `9101`은 이전 검증 기록과 복구를 위해 보존함
+- 현재 scenario는 QGA가 포함된 `9200` template을 사용함
 - 새 clone은 `9102-9199` range에서 생성해야 함
 
 향후 template 회귀가 의심될 때의 debug 명령:
@@ -1453,8 +1494,8 @@ Local-only files:
 ```text
 apiUrl: https://proxmox.example.local:8006/api2/json
 node: <lab-node>
-templateVmId: 9101
-templateName: windows11-template-qga-9101
+templateVmId: 9200
+templateName: windows11-template-qga-9200
 cloneRange: 9102-9199
 ```
 

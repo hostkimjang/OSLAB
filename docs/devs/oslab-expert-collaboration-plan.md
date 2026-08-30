@@ -242,7 +242,7 @@
 | Artifact upload smoke | Run Launcher에서 파일 업로드 | `.web-artifacts/` path 선택, artifact check `file`, upload state 표시, mobile horizontal overflow false |
 | Folder artifact upload/responsive smoke | Run Launcher에서 폴더 업로드와 좁은 panel 확인 | `.web-artifacts/<timestamp>-Release` directory path 선택, artifact check `directory`, `Release` 156개 파일/진행률/저장 경로 상태 카드 표시, `output/web-dashboard/artifact-folder-upload-responsive-smoke.json` |
 | Fast artifact transfer smoke | product-specific `bin/Release` artifact를 `http-pull` mode로 suite 실행 | archive hash/bytes 일치, guest download progress 표시, 기존 QGA upload 대비 전송 시간 단축, 실패 시 QGA fallback 가능 |
-| product-specific suite Web smoke | Web에서 product-specific 실행 묶음 + 제품 `bin/Release` 경로 실행 | job `cmognt5bg000usmmg6u6uvktu`, 실제 VM 단계 진행, 3 passed / 1 required failed / 1 allowed failed, QGA `exec-status` transient bug 발견 |
+| product-specific suite Web smoke | Web에서 product-specific 실행 묶음 + 제품 `bin/Release` 경로 실행 | 기록된 smoke job이 실제 VM 단계 진행, 3 passed / 1 required failed / 1 allowed failed, QGA `exec-status` transient bug 발견 |
 | product-specific path-profile Web regression | QGA retry 패치 후 path-profile 단일 시나리오 Web 재실행 | job `cmogpdv9r002gsmmg4f7b062i`, run `20260427-133443-product-specific-agent-path-profile-windows`, `passed`, assertions `8`, server/runtime errors `0` |
 | Evidence smoke | Results에서 `20260423-232535-demo-powershell-system-windows` 선택 | evidence checklist 표시, contract gaps `0` |
 | Results discovered/missing file smoke | Results에서 `20260426-174301-demo-python-hello-windows` 선택 | `raw/fixture-demo-python-runtime.expected-output.json`은 `추가 발견`, `normalized/inventory.json`은 dead link 없는 `누락` 카드로 표시 |

@@ -1,5 +1,7 @@
 # Web Dashboard Server Guide
 
+Language: English | [한국어](web-dashboard-server.ko.md)
+
 This guide explains how to run the `oslab` web dashboard server. For feature scope and UI behavior, see [Web Dashboard](web-dashboard.md).
 
 ## What Runs
@@ -27,7 +29,7 @@ corepack pnpm prisma:generate
 Set at least these values in `apps/api/.env`:
 
 ```text
-OSLAB_REPO_ROOT=C:/Users/kysky/Documents/gitlab/product-specific_autorun_test
+OSLAB_REPO_ROOT=C:/path/to/OSLAB
 OSLAB_WEB_ADMIN_USERNAME=admin
 OSLAB_WEB_ADMIN_PASSWORD=<strong-password>
 ```
@@ -126,7 +128,7 @@ Check the Web server:
 Invoke-WebRequest http://127.0.0.1:3000 -UseBasicParsing
 ```
 
-For browser regression work, follow [Browser Debug Checklist](devs/browser-debug-checklist.md).
+For browser regression work, follow the Korean-language maintainer log in [Browser Debug Checklist](devs/browser-debug-checklist.md).
 
 ## Troubleshooting
 

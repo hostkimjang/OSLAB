@@ -1,4 +1,4 @@
-# Concepts
+# 핵심 개념
 
 언어: [English](concepts.md) | 한국어
 
@@ -19,7 +19,9 @@
 
 즉, `oslab`은 “테스트용 VM을 만들고, 시험장을 세팅하고, 시험 대상을 실행하고, 채점표와 보고서를 남기는” 흐름을 자동화합니다.
 
-## Lifecycle Map
+<a id="lifecycle-map"></a>
+
+## 실행 수명주기
 
 | Concept | Input | Role | Output |
 | --- | --- | --- | --- |
@@ -33,7 +35,9 @@
 | Assertion | Scenario assertions | Normalized data 평가 | Pass/fail results |
 | Report | Run result와 assertion results | CI/human/automation output 작성 | JUnit, JSON, HTML, logs |
 
-## Why The Boundaries Exist
+<a id="why-the-boundaries-exist"></a>
+
+## 경계를 나누는 이유
 
 각 개념은 일부러 분리되어 있습니다. 실패했을 때 어느 단계가 문제인지 좁히고, 제품별 차이가 core platform을 오염시키지 않게 하기 위해서입니다.
 
@@ -46,7 +50,9 @@
 | Assertion | 자동으로 통과/실패를 판단하기 위해 | Canonical model 검사 | Raw output 직접 파싱 |
 | Report | 결과를 사람/CI/automation이 소비하게 하기 위해 | JUnit, JSON, HTML, logs 위치 제공 | VM 실행 제어 |
 
-## Scenario
+<a id="scenario"></a>
+
+## 시나리오
 
 무엇을 실행할지 설명하는 YAML file입니다. 쉽게 말해 scenario는 “실행 레시피”입니다. 어떤 VM을 만들고, 어떤 사전 준비를 하고, 어떤 artifact를 올리고, 무엇을 통과 기준으로 볼지 한 장에 적습니다.
 
@@ -68,7 +74,9 @@ Examples:
 - `scenarios/windows/demo-c-hello.example.yaml`
 - `scenarios/windows/demo-agent-steps.example.yaml`
 
-## Provider
+<a id="provider"></a>
+
+## 프로바이더
 
 Provider는 VM lifecycle을 관리합니다.
 
@@ -81,7 +89,9 @@ Provider는 VM lifecycle을 관리합니다.
 
 향후 provider는 같은 lifecycle surface를 구현하면 scenario semantics를 바꾸지 않고 추가할 수 있습니다.
 
-## Guest Channel
+<a id="guest-channel"></a>
+
+## 게스트 채널
 
 Guest channel은 VM 내부에서 command를 실행하고 file을 전송하는 interface입니다.
 
@@ -94,7 +104,9 @@ Guest channel은 VM 내부에서 command를 실행하고 file을 전송하는 in
 - Windows fallback용 WinRM
 - Linux용 SSH
 
-## Fixture
+<a id="fixture"></a>
+
+## 환경 준비(Fixture)
 
 Fixture는 artifact가 실행되기 전에 guest state를 준비합니다. 쉽게 말해 “테스트 전 환경 셋업 스크립트”입니다.
 
@@ -109,7 +121,9 @@ Examples:
 
 Python/C demo는 disposable clone 내부의 `C:\Oslab\tools` 아래에 portable tool을 bootstrap하기 위해 fixture를 사용합니다. Product 실행은 fixture가 아니라 `artifact.command` 또는 `product.steps`에 두는 것이 좋습니다.
 
-## Artifact
+<a id="artifact"></a>
+
+## 아티팩트
 
 Artifact는 VM에 upload되는 local file 또는 folder입니다. 쉽게 말해 “실제로 시험 볼 대상”입니다. 예를 들어 실행할 프로그램 폴더, 설치 파일, smoke test script 묶음이 artifact입니다.
 
@@ -120,7 +134,9 @@ MVP supported types:
 | `folder` | Directory를 upload합니다. 보통 archive로 전송합니다. |
 | `installer` | Installer file을 upload하고 `installCommand`를 실행합니다. |
 
-## Command Or Product Steps
+<a id="command-or-product-steps"></a>
+
+## 명령과 제품 실행 단계
 
 간단한 scenario는 artifact command 하나를 사용합니다.
 
@@ -134,7 +150,9 @@ Core runner는 이 steps를 generic step으로 취급합니다. Product semantic
 
 Step이 JSON을 출력하면 `captureStdoutJson: true`로 그 객체를 `raw/product-steps.json`에 저장할 수 있습니다. 그 다음 `expectStdoutJson`으로 `ok: true`, `registered: true`, `outputWritten: true` 같은 필수 field를 gate로 걸어 다음 step으로 넘어가기 전에 검증할 수 있습니다.
 
-## Adapter
+<a id="adapter"></a>
+
+## 어댑터
 
 Adapter는 raw product output을 canonical model로 normalize합니다. 쉽게 말해 제품마다 제각각인 출력 형식을 `oslab`이 공통으로 채점할 수 있는 형태로 바꾸는 변환기입니다.
 
@@ -149,7 +167,9 @@ Implemented:
 
 제품별 adapter logic은 core runner behavior 밖에 두고, generic getting-started 경로가 아니라 해당 제품 문서에 둡니다.
 
-## Assertion
+<a id="assertion"></a>
+
+## 결과 검증(Assertion)
 
 Assertion은 normalized output을 평가합니다. 쉽게 말해 “합격 기준”입니다. Assertion은 raw output이나 VM 상태를 직접 읽지 않고, adapter가 만든 canonical model만 보고 판단해야 합니다.
 
@@ -171,7 +191,9 @@ Implemented examples:
 
 State assertion은 normalized output metadata에서 읽습니다. 예를 들면 `metadata.files`, `metadata.directories`, `metadata.processes`, `metadata.services`, `metadata.packages`입니다. 실제 guest 상태 관찰과 보고는 artifact command가 담당합니다.
 
-## Report
+<a id="report"></a>
+
+## 보고서
 
 각 full run은 다음 결과를 만들 수 있습니다.
 

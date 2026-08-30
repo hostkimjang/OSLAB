@@ -237,7 +237,7 @@
   - Large Release screenshot: `output/web-dashboard/artifact-release-folder-direct-upload.png`
 - [x] Run Launcher 디렉터리 artifact 직접 경로 확인
   - API `GET /api/artifacts/check`는 절대 경로 디렉터리를 `kind=directory`로 반환
-  - Browser smoke에서 `C:\Users\kysky\Documents\gitlab\agent-windows\ProductAgent\bin\Release` 입력 후 `테스트 파일 확인됨 · directory`와 시나리오 실행 준비 상태 확인
+  - Browser smoke에서 `<artifact-source>\ProductAgent\bin\Release` 입력 후 `테스트 파일 확인됨 · directory`와 시나리오 실행 준비 상태 확인
   - Browser smoke: `output/web-dashboard/artifact-directory-path-smoke.json`
   - Screenshot: `output/web-dashboard/artifact-directory-path-direct-input.png`
 - [x] Run Launcher 좁은 화면 레이아웃 보강
@@ -440,7 +440,7 @@ uv run oslab run --scenario scenarios/windows/demo-powershell-system.example.yam
   - running/kept/stale `oslab-*` VM 목록
   - local lock file 목록
   - `config/oslab.local.yaml`, `config/oslab.local.env` 존재 여부
-  - 실제 확인: Proxmox `9.1.1`, node `softverse`, template `9101`, VMID range `9102-9199`, free `98`
+  - 실제 확인: Proxmox `9.1.1`, node `<lab-node>`, template `9101`, VMID range `9102-9199`, free `98`
 
 - [x] Lab Status UI 추가
   - Dashboard 첫 화면 상단에 `랩 상태` 패널 배치
@@ -681,7 +681,7 @@ uv run oslab run --scenario scenarios/windows/demo-powershell-system.example.yam
   - 좁은 viewport에서 result badge 2-line fallback
 
 - [x] product-specific 제품 Release 폴더 Web 실행 검증
-  - [x] 실행 묶음 Web smoke: `cmognt5bg000usmmg6u6uvktu`, 실제 VM 실행과 결과/실패 표시 확인
+  - [x] 실행 묶음 Web smoke: 기록된 job에서 실제 VM 실행과 결과/실패 표시 확인
   - [x] QGA `exec-status` transient retry 후 `path-profile` Web 재실행: `cmogpdv9r002gsmmg4f7b062i`, `passed`
 
 - [ ] Web dashboard Playwright smoke test 정식화
