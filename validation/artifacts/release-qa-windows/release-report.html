@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dispatch Board release gate</title>
+<style>
+:root { color-scheme:dark; --bg:#081426; --surface:#10223a; --border:#273c56; --text:#eff6ff; --muted:#b2c5dd; --pass:#65e4b6; --fail:#ff9eae }
+* { box-sizing:border-box }
+body { margin:0; color:var(--text); background:radial-gradient(ellipse at 0 0,#12304a,var(--bg) 60%); font:15px/1.4 'Segoe UI',sans-serif }
+main { margin:auto; max-width:1280px; padding:27px 44px 42px }
+header { display:flex; justify-content:space-between; gap:20px; align-items:center; margin-bottom:22px }
+.brand { display:flex; gap:9px; align-items:center; font-weight:700; letter-spacing:.09em }
+.logo { display:inline-block; width:15px; height:15px; border-radius:3px; background:var(--pass); transform:rotate(-12deg) }
+.tag { color:var(--muted); border:1px solid var(--border); border-radius:100px; padding:5px 11px; font-size:12px; font-weight:600; white-space:nowrap }
+[data-verdict="FAIL"] { --outcome:var(--fail) }
+[data-verdict="PASS"] { --outcome:var(--pass) }
+.hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:22px; align-items:center; border:1px solid var(--border); border-top:3px solid var(--outcome); border-radius:14px; background:var(--surface); padding:20px 24px }
+.eyebrow { color:var(--outcome); font-size:12px; font-weight:700; letter-spacing:.10em; text-transform:uppercase }
+h1 { margin:4px 0 3px; font-size:clamp(24px,3vw,37px); line-height:1.12 }
+.hero p { margin:5px 0 0; color:var(--muted) }
+.verdict { color:var(--outcome); font-size:clamp(28px,4vw,44px); font-weight:750; letter-spacing:.06em }
+.metrics { margin:14px 0 19px; display:grid; grid-template-columns:repeat(4,1fr); gap:12px }
+.metric { border:1px solid var(--border); background:var(--surface); border-radius:10px; padding:10px 15px }
+.metric strong { display:block; font-size:23px; line-height:1.2 }
+.metric span { color:var(--muted); font-size:12px }
+h2 { font-size:16px; margin:0 0 8px }
+table { width:100%; table-layout:fixed; border-collapse:collapse; border:1px solid var(--border); background:var(--surface); border-radius:10px; overflow:hidden }
+th,td { text-align:left; border-bottom:1px solid var(--border); padding:8px 12px; vertical-align:top; overflow-wrap:anywhere }
+th { color:var(--muted); font-size:12px; font-weight:600 }
+th:first-child { width:76px }
+th:nth-child(2) { width:32% }
+th:nth-child(3) { width:27% }
+td { font-size:13px }
+.status { font-size:11px; font-weight:750; letter-spacing:.04em; white-space:nowrap }
+.status.passed { color:var(--pass) }
+.status.failed { color:var(--fail) }
+footer { margin-top:14px; color:var(--muted); font-size:12px }
+@media (max-width:700px) { main { padding:20px 16px } .metrics { grid-template-columns:repeat(2,1fr) } th:nth-child(2) { width:28% } }
+</style>
+</head>
+<body data-verdict="@@VERDICT@@">
+<main>
+<header><div class="brand"><i class="logo" aria-hidden="true"></i> OSLAB / RELEASE QA</div><div class="tag">Windows guest &nbsp;&middot;&nbsp; Dispatch Board @@VERSION@@</div></header>
+<section class="hero" aria-label="Release gate">
+  <div><div class="eyebrow">@@LABEL@@</div><h1>@@TITLE@@</h1><p>@@SUMMARY@@</p></div>
+  <div class="verdict">@@VERDICT@@</div>
+</section>
+<div class="metrics">
+  <div class="metric"><strong>@@ACCEPTED@@</strong><span>Accepted shipments</span></div>
+  <div class="metric"><strong>@@REJECTED@@</strong><span>Rejected rows</span></div>
+  <div class="metric"><strong>@@EXPORTED@@</strong><span>Manifest records</span></div>
+  <div class="metric"><strong>@@ASSERTIONS@@</strong><span>Assertions passed</span></div>
+</div>
+<h2>Guest assertion results</h2>
+<table>
+<thead><tr><th scope="col">Status</th><th scope="col">Assertion</th><th scope="col">Expected</th><th scope="col">Observed</th></tr></thead>
+<tbody>@@ROWS@@</tbody>
+</table>
+<footer>Generated from the shipment state and exported file inside the Windows guest.</footer>
+</main>
+</body>
+</html>

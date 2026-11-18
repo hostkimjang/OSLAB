@@ -10,11 +10,13 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-![Screen captures from 32 actual Windows VM checks](docs/media/oslab-32vm-live.gif)
+![Dispatch Board release QA on four Windows VMs, from MSI install to a verified patch](docs/media/oslab-release-qa.gif)
 
-> **Recorded Windows VM runs.** These are 32 distinct checks on disposable Windows 11 guests, filmed across 11 batches with up to 4 recorded VMs per batch. OSLAB MCP sent the guest input and captured the console screens. The montage shows the real Windows captures and enlarges selected app workflows.
+> **A Windows release tested end to end.** Four Windows 11 VMs run the Dispatch Board demo. OSLab MCP clicks through a real MSI install and operates the desktop app. The suite verifies saved state across an upgrade, catches an intentional defect that drops a shipment, and confirms the patch restores the original CSV.
 
-[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-live.mp4) · [Capture and result details](docs/media/oslab-32vm-live-attestation.json) · [32-screen design concept](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4)
+[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4) · [Run the scenarios](docs/release-qa-demo.md) · [Read the guest results](docs/media/oslab-release-qa-attestation.json)
+
+[32-VM recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-live.mp4) · [32-VM results](docs/media/oslab-32vm-live-attestation.json) · [32-screen design concept](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4)
 
 OSLAB is an OS integration test platform for software that must be verified in a real operating system—not only in a unit test, container, or mocked environment. It clones a disposable VM, prepares the guest, transfers an artifact, executes it, evaluates assertions, writes reports, and cleans up the VM.
 

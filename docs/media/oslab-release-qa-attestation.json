@@ -1,0 +1,483 @@
+{
+  "demo": "Dispatch Board Windows release QA",
+  "guest_os": "Windows 11",
+  "guest_count": 4,
+  "artifact_source": "../../validation/artifacts/release-qa-windows",
+  "scope": "Four isolated disposable Proxmox clones with synthetic shipping data",
+  "capture": "OSLab MCP console screenshots, click and key tools. Edited from guest screenshots.",
+  "verification": "Windows Installer registration and an independent PowerShell verifier against guest JSON state and CSV output",
+  "cases": [
+    {
+      "scenario": "install",
+      "installed_versions": [
+        "1.0.0"
+      ],
+      "guest_result": {
+        "mode": "export",
+        "version": "1.0.0",
+        "releaseVerdict": "PASS",
+        "expectedVerdict": "PASS",
+        "executionPassed": true,
+        "accepted": 7,
+        "rejected": 1,
+        "exported": 7,
+        "checks": [
+          {
+            "id": "state.readable",
+            "name": "Application wrote its guest state",
+            "passed": true,
+            "expected": "Readable JSON",
+            "observed": "Readable"
+          },
+          {
+            "id": "input.fixture",
+            "name": "Guest import used the approved QA fixture",
+            "passed": true,
+            "expected": "Matching SHA-256",
+            "observed": "Matching SHA-256"
+          },
+          {
+            "id": "app.version",
+            "name": "Installed build launched",
+            "passed": true,
+            "expected": "Version 1.0.0 launch",
+            "observed": "State 1.0.0 / Launch 1.0.0"
+          },
+          {
+            "id": "import.records",
+            "name": "Accepted shipments match the fixture",
+            "passed": true,
+            "expected": "7 exact rows",
+            "observed": "7 matching rows"
+          },
+          {
+            "id": "import.reject",
+            "name": "Malformed quantity was rejected",
+            "passed": true,
+            "expected": "SHP-1048 / invalid units",
+            "observed": "SHP-1048 / Units must be a positive whole number"
+          },
+          {
+            "id": "audit.import",
+            "name": "Import appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one import event",
+            "observed": "1 events"
+          },
+          {
+            "id": "state.hold",
+            "name": "Operator hold was saved",
+            "passed": true,
+            "expected": "SHP-1041 / On Hold",
+            "observed": "On Hold"
+          },
+          {
+            "id": "audit.hold",
+            "name": "Hold appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one status change",
+            "observed": "1 events"
+          },
+          {
+            "id": "export.schema",
+            "name": "Export preserves the shipment CSV schema",
+            "passed": true,
+            "expected": "Id,Customer,Destination,Units,Priority,Status",
+            "observed": "Id,Customer,Destination,Units,Priority,Status"
+          },
+          {
+            "id": "export.count",
+            "name": "Export contains every accepted shipment",
+            "passed": true,
+            "expected": "7 records",
+            "observed": "7 records"
+          },
+          {
+            "id": "export.content",
+            "name": "Exact data and status survive export",
+            "passed": true,
+            "expected": "7 rows in order, including the held shipment",
+            "observed": "Every shipment and status matches"
+          },
+          {
+            "id": "export.exclude",
+            "name": "Rejected shipment stayed out of the export",
+            "passed": true,
+            "expected": "No SHP-1048",
+            "observed": "No SHP-1048"
+          },
+          {
+            "id": "audit.export",
+            "name": "App export audit matches the file",
+            "passed": true,
+            "expected": "Recorded counts and exported file agree",
+            "observed": "7 of 7 recorded"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "upgrade",
+      "installed_versions": [
+        "1.0.0",
+        "2.0.0"
+      ],
+      "guest_result": {
+        "mode": "upgrade",
+        "version": "2.0.0",
+        "releaseVerdict": "PASS",
+        "expectedVerdict": "PASS",
+        "executionPassed": true,
+        "accepted": 7,
+        "rejected": 1,
+        "exported": 7,
+        "checks": [
+          {
+            "id": "state.readable",
+            "name": "Application wrote its guest state",
+            "passed": true,
+            "expected": "Readable JSON",
+            "observed": "Readable"
+          },
+          {
+            "id": "input.fixture",
+            "name": "Guest import used the approved QA fixture",
+            "passed": true,
+            "expected": "Matching SHA-256",
+            "observed": "Matching SHA-256"
+          },
+          {
+            "id": "app.version",
+            "name": "Installed build launched",
+            "passed": true,
+            "expected": "Version 2.0.0 launch",
+            "observed": "State 2.0.0 / Launch 2.0.0"
+          },
+          {
+            "id": "import.records",
+            "name": "Accepted shipments match the fixture",
+            "passed": true,
+            "expected": "7 exact rows",
+            "observed": "7 matching rows"
+          },
+          {
+            "id": "import.reject",
+            "name": "Malformed quantity was rejected",
+            "passed": true,
+            "expected": "SHP-1048 / invalid units",
+            "observed": "SHP-1048 / Units must be a positive whole number"
+          },
+          {
+            "id": "audit.import",
+            "name": "Import appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one import event",
+            "observed": "1 events"
+          },
+          {
+            "id": "state.hold",
+            "name": "Operator hold was saved",
+            "passed": true,
+            "expected": "SHP-1041 / On Hold",
+            "observed": "On Hold"
+          },
+          {
+            "id": "audit.hold",
+            "name": "Hold appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one status change",
+            "observed": "1 events"
+          },
+          {
+            "id": "export.schema",
+            "name": "Export preserves the shipment CSV schema",
+            "passed": true,
+            "expected": "Id,Customer,Destination,Units,Priority,Status",
+            "observed": "Id,Customer,Destination,Units,Priority,Status"
+          },
+          {
+            "id": "export.count",
+            "name": "Export contains every accepted shipment",
+            "passed": true,
+            "expected": "7 records",
+            "observed": "7 records"
+          },
+          {
+            "id": "export.content",
+            "name": "Exact data and status survive export",
+            "passed": true,
+            "expected": "7 rows in order, including the held shipment",
+            "observed": "Every shipment and status matches"
+          },
+          {
+            "id": "export.exclude",
+            "name": "Rejected shipment stayed out of the export",
+            "passed": true,
+            "expected": "No SHP-1048",
+            "observed": "No SHP-1048"
+          },
+          {
+            "id": "audit.export",
+            "name": "App export audit matches the file",
+            "passed": true,
+            "expected": "Recorded counts and exported file agree",
+            "observed": "7 of 7 recorded"
+          },
+          {
+            "id": "upgrade.history",
+            "name": "Upgrade retained the previous build audit",
+            "passed": true,
+            "expected": "1.0.0 then 2.0.0",
+            "observed": "1.0.0 -> 2.0.0"
+          },
+          {
+            "id": "upgrade.baseline",
+            "name": "Pre-upgrade and post-upgrade exports match",
+            "passed": true,
+            "expected": "Byte-identical CSV",
+            "observed": "SHA-256 6311bbe8b3eb... matches"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "regression",
+      "installed_versions": [
+        "1.0.0",
+        "2.0.0"
+      ],
+      "guest_result": {
+        "mode": "regression",
+        "version": "2.0.0",
+        "releaseVerdict": "FAIL",
+        "expectedVerdict": "FAIL",
+        "executionPassed": true,
+        "accepted": 7,
+        "rejected": 1,
+        "exported": 6,
+        "checks": [
+          {
+            "id": "state.readable",
+            "name": "Application wrote its guest state",
+            "passed": true,
+            "expected": "Readable JSON",
+            "observed": "Readable"
+          },
+          {
+            "id": "input.fixture",
+            "name": "Guest import used the approved QA fixture",
+            "passed": true,
+            "expected": "Matching SHA-256",
+            "observed": "Matching SHA-256"
+          },
+          {
+            "id": "app.version",
+            "name": "Installed build launched",
+            "passed": true,
+            "expected": "Version 2.0.0 launch",
+            "observed": "State 2.0.0 / Launch 2.0.0"
+          },
+          {
+            "id": "import.records",
+            "name": "Accepted shipments match the fixture",
+            "passed": true,
+            "expected": "7 exact rows",
+            "observed": "7 matching rows"
+          },
+          {
+            "id": "import.reject",
+            "name": "Malformed quantity was rejected",
+            "passed": true,
+            "expected": "SHP-1048 / invalid units",
+            "observed": "SHP-1048 / Units must be a positive whole number"
+          },
+          {
+            "id": "audit.import",
+            "name": "Import appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one import event",
+            "observed": "1 events"
+          },
+          {
+            "id": "state.hold",
+            "name": "Operator hold was saved",
+            "passed": true,
+            "expected": "SHP-1041 / On Hold",
+            "observed": "On Hold"
+          },
+          {
+            "id": "audit.hold",
+            "name": "Hold appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one status change",
+            "observed": "1 events"
+          },
+          {
+            "id": "export.schema",
+            "name": "Export preserves the shipment CSV schema",
+            "passed": true,
+            "expected": "Id,Customer,Destination,Units,Priority,Status",
+            "observed": "Id,Customer,Destination,Units,Priority,Status"
+          },
+          {
+            "id": "export.count",
+            "name": "Export contains every accepted shipment",
+            "passed": false,
+            "expected": "7 records",
+            "observed": "6 records"
+          },
+          {
+            "id": "export.content",
+            "name": "Exact data and status survive export",
+            "passed": false,
+            "expected": "7 rows in order, including the held shipment",
+            "observed": "Missing SHP-1047, all earlier rows match"
+          },
+          {
+            "id": "export.exclude",
+            "name": "Rejected shipment stayed out of the export",
+            "passed": true,
+            "expected": "No SHP-1048",
+            "observed": "No SHP-1048"
+          },
+          {
+            "id": "audit.export",
+            "name": "App export audit matches the file",
+            "passed": true,
+            "expected": "Recorded counts and exported file agree",
+            "observed": "6 of 7 recorded"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "recovery",
+      "installed_versions": [
+        "1.0.0",
+        "2.0.0",
+        "2.0.1"
+      ],
+      "guest_result": {
+        "mode": "fixed",
+        "version": "2.0.1",
+        "releaseVerdict": "PASS",
+        "expectedVerdict": "PASS",
+        "executionPassed": true,
+        "accepted": 7,
+        "rejected": 1,
+        "exported": 7,
+        "checks": [
+          {
+            "id": "state.readable",
+            "name": "Application wrote its guest state",
+            "passed": true,
+            "expected": "Readable JSON",
+            "observed": "Readable"
+          },
+          {
+            "id": "input.fixture",
+            "name": "Guest import used the approved QA fixture",
+            "passed": true,
+            "expected": "Matching SHA-256",
+            "observed": "Matching SHA-256"
+          },
+          {
+            "id": "app.version",
+            "name": "Installed build launched",
+            "passed": true,
+            "expected": "Version 2.0.1 launch",
+            "observed": "State 2.0.1 / Launch 2.0.1"
+          },
+          {
+            "id": "import.records",
+            "name": "Accepted shipments match the fixture",
+            "passed": true,
+            "expected": "7 exact rows",
+            "observed": "7 matching rows"
+          },
+          {
+            "id": "import.reject",
+            "name": "Malformed quantity was rejected",
+            "passed": true,
+            "expected": "SHP-1048 / invalid units",
+            "observed": "SHP-1048 / Units must be a positive whole number"
+          },
+          {
+            "id": "audit.import",
+            "name": "Import appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one import event",
+            "observed": "1 events"
+          },
+          {
+            "id": "state.hold",
+            "name": "Operator hold was saved",
+            "passed": true,
+            "expected": "SHP-1041 / On Hold",
+            "observed": "On Hold"
+          },
+          {
+            "id": "audit.hold",
+            "name": "Hold appears in the app audit trail",
+            "passed": true,
+            "expected": "At least one status change",
+            "observed": "1 events"
+          },
+          {
+            "id": "export.schema",
+            "name": "Export preserves the shipment CSV schema",
+            "passed": true,
+            "expected": "Id,Customer,Destination,Units,Priority,Status",
+            "observed": "Id,Customer,Destination,Units,Priority,Status"
+          },
+          {
+            "id": "export.count",
+            "name": "Export contains every accepted shipment",
+            "passed": true,
+            "expected": "7 records",
+            "observed": "7 records"
+          },
+          {
+            "id": "export.content",
+            "name": "Exact data and status survive export",
+            "passed": true,
+            "expected": "7 rows in order, including the held shipment",
+            "observed": "Every shipment and status matches"
+          },
+          {
+            "id": "export.exclude",
+            "name": "Rejected shipment stayed out of the export",
+            "passed": true,
+            "expected": "No SHP-1048",
+            "observed": "No SHP-1048"
+          },
+          {
+            "id": "audit.export",
+            "name": "App export audit matches the file",
+            "passed": true,
+            "expected": "Recorded counts and exported file agree",
+            "observed": "7 of 7 recorded"
+          }
+        ]
+      }
+    }
+  ],
+  "recovery_matches_baseline_byte_for_byte": true,
+  "guests_disks_and_leases_cleaned": true,
+  "media": [
+    {
+      "file": "oslab-release-qa.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration_seconds": 40.0,
+      "sha256": "45e68d78128098c8b57155682deed8b4cf0f4ce7a64309f63e1753da4cb97fa2"
+    },
+    {
+      "file": "oslab-release-qa.gif",
+      "width": 960,
+      "height": 540,
+      "duration_seconds": 40.01,
+      "sha256": "5f9dbcd811a910125db282cb1f8d8ac5ab7406250bea89078d22d03449700d19"
+    }
+  ]
+}

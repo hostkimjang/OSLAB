@@ -1,0 +1,9 @@
+Id,Customer,Destination,Units,Priority
+SHP-1041,Northstar Health,Seattle WA,24,Express
+SHP-1042,Beacon Supply,Portland OR,12,Standard
+SHP-1043,Juniper Foods,Boise ID,18,Express
+SHP-1044,Atlas Hardware,Spokane WA,36,Standard
+SHP-1045,Ripple Retail,Tacoma WA,9,Standard
+SHP-1046,Aster Studio,Bend OR,7,Express
+SHP-1047,Cedar Outfitters,Eugene OR,16,Standard
+SHP-1048,Birch Medical,Salem OR,invalid,Express
