@@ -10,11 +10,11 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-![32 VM consoles running different illustrated OSLAB test scenarios](docs/media/oslab-32vm-concept.gif)
+![Screen captures from 32 actual Windows VM checks](docs/media/oslab-32vm-live.gif)
 
-> **Concept scenario.** Watch 32 illustrated VM consoles run different checks. The camera moves in on package installation, a file transfer, a terminal smoke suite, and a visual comparison.
+> **Recorded Windows VM runs.** These are 32 distinct checks on disposable Windows 11 guests, filmed across 11 batches with up to 4 recorded VMs per batch. OSLAB MCP sent the guest input and captured the console screens. The montage shows the real Windows captures and enlarges selected app workflows.
 
-[Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4) · [All 32 scenarios](docs/media/oslab-32vm-concept.json) · [Real two-VM capture](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-computer-use-demo.mp4) · [Live capture notes](docs/media/oslab-computer-use-demo-attestation.json)
+[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-live.mp4) · [Capture and result details](docs/media/oslab-32vm-live-attestation.json) · [32-screen design concept](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4)
 
 OSLAB is an OS integration test platform for software that must be verified in a real operating system—not only in a unit test, container, or mocked environment. It clones a disposable VM, prepares the guest, transfers an artifact, executes it, evaluates assertions, writes reports, and cleans up the VM.
 
@@ -182,6 +182,8 @@ Check the registered VMID in `codex mcp get oslab`. To control more than one VM,
 Claude Code can use the same server across projects. Register it in [Claude Code's user scope](docs/computer-use-mcp.md#claude-code), or use the [Claude Desktop setup](docs/computer-use-mcp.md#claude-desktop).
 
 The MCP server gets a console ticket from the Proxmox API and exchanges screen data and input over a VNC WebSocket. The host mouse and keyboard remain available while Codex works. [Implementation and tools](docs/computer-use-mcp.md)
+
+[Two-VM input isolation recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-computer-use-demo.mp4) · [Verification details](docs/media/oslab-computer-use-demo-attestation.json)
 
 ## Evidence and Reports
 

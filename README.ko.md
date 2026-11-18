@@ -10,11 +10,11 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-![OSLAB의 서로 다른 테스트 시나리오를 실행하는 32개 VM 콘솔 콘셉트](docs/media/oslab-32vm-concept.gif)
+![실제 Windows VM 32대에서 서로 다른 검사를 실행한 화면](docs/media/oslab-32vm-live.gif)
 
-> **32대 VM 콘셉트 영상.** 서로 다른 테스트 화면이 차오르고, 설치 마법사·파일 전송·터미널 테스트·화면 비교를 차례로 확대합니다.
+> **실제 Windows VM 검증 영상.** 일회용 Windows 11 복제본에서 서로 다른 검사 32개를 실행했습니다. 11개 배치로 나눠 배치당 최대 4대의 화면을 촬영했습니다. OSLAB MCP로 콘솔 화면을 캡처하고 게스트에 입력을 보냈으며, 편집에서 주요 Windows 앱 화면을 확대했습니다.
 
-[1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4) · [32개 시나리오 목록](docs/media/oslab-32vm-concept.json) · [실제 VM 두 대 조작 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-computer-use-demo.mp4) · [실제 촬영 기록](docs/media/oslab-computer-use-demo-attestation.json)
+[1080p 실촬영 MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-live.mp4) · [촬영과 검증 결과](docs/media/oslab-32vm-live-attestation.json) · [32개 화면 디자인 콘셉트](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4)
 
 OSLAB은 단위 테스트나 컨테이너, 모의 환경만으로 확인하기 어려운 소프트웨어를 **실제 운영체제에서 검증하는 OS 통합 테스트 플랫폼**입니다. 일회용 VM을 복제하고, 게스트 환경을 준비한 뒤, 테스트할 파일을 전송해 실행합니다. 이어서 결과 판정과 보고서 생성을 마치고 VM을 정리합니다.
 
@@ -182,6 +182,8 @@ codex mcp get oslab
 Claude Code에서도 같은 서버를 모든 프로젝트에서 사용할 수 있습니다. [Claude Code 사용자 범위 등록](docs/computer-use-mcp.ko.md#claude-code) 또는 [Claude Desktop 설정](docs/computer-use-mcp.ko.md#claude-desktop)을 따릅니다.
 
 MCP 서버는 Proxmox API로 콘솔 티켓을 받고 VNC WebSocket으로 해당 VM의 화면과 입력을 주고받습니다. 작업 중에도 호스트에서 마우스와 키보드를 사용할 수 있습니다. [구현 방식과 도구 사용법](docs/computer-use-mcp.ko.md)
+
+[VM 두 대의 입력 격리 검증 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-computer-use-demo.mp4) · [검증 기록](docs/media/oslab-computer-use-demo-attestation.json)
 
 ## 실행 증거와 보고서
 

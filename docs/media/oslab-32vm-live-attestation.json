@@ -1,0 +1,695 @@
+{
+  "kind": "actual_guest_screencaps",
+  "guest": "Windows 11",
+  "capture": "OSLab MCP screenshot, click and key tools via Proxmox VNC; guest evidence checked independently",
+  "edit": "Actual frames from multiple lab batches arranged into a 32-window montage with cropped close-ups and titles.",
+  "recorded_vm_count": 32,
+  "separate_desktop_closeups": {
+    "guests": 1,
+    "apps": [
+      "Notepad",
+      "File Explorer"
+    ],
+    "mcp_input": [
+      "Win+R",
+      "typed text",
+      "Win+E"
+    ]
+  },
+  "recorded_batches": {
+    "1": 1,
+    "2": 2,
+    "3": 2,
+    "4": 4,
+    "5": 4,
+    "6": 4,
+    "7": 4,
+    "8": 4,
+    "9": 3,
+    "10": 3,
+    "11": 1
+  },
+  "max_recorded_vms_per_batch": 4,
+  "passed_cases": 32,
+  "cases": [
+    {
+      "case": 1,
+      "name": "Windows Installer engine",
+      "batch": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "msiexec executable present",
+          "status": "pass"
+        },
+        {
+          "name": "Installer major version is available",
+          "status": "pass"
+        },
+        {
+          "name": "Executable starts with Windows MZ header",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 2,
+      "name": "File transfer integrity",
+      "batch": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Destination file created",
+          "status": "pass"
+        },
+        {
+          "name": "Copied size matches source",
+          "status": "pass"
+        },
+        {
+          "name": "SHA-256 matches after transfer",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 3,
+      "name": "Service inventory",
+      "batch": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Service manager returned an inventory",
+          "status": "pass"
+        },
+        {
+          "name": "Windows Event Log service exists",
+          "status": "pass"
+        },
+        {
+          "name": "Service state is readable",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 4,
+      "name": "Command-line smoke test",
+      "batch": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Command interpreter present",
+          "status": "pass"
+        },
+        {
+          "name": "Child command exits successfully",
+          "status": "pass"
+        },
+        {
+          "name": "Output contains exact smoke marker",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 5,
+      "name": "UTF-8 note round trip",
+      "batch": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Text file written by Windows PowerShell",
+          "status": "pass"
+        },
+        {
+          "name": "Unicode text survives write and read",
+          "status": "pass"
+        },
+        {
+          "name": "UTF-8 encoding preserves the accent bytes",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 6,
+      "name": "HTML layout fixture",
+      "batch": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Markup-sensitive text encoded",
+          "status": "pass"
+        },
+        {
+          "name": "Fixture saves as an HTML file",
+          "status": "pass"
+        },
+        {
+          "name": "Content node decodes the original text",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 7,
+      "name": "CPU work sample",
+      "batch": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Windows exposes a logical processor",
+          "status": "pass"
+        },
+        {
+          "name": "Deterministic workload returns expected sum",
+          "status": "pass"
+        },
+        {
+          "name": "Hi-resolution timing samples the workload",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 8,
+      "name": "ZIP archive round trip",
+      "batch": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Windows archive command built the ZIP",
+          "status": "pass"
+        },
+        {
+          "name": "Archive extracts the expected file",
+          "status": "pass"
+        },
+        {
+          "name": "Unpacked content matches the original hash",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 9,
+      "name": "JUnit evidence parsing",
+      "batch": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "JUnit root element parsed",
+          "status": "pass"
+        },
+        {
+          "name": "Two evidence rows are present",
+          "status": "pass"
+        },
+        {
+          "name": "Failure count agrees with nested results",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 10,
+      "name": "Locale formatting matrix",
+      "batch": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "US decimal format uses a point",
+          "status": "pass"
+        },
+        {
+          "name": "French decimal format uses a comma",
+          "status": "pass"
+        },
+        {
+          "name": "Korean calendar parses the sample date",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 11,
+      "name": "Pixel comparison fixture",
+      "batch": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Two fixtures have identical dimensions",
+          "status": "pass"
+        },
+        {
+          "name": "Expected pixel difference is detected",
+          "status": "pass"
+        },
+        {
+          "name": "Untouched pixels still match",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 12,
+      "name": "Loopback HTTP exchange",
+      "batch": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Guest loopback TCP connection accepted",
+          "status": "pass"
+        },
+        {
+          "name": "Loopback peer receives health request",
+          "status": "pass"
+        },
+        {
+          "name": "Client reads expected status code",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 13,
+      "name": "Calculator arithmetic",
+      "batch": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Decimal addition yields 42",
+          "status": "pass"
+        },
+        {
+          "name": "Integer multiplication yields 42",
+          "status": "pass"
+        },
+        {
+          "name": "Calculator launch target resolves",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 14,
+      "name": "TAR archive inventory",
+      "batch": 6,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Windows tar produced the archive",
+          "status": "pass"
+        },
+        {
+          "name": "Archive lists exactly the expected entry",
+          "status": "pass"
+        },
+        {
+          "name": "Extracted payload matches the source text",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 15,
+      "name": "Startup manifest replay",
+      "batch": 6,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Startup schema version recognized",
+          "status": "pass"
+        },
+        {
+          "name": "Runtime starts before ready state",
+          "status": "pass"
+        },
+        {
+          "name": "Recovery policy survives serialization",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 16,
+      "name": "PowerShell pipeline assertions",
+      "batch": 6,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Filter isolates all even values",
+          "status": "pass"
+        },
+        {
+          "name": "Pipeline sum equals 72",
+          "status": "pass"
+        },
+        {
+          "name": "Sort retains expected first and last records",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 17,
+      "name": "Paint PNG render",
+      "batch": 6,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Graphics API created a PNG image",
+          "status": "pass"
+        },
+        {
+          "name": "Rendered image has a 420 x 225 canvas",
+          "status": "pass"
+        },
+        {
+          "name": "Paint fixture contains the expected accent",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 18,
+      "name": "CSV export and import",
+      "batch": 7,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "CSV import returns two data rows",
+          "status": "pass"
+        },
+        {
+          "name": "Comma stays inside its original field",
+          "status": "pass"
+        },
+        {
+          "name": "Quote and numeric value survive export",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 19,
+      "name": "Random-access file IO",
+      "batch": 7,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "File stream reserves 8 KiB",
+          "status": "pass"
+        },
+        {
+          "name": "Random offset reads the written marker",
+          "status": "pass"
+        },
+        {
+          "name": "Adjacent byte remains unaffected",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 20,
+      "name": "Form input validation",
+      "batch": 7,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Valid request identifier passes",
+          "status": "pass"
+        },
+        {
+          "name": "Incomplete identifier is rejected",
+          "status": "pass"
+        },
+        {
+          "name": "Normalized input matches the required mask",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 21,
+      "name": "Evidence manifest integrity",
+      "batch": 7,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Manifest contains 2 records",
+          "status": "pass"
+        },
+        {
+          "name": "Names and digests identify different evidence",
+          "status": "pass"
+        },
+        {
+          "name": "Replayed SHA-256 matches staged file",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 22,
+      "name": "Unicode normalization",
+      "batch": 8,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Composed and combining forms differ ordinally",
+          "status": "pass"
+        },
+        {
+          "name": "NFC normalization produces equal text",
+          "status": "pass"
+        },
+        {
+          "name": "Combining sequence is retained on disk",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 23,
+      "name": "Virtual display compatibility",
+      "batch": 8,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Primary display is discoverable",
+          "status": "pass"
+        },
+        {
+          "name": "Visible display has positive dimensions",
+          "status": "pass"
+        },
+        {
+          "name": "Display reports a usable color depth",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 24,
+      "name": "Local browser route fixture",
+      "batch": 8,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Query text is URL encoded",
+          "status": "pass"
+        },
+        {
+          "name": "Route parameters decode without loss",
+          "status": "pass"
+        },
+        {
+          "name": "Local HTML result contains the encoded route",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 25,
+      "name": "Scratch artifact cleanup",
+      "batch": 8,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Scratch file is scoped to the fixture",
+          "status": "pass"
+        },
+        {
+          "name": "Scratch file has been removed",
+          "status": "pass"
+        },
+        {
+          "name": "Empty scratch directory has been removed",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 26,
+      "name": "Windows ACL readback",
+      "batch": 9,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Windows file security descriptor is readable",
+          "status": "pass"
+        },
+        {
+          "name": "The descriptor reports an owner",
+          "status": "pass"
+        },
+        {
+          "name": "At least one access rule is readable",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 27,
+      "name": "Child environment isolation",
+      "batch": 9,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Process-local test variable starts unset",
+          "status": "pass"
+        },
+        {
+          "name": "Child cmd sees its own test variable",
+          "status": "pass"
+        },
+        {
+          "name": "Parent environment remains unchanged",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 28,
+      "name": "PowerShell subprocess contract",
+      "batch": 11,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Windows PowerShell executable available",
+          "status": "pass"
+        },
+        {
+          "name": "Fresh PowerShell process exits successfully",
+          "status": "pass"
+        },
+        {
+          "name": "Structured child result matches contract",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 29,
+      "name": "XML configuration encoding",
+      "batch": 9,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Ampersand and angle bracket escaped",
+          "status": "pass"
+        },
+        {
+          "name": "XML attribute is readable",
+          "status": "pass"
+        },
+        {
+          "name": "Decoded setting matches the original value",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 30,
+      "name": "Keyboard navigation order",
+      "batch": 10,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Tab sequence starts on first editable field",
+          "status": "pass"
+        },
+        {
+          "name": "Second field follows first in tab order",
+          "status": "pass"
+        },
+        {
+          "name": "Confirmation is last in tab order",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 31,
+      "name": "Managed memory sample",
+      "batch": 10,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Managed runtime allocates the requested buffer",
+          "status": "pass"
+        },
+        {
+          "name": "Both ends of the buffer retain markers",
+          "status": "pass"
+        },
+        {
+          "name": "Runtime exposes a readable memory sample",
+          "status": "pass"
+        }
+      ]
+    },
+    {
+      "case": 32,
+      "name": "Application settings replay",
+      "batch": 10,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Boolean feature flag stays enabled",
+          "status": "pass"
+        },
+        {
+          "name": "Theme value is decoded exactly",
+          "status": "pass"
+        },
+        {
+          "name": "Guest concurrency limit is an integer",
+          "status": "pass"
+        }
+      ]
+    }
+  ],
+  "exports": [
+    {
+      "file": "oslab-32vm-live.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration_seconds": 25.0,
+      "bytes": 1273087,
+      "sha256": "ab4016816c103046d213f4dd6b4a246bbf1a6714ab5ea0c0597d8ed011833c71"
+    },
+    {
+      "file": "oslab-32vm-live.gif",
+      "width": 880,
+      "height": 496,
+      "duration_seconds": 25.0,
+      "bytes": 1639560,
+      "sha256": "4cbb108ba33a31c0e201e652a2a880a0c6609e6c95c1a12993da05d3d4c57979"
+    }
+  ],
+  "design_concept": "oslab-32vm-concept.json"
+}
