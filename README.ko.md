@@ -10,9 +10,11 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-[![OSLAB 소개 애니메이션](docs/media/oslab-overview.gif)](docs/media/oslab-overview.mp4)
+[![OSLAB로 Windows VM 두 대를 클릭해 각 검사를 실행하는 장면](docs/media/oslab-computer-use-demo.gif)](docs/media/oslab-computer-use-demo.mp4)
 
-> 개념을 빠르게 보여 주는 일러스트 영상입니다. 이미지를 누르면 고화질 MP4가 열립니다.
+> 실제 Windows VM 두 대에서 OSLAB MCP로 SHA-256 검사와 파일 쓰기·읽기·정리 검사를 실행합니다. 약 15초로 편집한 콘솔 캡처에 실제 클릭 위치를 표시했습니다. 미리보기를 누르면 MP4를 열 수 있습니다.
+
+[촬영과 검증 기록](docs/media/oslab-computer-use-demo-attestation.json) · [OSLAB 전체 소개 영상](docs/media/oslab-overview.mp4)
 
 OSLAB은 단위 테스트나 컨테이너, 모의 환경만으로 확인하기 어려운 소프트웨어를 **실제 운영체제에서 검증하는 OS 통합 테스트 플랫폼**입니다. 일회용 VM을 복제하고, 게스트 환경을 준비한 뒤, 테스트할 파일을 전송해 실행합니다. 이어서 결과 판정과 보고서 생성을 마치고 VM을 정리합니다.
 

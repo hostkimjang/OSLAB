@@ -1,0 +1,55 @@
+{
+  "capture": {
+    "method": "OSLab MCP screenshot and click tools over the Proxmox VNC console",
+    "guest": "Windows 11",
+    "vm_count": 2,
+    "paired_frames_captured": 9,
+    "clicks_requested_concurrently": true,
+    "edit": "Cropped and arranged captured frames. Unrelated desktop UI is omitted. Animated pointers end at the recorded click coordinates.",
+    "workload": "Small, isolated validation fixtures running in the guests",
+    "host_cursor": {
+      "sample_count": 392,
+      "distinct_positions": 1
+    }
+  },
+  "checks": [
+    {
+      "vm": "VM A",
+      "steps": [
+        "Load sample package",
+        "Compute SHA-256",
+        "Compare expected digest"
+      ],
+      "passed_steps": 3,
+      "result": "passed"
+    },
+    {
+      "vm": "VM B",
+      "steps": [
+        "Write isolated sample",
+        "Read and compare contents",
+        "Remove the scratch file"
+      ],
+      "passed_steps": 3,
+      "result": "passed"
+    }
+  ],
+  "exports": [
+    {
+      "file": "oslab-computer-use-demo.mp4",
+      "sha256": "ec1806c95938bff60d85c86099b675166e235c06cb9c82bb953177e6c509f651",
+      "bytes": 564846,
+      "width": 1920,
+      "height": 1080,
+      "duration_seconds": 14.5
+    },
+    {
+      "file": "oslab-computer-use-demo.gif",
+      "sha256": "c242f3b25f0e2cac6c7d767aaf820776a4f32f0cf0ee9b6d34baccf6d48fad13",
+      "bytes": 784139,
+      "width": 880,
+      "height": 495,
+      "duration_seconds": 14.5
+    }
+  ]
+}
