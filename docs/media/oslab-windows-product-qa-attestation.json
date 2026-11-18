@@ -1,0 +1,1610 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "suite": "Developer QA on Windows",
+  "cases_planned": 32,
+  "cases_observed": 32,
+  "cases_passed": 32,
+  "checks_passed": 140,
+  "missing_or_unpassed_cases": [],
+  "windows_version": "10.0.26200",
+  "capture": {
+    "max_simultaneous_captures": 3,
+    "opening_cases": [
+      "01",
+      "02",
+      "06",
+      "07"
+    ],
+    "waves": [
+      {
+        "wave": 1,
+        "cases": [
+          "04",
+          "29",
+          "30",
+          "31"
+        ],
+        "shared_seconds": 0
+      },
+      {
+        "wave": 2,
+        "cases": [
+          "01",
+          "02",
+          "06",
+          "07"
+        ],
+        "shared_seconds": 0
+      },
+      {
+        "wave": 3,
+        "cases": [
+          "03",
+          "05"
+        ],
+        "shared_seconds": 44.799
+      },
+      {
+        "wave": 4,
+        "cases": [
+          "12",
+          "13"
+        ],
+        "shared_seconds": 60.97
+      },
+      {
+        "wave": 5,
+        "cases": [
+          "16",
+          "17"
+        ],
+        "shared_seconds": 39.276
+      },
+      {
+        "wave": 6,
+        "cases": [
+          "14"
+        ],
+        "shared_seconds": 62.318
+      },
+      {
+        "wave": 7,
+        "cases": [
+          "08",
+          "09"
+        ],
+        "shared_seconds": 11.086
+      },
+      {
+        "wave": 8,
+        "cases": [
+          "21"
+        ],
+        "shared_seconds": 75.526
+      },
+      {
+        "wave": 9,
+        "cases": [
+          "18"
+        ],
+        "shared_seconds": 11.167
+      },
+      {
+        "wave": 10,
+        "cases": [
+          "19"
+        ],
+        "shared_seconds": 48.815
+      },
+      {
+        "wave": 11,
+        "cases": [
+          "11"
+        ],
+        "shared_seconds": 69.541
+      },
+      {
+        "wave": 12,
+        "cases": [
+          "25"
+        ],
+        "shared_seconds": 46.15
+      },
+      {
+        "wave": 13,
+        "cases": [
+          "20"
+        ],
+        "shared_seconds": 103.151
+      },
+      {
+        "wave": 14,
+        "cases": [
+          "24"
+        ],
+        "shared_seconds": 19.915
+      },
+      {
+        "wave": 15,
+        "cases": [
+          "15"
+        ],
+        "shared_seconds": 77.98
+      },
+      {
+        "wave": 16,
+        "cases": [
+          "22"
+        ],
+        "shared_seconds": 36.383
+      },
+      {
+        "wave": 17,
+        "cases": [
+          "27"
+        ],
+        "shared_seconds": 50.842
+      },
+      {
+        "wave": 18,
+        "cases": [
+          "32"
+        ],
+        "shared_seconds": 95.59
+      },
+      {
+        "wave": 19,
+        "cases": [
+          "10"
+        ],
+        "shared_seconds": 18.242
+      },
+      {
+        "wave": 20,
+        "cases": [
+          "28"
+        ],
+        "shared_seconds": 47.857
+      },
+      {
+        "wave": 21,
+        "cases": [
+          "26"
+        ],
+        "shared_seconds": 99.435
+      },
+      {
+        "wave": 22,
+        "cases": [
+          "23"
+        ],
+        "shared_seconds": 28.235
+      }
+    ],
+    "featured_cases": [
+      "01",
+      "02",
+      "03",
+      "05",
+      "08"
+    ]
+  },
+  "media": {
+    "mp4": {
+      "file": "oslab-windows-product-qa.mp4",
+      "bytes": 2728497,
+      "sha256": "23d7a8f2d34a4e4e1b34b5788bcd36e43864cc3f6ab0133ed0e69779b0ba02df",
+      "width": 1920,
+      "height": 1080,
+      "duration_seconds": 52.0,
+      "frames": 1248
+    },
+    "gif": {
+      "file": "oslab-windows-product-qa.gif",
+      "bytes": 2225867,
+      "sha256": "eb1a932339c731e8a728be8436635eb176c6eaf44229d645b32e76d3a950ced3",
+      "width": 960,
+      "height": 540,
+      "duration_seconds": 52.0,
+      "frames": 520
+    }
+  },
+  "cases": [
+    {
+      "id": "01",
+      "app": "7-Zip File Manager",
+      "kind": "installed Windows program",
+      "scenario": "Restore a build delivery ZIP and compare every recovered file to its release manifest.",
+      "actions": [
+        "Inspect the release archive",
+        "Set an extraction destination",
+        "Verify six recovered files"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Recovered release tree",
+          "passed": true
+        },
+        {
+          "name": "build-manifest.json SHA-256",
+          "passed": true
+        },
+        {
+          "name": "smoke-report.xml SHA-256",
+          "passed": true
+        },
+        {
+          "name": "deployment.ini SHA-256",
+          "passed": true
+        },
+        {
+          "name": "api-contract.json SHA-256",
+          "passed": true
+        },
+        {
+          "name": "expected-commands.txt SHA-256",
+          "passed": true
+        },
+        {
+          "name": "migration.md SHA-256",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "5aae475b629a4bde7a09834e56cb879b5afa00cc3adbe36ed6bcf402c351a0a8",
+        "e9e375decce47aa1d79c3d1ee99cda9239f95042fdf468b3cb7283e3d5a44b70",
+        "6474047f9d6384dc971de458f7f6f9cab9382b59ec454d7b6f6a97afa34d1a9b",
+        "64a2fce806de55480264d916e1d6ffe089616d5eac67d56e95debe5a5eefe8ff"
+      ],
+      "console_inputs": {
+        "mouse": 1,
+        "keyboard": 11
+      },
+      "program_version": "26.06"
+    },
+    {
+      "id": "02",
+      "app": "LibreOffice Calc",
+      "kind": "installed Windows program",
+      "scenario": "Repair a missing artifact subtotal and verify the release gate recalculates.",
+      "actions": [
+        "Inspect failed artifact gate",
+        "Correct the Win-x64 count",
+        "Save and verify computed cells"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The uploaded baseline contains the 42 blocked gate",
+          "passed": true
+        },
+        {
+          "name": "Saved repair changed only the Windows x64 input count",
+          "passed": true
+        },
+        {
+          "name": "Calc stored recalculated totals and deficit",
+          "passed": true
+        },
+        {
+          "name": "The persisted gate formula evaluates to PASS",
+          "passed": true
+        },
+        {
+          "name": "The gate, deficit and totals remain formula cells",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "288566bd963da8312925c8ccf9d5ea2b17efbf03c2b2496ffbad9a52bd5b1b20",
+        "436fd323c4257d3d9a7036631b11e18a74661856e68c19719b6e89ef414691d8",
+        "f63c6897c56a9fb7d65453624a60d1bf5e4264e8cc72fc6571c14fa0162fdca1",
+        "1cb24d63fc5c053581cd471cd7d45fe2cca38ba10264dc284c414d21d4ae4281"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 14
+      },
+      "program_version": "26.8.3.1"
+    },
+    {
+      "id": "03",
+      "app": "OBS Studio",
+      "kind": "installed Windows program",
+      "scenario": "Record a release evidence scene and check the playable AAC container.",
+      "actions": [
+        "Inspect the staged evidence scene",
+        "Start a software-encoded recording",
+        "Stop and verify the output"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Recording includes an H.264 video track",
+          "passed": true
+        },
+        {
+          "name": "Recording resolution matches the release contract",
+          "passed": true
+        },
+        {
+          "name": "Container duration is within 5–18 seconds",
+          "passed": true,
+          "measured_seconds": 6.933
+        },
+        {
+          "name": "Encoded video contains at least 60 timed samples",
+          "passed": true
+        },
+        {
+          "name": "Recording includes an AAC audio track",
+          "passed": true
+        },
+        {
+          "name": "OBS preview rendered the reference color patch",
+          "passed": true
+        },
+        {
+          "name": "The frame at 1s contains the expected release slate",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "db78e204f9083d5dcff771b4aecd92d97310a0e2e4514c179409ff05973137ea",
+        "101964cce0d03f43816d4244467a268caff628d25fdfd9df26af1b5058eb4702",
+        "a3d0db4713fc3667a46f19913389a333c71da840d12e7b6a817f1a25d4dbf1b9",
+        "88de501d17e9d4cc087f1a9fa6c2fcebd5eb9803398d96a30f4a7d83273c8570"
+      ],
+      "console_inputs": {
+        "mouse": 2,
+        "keyboard": 1
+      },
+      "program_version": "33.0.1"
+    },
+    {
+      "id": "04",
+      "app": "Notepad++",
+      "kind": "installed Windows program",
+      "scenario": "Approve the release gate in the active INI stanza without altering its rollback template.",
+      "actions": [
+        "Review the configuration",
+        "Select the active release gate",
+        "Save and verify exact bytes"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Active release gate",
+          "passed": true
+        },
+        {
+          "name": "Rollback template gate",
+          "passed": true
+        },
+        {
+          "name": "Unrelated build revision",
+          "passed": true
+        },
+        {
+          "name": "Exact approved INI bytes including CRLF",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "e4b80753192887f44b36892a40eef738f3a0f9737a06dd685fa657263ae93860",
+        "e6d534e899f435b21921ad59b49ed08ce8431f415cf04380b660b7274a4309fa",
+        "fe052673769ff524efde6f64f3d2994254317ec1d2b4ecc3f75b134f2af781ad",
+        "3ec56ef6289817d5921b4879bd96cf842edf0b2456489e8c6822f99d39f57344"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 6
+      },
+      "program_version": "8.9.9.1"
+    },
+    {
+      "id": "05",
+      "app": "Visual Studio Code",
+      "kind": "installed Windows program",
+      "scenario": "Reproduce a Windows service startup-budget regression, fix the candidate configuration and rerun the gate.",
+      "actions": [
+        "Open candidate JSON",
+        "Reproduce startup gate failure",
+        "Correct the budget",
+        "Rerun release checks"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "All four cold starts exceeded the original measured budget",
+          "passed": true
+        },
+        {
+          "name": "All four cold starts pass with the updated candidate",
+          "passed": true
+        },
+        {
+          "name": "Only startupTimeoutMs changed in the editor",
+          "passed": true
+        },
+        {
+          "name": "The gate retained the release artifact, routes and retry limit",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "6d4e0f6a5b38f5190759f79a0154a959c26829509ebdbe9e1435a72d402a23c5",
+        "7fe71432490c7c9bd4bd52c84b6c08d449611ac165089912d22ef5aef7435ce4",
+        "78311668299ebdd325ce6126c168b71eaa8c9ce8188fbd7448f62f322b471b26",
+        "8c846dcd91ceaa3dc91b389d8da5f1b42d480e25cebbcd17fc4027275fc42839"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 12
+      },
+      "program_version": "1.146.0"
+    },
+    {
+      "id": "06",
+      "app": "Git GUI",
+      "kind": "installed Windows program",
+      "scenario": "Review the rollback guard diff, stage only that fixture change, and audit the resulting local Git tree.",
+      "actions": [
+        "Open the working tree",
+        "Stage the guard change",
+        "Review staged diff",
+        "Confirm the local commit"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "One staged line switched the rollback guard on",
+          "passed": true
+        },
+        {
+          "name": "The GUI created the intended second local commit",
+          "passed": true
+        },
+        {
+          "name": "Only the release guard changed in the committed tree",
+          "passed": true
+        },
+        {
+          "name": "The approved rollback value is present in the Git blob",
+          "passed": true
+        },
+        {
+          "name": "The original manifest blob is unchanged",
+          "passed": true
+        },
+        {
+          "name": "Fixture repository has a clean tree and no remotes",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "feb06f1b2247cdf1ab1193550f3f463eca93b50d96b5a62ba388dedcf705da43",
+        "2c7b8328fa86acccd23a59779666a749dd31c2b2c8634fedba96a5ddf032ae7c",
+        "1ee553b983b60713d7796f6c2c044538e0787edb5812d75c4a1b606c63de4be9",
+        "0c803dad659ad404a72fe7593b9320e7246e68f55b3204667da00b084a3d1dc9"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 8
+      },
+      "program_version": "2.56.1.windows.1"
+    },
+    {
+      "id": "07",
+      "app": "Python IDLE",
+      "kind": "installed Windows program",
+      "scenario": "Run three retry-budget tests, repair the off-by-one limit in IDLE, then rerun the suite.",
+      "actions": [
+        "Open the test fixture",
+        "Run the failing suite",
+        "Repair the retry cap",
+        "Confirm three passing tests"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Baseline runs three tests and isolates the off-by-one regression",
+          "passed": true
+        },
+        {
+          "name": "Corrected suite passes all three tests",
+          "passed": true
+        },
+        {
+          "name": "Only the release retry constant changed in the saved fixture",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "273619bfe3b31b91b5651f008f3da301448472a03cb72ad3324d05bf269fe437",
+        "7300558d1f574c95378bbde92cca7ee7cc8604d839a780578ca9ae7d772519db",
+        "e84cde1ee615a686d78fab3de74e7c3e02e82ac112868c49de35403f924a6397",
+        "9c7255c107036ada4dcaf1e912a12eb2ea6a99f26179d2330597a3cf7f404c83"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 13
+      },
+      "program_version": "3.14.10"
+    },
+    {
+      "id": "08",
+      "app": "DB Browser for SQLite",
+      "kind": "installed Windows program",
+      "scenario": "Run and commit a backfill migration, then verify legacy rows and database integrity.",
+      "actions": [
+        "Open the pre-upgrade database",
+        "Run the SQL migration",
+        "Commit and verify the backfill"
+      ],
+      "wave": 7,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "SQLite integrity check",
+          "passed": true
+        },
+        {
+          "name": "Migrated database version",
+          "passed": true
+        },
+        {
+          "name": "Legacy rows unchanged",
+          "passed": true
+        },
+        {
+          "name": "Backfilled states",
+          "passed": true
+        },
+        {
+          "name": "New result field is non-null",
+          "passed": true
+        },
+        {
+          "name": "Filter index installed",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "6088c5c71a7e995529a73823fe21ecca5e39090d1581d52f94e86eeb36da2031",
+        "1be752f25d70ecf51783af2eccc8415da71bab16da399a13f57538b22af16526",
+        "95295075500dfa85ab4994f3b8ff66a068d8706c4836902b29c09b57788d7f8a",
+        "579e66e8a507431b1f741d83f60c5618de446f8e02e526df0d08679290f8cae9"
+      ],
+      "console_inputs": {
+        "mouse": 2,
+        "keyboard": 8
+      },
+      "program_version": "3.13.1"
+    },
+    {
+      "id": "09",
+      "app": "WinMerge",
+      "kind": "installed Windows program",
+      "scenario": "Merge the approved retry-policy hunk while keeping the candidate version and routing.",
+      "actions": [
+        "Open baseline and candidate",
+        "Review both differences",
+        "Merge one hunk and save"
+      ],
+      "wave": 7,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Baseline was never modified",
+          "passed": true
+        },
+        {
+          "name": "Only the approved retry limit was ported",
+          "passed": true
+        },
+        {
+          "name": "Candidate retains its release version",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "9ab0aba959609698e0079924b9748a42105b1aa5ba32437ef97742f339e57180",
+        "25b29a38bf24f668e286a5fab6860de27fbb371002024a1273e2b48f51cdf427",
+        "79865e05405fd7437ca6819e725177998a70cb9f2e133ed5189e1498ae60f139",
+        "fe6d6b73294ca8a2f62f4e9fc3edebab8e05b4a7cf4038941cb025052ccd8f8f"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 5
+      },
+      "program_version": "2.16.60.0"
+    },
+    {
+      "id": "10",
+      "app": "VLC media player",
+      "kind": "installed Windows program",
+      "scenario": "Play a fixed-length release clip, seek to the check point, and verify the player's actual position.",
+      "actions": [
+        "Load and play the local clip",
+        "Jump to the 12-second marker",
+        "Pause and verify duration"
+      ],
+      "wave": 19,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "VLC reported the exact fixture duration",
+          "passed": true
+        },
+        {
+          "name": "VLC's timeline advanced during playback",
+          "passed": true
+        },
+        {
+          "name": "The UI seek reached the 12-second marker",
+          "passed": true
+        },
+        {
+          "name": "VLC's displayed position stayed paused at the review point",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "ddad7707b8bfaf627f9984eb29a8cc6b3dc5aa6ee61259d54731e2a4461028ec",
+        "37e5080fa4e85035bf3e0d58efb6ecbb9b65ce9a2592eb0ba18df85a4e93e1b9",
+        "6e98c20c3a1ef72bf6cca574065c31ac63cd2dd81d2d618ee8e2e6f10e07aa1a",
+        "8d72bae1b6b3924ecdc05f667e0204ac338fd19a809b9ac2d135ce5426ac23e5"
+      ],
+      "console_inputs": {
+        "mouse": 3,
+        "keyboard": 2
+      },
+      "program_version": "3.0.23.0"
+    },
+    {
+      "id": "11",
+      "app": "Audacity",
+      "kind": "installed Windows program",
+      "scenario": "Remove the two-second test slate and export an exact three-second mono WAV.",
+      "actions": [
+        "Import the raw audio fixture",
+        "Remove the test slate",
+        "Export WAV and check PCM"
+      ],
+      "wave": 11,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Export is mono signed 16-bit PCM",
+          "passed": true
+        },
+        {
+          "name": "The two-second slate was removed from the five-second import",
+          "passed": true
+        },
+        {
+          "name": "Original low guide tone is absent at the new start",
+          "passed": true
+        },
+        {
+          "name": "The retained test tone preserved its amplitude",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "05cd159436f6f72f05181dddcc672ecc00e22d4997437ffcfba95e3068760565",
+        "e5b974c0ce83db69426efd246ff2e346e6a43efd6353cda234439c38805ce079",
+        "8093fc318de308701a941570724c84e0fe839b470a306bd4d8f3acf5f88e4e5a",
+        "77ffb4f707ae1f830a5c2e6c9448787fc85cec1619c715748a89f3add0603aa4"
+      ],
+      "console_inputs": {
+        "mouse": 7,
+        "keyboard": 10
+      },
+      "program_version": "4.0.2"
+    },
+    {
+      "id": "12",
+      "app": "LibreOffice Writer",
+      "kind": "installed Windows program",
+      "scenario": "Add an approval receipt to the QA handoff and render the two-page report to PDF.",
+      "actions": [
+        "Review release handoff",
+        "Sign the decision page",
+        "Verify two-page PDF"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The release receipt was persisted exactly once",
+          "passed": true
+        },
+        {
+          "name": "The decision page retains its title and sign-off label",
+          "passed": true
+        },
+        {
+          "name": "The acceptance report exports exactly two pages",
+          "passed": true
+        },
+        {
+          "name": "The exported page geometry remains A4 portrait",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "8bb50363a8e7f1233e4da59d69fe55462f6e7c7873911cde2d3cd442298293af",
+        "d62519375b42d06a39cde0f451a0985fabf976365f79d71617855689a6821a70",
+        "0a7aae5a174036eb976cfc67b7cba22e5a1efc18e429fa1351179127c5d5499d",
+        "278a09826187cf0028756f7166db0da742da33228f00dfa8976d2c516318c588"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 19
+      },
+      "program_version": "26.8.3.1"
+    },
+    {
+      "id": "13",
+      "app": "LibreOffice Impress",
+      "kind": "installed Windows program",
+      "scenario": "Play both incident brief slides and verify their sequence and 16:9 PDF geometry.",
+      "actions": [
+        "Play the release brief",
+        "Advance to the decision",
+        "Verify the exported deck"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Slide 1 filled the slideshow with the candidate navy background",
+          "passed": true
+        },
+        {
+          "name": "Slide 2 used the approved decision teal background",
+          "passed": true
+        },
+        {
+          "name": "The PDF contains both slides",
+          "passed": true
+        },
+        {
+          "name": "The released deck remains 16:9",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "750aadeb748536eca59ac305234fdeea5d0a0918d4b810f5d3cb4f8c9ed5745e",
+        "3dc2467402fc50e795ffade70afd4e1bcc257b566d3a17e15a7572da4943c7ca",
+        "dc907d54ac233667b885aa3a4b6d1ac9169303666944efd3a4fe8721de0ff99a",
+        "0bf26e81cea0f9cb062536b3477b8850f5c989eaffc6cb51a512a1540529b19a"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 15
+      },
+      "program_version": "26.8.3.1"
+    },
+    {
+      "id": "14",
+      "app": "LibreOffice Draw",
+      "kind": "installed Windows program",
+      "scenario": "Adjust a registration mark and verify its vector geometry and released PDF bounds.",
+      "actions": [
+        "Locate the registration mark",
+        "Move the mark away from the trim",
+        "Save and verify print geometry"
+      ],
+      "wave": 6,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The printed registration mark moved right of the original trim",
+          "passed": true
+        },
+        {
+          "name": "The adjacent reference anchor kept its exact x position",
+          "passed": true
+        },
+        {
+          "name": "The release proof is a single PDF page",
+          "passed": true
+        },
+        {
+          "name": "The exported release proof retained its A4 bounds",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "ca2543efe2c3f2080c9030ed9e8356a5905f55902eb102f64c7b04ede0216a0f",
+        "77410af156e3d3adc394156e66e405fc6e5c0b7ff765fd9e688187901816c5bf",
+        "2f59e9765467948f77702d322172b8306cf34cd588c7f6a9f98c1d2092e82b4d",
+        "ed468a77f61cda7442127a02877c36667b74d6a422f8e29051fc4fdaf46c4c78"
+      ],
+      "console_inputs": {
+        "mouse": 1,
+        "keyboard": 19
+      },
+      "program_version": "26.8.3.1"
+    },
+    {
+      "id": "15",
+      "app": "Shotcut",
+      "kind": "installed Windows program",
+      "scenario": "Export a verified two-shot edit and check the encoder output dimensions and duration.",
+      "actions": [
+        "Open the release timeline",
+        "Review the second shot",
+        "Export MP4 and check the result"
+      ],
+      "wave": 15,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Recording includes an H.264 video track",
+          "passed": true
+        },
+        {
+          "name": "Recording resolution matches the release contract",
+          "passed": true
+        },
+        {
+          "name": "Container duration is within 3.95–4.1 seconds",
+          "passed": true,
+          "measured_seconds": 4.011
+        },
+        {
+          "name": "Encoded video contains at least 60 timed samples",
+          "passed": true
+        },
+        {
+          "name": "The frame at 1s contains the expected release slate",
+          "passed": true
+        },
+        {
+          "name": "The frame at 3s contains the expected release slate",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "ef50e5281f951bbf5dce7180bc27c6633db637eb562e062d0b2ee1459b6920ee",
+        "b209759059069b680d1d15ca903bc2b413ced9ab024eaa006d52978025d9250a",
+        "299f3a34bd02abdd79f930c6e44144c712d8a06674b689ac6d55cbfca91e6fb1",
+        "a48f8ede1721ddb966f035b4afb63039575587d1cabe354d8b4b405546e66328"
+      ],
+      "console_inputs": {
+        "mouse": 3,
+        "keyboard": 11
+      },
+      "program_version": "26.11.15"
+    },
+    {
+      "id": "16",
+      "app": "ILSpy",
+      "kind": "installed Windows program",
+      "scenario": "Inspect two synthetic release binaries and export the candidate's public API for signature checks.",
+      "actions": [
+        "Inspect baseline IL",
+        "Open candidate decompilation",
+        "Export the public class",
+        "Validate exported signatures"
+      ],
+      "wave": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The release candidate retains its 3.0 binary version",
+          "passed": true
+        },
+        {
+          "name": "Baseline and candidate retain the exact public API methods",
+          "passed": true
+        },
+        {
+          "name": "The compiled candidate returns the signed release state",
+          "passed": true
+        },
+        {
+          "name": "ILSpy exported the public class, retry signature and candidate state",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "843aa9eba6f072ef1fd2500a27a1c926823a672f927fca2ba0b4761b64201426",
+        "e33139fee4cbd227e6d088d3d117210c7226d0fd47fadb0dd87ef8bb26224299",
+        "153f363743ceebc14cfcc259c3e83339ce2501efe89f5dd3f330c18f06292181",
+        "094c01d96b02bca03f152e4a47421db1c4497055429316703e1dfc68d7caaf10"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 7
+      },
+      "program_version": "11.2.0.10050+c86190ef4e24f3137c13a9275316042842d2fada"
+    },
+    {
+      "id": "17",
+      "app": "Inkscape",
+      "kind": "installed Windows program",
+      "scenario": "The vector source contains print bleed. A production raster must keep the page rectangle and exclude the off-page registration mark.",
+      "actions": [
+        "Inspect the SVG and print bleed",
+        "Export the page",
+        "Verify dimensions and interior pixels"
+      ],
+      "wave": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Actual Inkscape output format",
+          "passed": true
+        },
+        {
+          "name": "Page export has the expected size",
+          "passed": true
+        },
+        {
+          "name": "Page corner stays opaque navy",
+          "passed": true
+        },
+        {
+          "name": "Release badge retains its interior color",
+          "passed": true
+        },
+        {
+          "name": "Off-page red registration mark is clipped",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "6f1ab9ccf8b145baae4deba375be39a94a9d58778ea00f40414bc5336c6db70e",
+        "6f1ab9ccf8b145baae4deba375be39a94a9d58778ea00f40414bc5336c6db70e",
+        "4e1c952b663730407e618b1d0bba79f002990f2438656b555e4aa2f7fd6823b3",
+        "8071865ff7cc03d04397ae2dce86a1c069b4441f12337058f10caf26a2bc7660"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 6
+      },
+      "program_version": "1.4.4"
+    },
+    {
+      "id": "18",
+      "app": "SumatraPDF",
+      "kind": "installed Windows program",
+      "scenario": "Navigate a release packet to the rollback evidence and final sign-off. Check that the correct page renders at every stop.",
+      "actions": [
+        "Open the three-page packet",
+        "Jump to rollback evidence",
+        "Navigate to sign-off"
+      ],
+      "wave": 9,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Rendered first page is the candidate overview",
+          "passed": true
+        },
+        {
+          "name": "Go to page renders the rollback evidence",
+          "passed": true
+        },
+        {
+          "name": "Next page renders the release sign-off",
+          "passed": true
+        },
+        {
+          "name": "Reviewing in SumatraPDF preserves the source bytes",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "d1ab63e9650769985af021c9991f31b224dc26184bfa86b21f5a87855fda45e5",
+        "e840b1dbf793e7d1cbc04f0e1db2958fc5976942ee785e73b2661aacfa0371f7",
+        "1dea8f293056abdddd97dd82b6cb724a452a0fcd753a2cc37de86111f64d96a3",
+        "fefa5a8ff580e3da6c8237c74d7ec8813eec667efbfcb8540279e21a9f4cf3a5"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 8
+      },
+      "program_version": "3.6.1"
+    },
+    {
+      "id": "19",
+      "app": "Everything",
+      "kind": "installed Windows program",
+      "scenario": "Search an actual release directory inventory, remove non-ZIP matches and check the exact set of release-candidate packages.",
+      "actions": [
+        "Open the generated file inventory",
+        "Find release-candidate files",
+        "Restrict to ZIPs and copy verified paths"
+      ],
+      "wave": 10,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Everything indexed five controlled release files",
+          "passed": true
+        },
+        {
+          "name": "The UI result set contains only candidate ZIP files",
+          "passed": true
+        },
+        {
+          "name": "Candidate notes and stable ZIP do not appear in exported results",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "6d66366e937d6310a44ad71607547f6976f80010fc1fa1a1e1108aeaf77e8b0f",
+        "96439eda15087e7176d247923e2d496dc4327009396b4546687b3587afaa8fdc",
+        "dd3e947dc8cb5dc80acf621d524217162ada0e1f5bbbd0412a2034631c484116",
+        "c14f1ccdaf8aca148a14d6e713160171fb924beb8ec7553bfda3beb871b2dc05"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 10
+      },
+      "program_version": "1.4.1.1032"
+    },
+    {
+      "id": "20",
+      "app": "ImageMagick",
+      "kind": "installed Windows program",
+      "scenario": "Detect a changed release badge in a raster baseline comparison, produce a real diff, and confirm the corrected build leaves zero changed pixels.",
+      "actions": [
+        "Compare reference and candidate",
+        "Inspect the generated diff",
+        "Compare the corrected candidate"
+      ],
+      "wave": 13,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "ImageMagick identifies the precise changed bounding box",
+          "passed": true
+        },
+        {
+          "name": "Visual difference detects exactly the released badge pixels",
+          "passed": true
+        },
+        {
+          "name": "ImageMagick diff agrees with independent pixel arithmetic",
+          "passed": true
+        },
+        {
+          "name": "Corrected raster yields zero changed pixels",
+          "passed": true
+        },
+        {
+          "name": "The displayed comparison changes from candidate to repaired diff",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "4d277fc3e113ea10126a363d939d977a33bfb5606b85e991aac88676fc773df5",
+        "021d53016df11435873eb2e7452d736a98b56dd5f2d71bfc3b9bc3565919ab9f",
+        "f27ed8b0413b3609599aef8a4eb48350e433d527b39a8cb05ab51975c25d44f6",
+        "ca554390c3e235f4456dfac5a7f56c9f15d8c4f9b6b15aa397a75570b450e4d8"
+      ],
+      "console_inputs": {
+        "mouse": 2,
+        "keyboard": 5
+      },
+      "program_version": "7.1.2-35"
+    },
+    {
+      "id": "21",
+      "app": "Event Viewer",
+      "kind": "installed Windows program",
+      "scenario": "Inspect a filtered deployment incident and verify that recovery followed the missing-manifest error.",
+      "actions": [
+        "Open the incident log",
+        "Inspect the blocked release",
+        "Compare the recovery event"
+      ],
+      "wave": 8,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Incident and recovery event IDs",
+          "passed": true
+        },
+        {
+          "name": "Failure and success event levels",
+          "passed": true
+        },
+        {
+          "name": "Both events belong to the release test provider",
+          "passed": true
+        },
+        {
+          "name": "The same release failed and then recovered",
+          "passed": true
+        },
+        {
+          "name": "Record IDs establish the recovery order",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "5d6fe258abc32975e65eab703258089f34889a33c90e32683bbcc3dc117e9340",
+        "cf86b49e3017cca704ab3094af36e4c79f28703b9362c6cd43344959c588d7c7",
+        "cf86b49e3017cca704ab3094af36e4c79f28703b9362c6cd43344959c588d7c7",
+        "f1a33eff74aabb2221c3c0db4c0ed23aa427c13c74e443d25868867b357aca7c"
+      ],
+      "console_inputs": {
+        "mouse": 1,
+        "keyboard": 5
+      }
+    },
+    {
+      "id": "22",
+      "app": "Task Scheduler",
+      "kind": "installed Windows program",
+      "scenario": "Run the release-manifest task on demand and match its output hashes against the fixture bytes.",
+      "actions": [
+        "Locate the isolated task folder",
+        "Run the manifest job",
+        "Verify result and artifact hashes"
+      ],
+      "wave": 16,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "On-demand task finished with exit code zero",
+          "passed": true
+        },
+        {
+          "name": "Manifest identifies the release candidate",
+          "passed": true
+        },
+        {
+          "name": "Release manifest lists exactly two files",
+          "passed": true
+        },
+        {
+          "name": "Every artifact matches the input SHA-256",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "3332da8fd926f432985e77ed0cac7b281eec1d2f7c2b9b77200bc7dbf234c554",
+        "ea976927789acaa6c7ea0fe9bd652387fd1527b746f2c216ec8a38f387f1b61f",
+        "5ca0c55f84db65d41430dfd5b55e158d69fb3b6188ba7307457318aa1b2f9764",
+        "ac9a50be9c1d3fd7e225ee300bb1a269751749acc4ce860d1784fcb62a43f608"
+      ],
+      "console_inputs": {
+        "mouse": 4,
+        "keyboard": 7
+      }
+    },
+    {
+      "id": "23",
+      "app": "Windows PowerShell ISE",
+      "kind": "installed Windows program",
+      "scenario": "Run a package-file test, correct a stale expected file count, and compare both test receipts.",
+      "actions": [
+        "Review the smoke test",
+        "Reproduce the count mismatch",
+        "Correct the expectation and rerun"
+      ],
+      "wave": 22,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Stale package count blocked the release",
+          "passed": true
+        },
+        {
+          "name": "Corrected expected count passed the release gate",
+          "passed": true
+        },
+        {
+          "name": "The manifests contained the same three names",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "c8e0875fb8fe013505987a52857abf9e6f2ade17079ec268641214c286e93690",
+        "e1b5bf2635208188a15729b560d56fd7f90c7b355f1f4b8241e9e5f9dc9fd680",
+        "c5beb077158cf79529442aa7e92cd6638bb622a3f87cfc25cbc4ae0103c83b80",
+        "5eddad6d5d9a6a2edd1171d9ca974e30f8aa0b73588ff5781edb8e9e0f11a9e7"
+      ],
+      "console_inputs": {
+        "mouse": 3,
+        "keyboard": 3
+      }
+    },
+    {
+      "id": "24",
+      "app": "ODBC Data Source Administrator",
+      "kind": "installed Windows program",
+      "scenario": "Inspect a migrated 64-bit test data source and verify that its offline driver and routing settings survived.",
+      "actions": [
+        "Open the system data sources",
+        "Inspect the release QA data source",
+        "Verify the installed driver and registry values"
+      ],
+      "wave": 14,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "System DSN uses the intended installed driver",
+          "passed": true
+        },
+        {
+          "name": "ODBC architecture",
+          "passed": true
+        },
+        {
+          "name": "Data source maps to the isolated fixture address",
+          "passed": true
+        },
+        {
+          "name": "Release description was preserved",
+          "passed": true
+        },
+        {
+          "name": "The DSN requests integrated authentication",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "833b6669f2b63458ed59189b9f265adb2a5919e8dc405da1bd3703ba742abd4f",
+        "1d1508d3d1f3a955d8d8439fef9e509bddc37b02f5a3a8d9ed144096ca13937a",
+        "1aa683b20939069ec344d85bbbe2c00f9dd79fdfbc7342c2b4a53886bfc16033",
+        "924096c594667d820ce9322b7d945f3dfb52ae984a881746398b55ece3c9fd4f"
+      ],
+      "console_inputs": {
+        "mouse": 4,
+        "keyboard": 2
+      }
+    },
+    {
+      "id": "25",
+      "app": "Process Monitor",
+      "kind": "installed Windows program",
+      "scenario": "Trace a staged app that cannot find its settings, then verify the recovered file access.",
+      "actions": [
+        "Start a guest file trace",
+        "Reproduce the failed startup",
+        "Verify the successful rerun"
+      ],
+      "wave": 12,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Synthetic loader reproduced the missing settings",
+          "passed": true
+        },
+        {
+          "name": "Procmon captured CreateFile → NAME NOT FOUND for that loader",
+          "passed": true
+        },
+        {
+          "name": "Procmon captured CreateFile → SUCCESS after restoring the fixture",
+          "passed": true
+        },
+        {
+          "name": "The same loader parsed the restored fixture",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "8898421eee282e8910e7dcd0412bfac321e9f56c83e50375f2180b972e1b8747",
+        "af7742da778b3c1686bc168733a3b9a13c29300c149519fc7f140ece86e023d9",
+        "4f5fd8e2708d9dfc39d0e063e2e17a3150ce24796f28e4cee13a0e1f9b125356",
+        "4f5fd8e2708d9dfc39d0e063e2e17a3150ce24796f28e4cee13a0e1f9b125356"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 15
+      },
+      "program_version": "4.13",
+      "signature_verified": true
+    },
+    {
+      "id": "26",
+      "app": "Process Explorer",
+      "kind": "installed Windows program",
+      "scenario": "Identify the QA process holding a release manifest and verify that it releases the lock.",
+      "actions": [
+        "Start the dedicated exporter",
+        "Find its manifest handle",
+        "Verify the released file"
+      ],
+      "wave": 21,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Windows identified the dedicated manifest exporter",
+          "passed": true
+        },
+        {
+          "name": "An independent exclusive open was blocked while the exporter held the file",
+          "passed": true
+        },
+        {
+          "name": "Process Explorer saved the exact exporter PID and file handle",
+          "passed": true
+        },
+        {
+          "name": "Process Explorer reported zero matches after release",
+          "passed": true
+        },
+        {
+          "name": "The exporter exited and an independent exclusive open succeeded",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "0ec09937c2bb856939a6f44c584d72094d8381ebb510eb36b4a77315f5f80c75",
+        "a32e0ccc323c0d3c31e2b468a65583ec115fdbb314bf1df5346bc2c1b38d8185",
+        "1cd16ef7999bb4c116b36999d2fa48be03336cb695fd3b74d0d1619e5b4413ab",
+        "f0a5bbbfa2449c5beaaaf42e212934c14924d780deef73d279a60a17a3f2a508"
+      ],
+      "console_inputs": {
+        "mouse": 3,
+        "keyboard": 11
+      },
+      "program_version": "17.21",
+      "signature_verified": true
+    },
+    {
+      "id": "27",
+      "app": "TCPView",
+      "kind": "installed Windows program",
+      "scenario": "Compare a QA service's listener and established loopback session against Windows socket state.",
+      "actions": [
+        "Start the local fixture listener",
+        "Connect the QA client",
+        "Save and compare the TCP snapshot"
+      ],
+      "wave": 17,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The QA program listened only on loopback port 46361",
+          "passed": true
+        },
+        {
+          "name": "Windows observed the established local client session",
+          "passed": true
+        },
+        {
+          "name": "TCPView's GUI export identified the same process, port, and connection state",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "a927fe65c5f2c0ca53b1ceb018149a83e553110aeca4fe9d852a320a5554053f",
+        "738a92827ca495284017a40fd2418f3c17ea15c97a59332ae051aca7c7eec901",
+        "0c4e7828b85067c91d4ee18ae106959b1edfb75bb00259e6eb7e588e8484ec61",
+        "1c289a3f8baa40f7f77cab887a47f8f77c0b46c59fcee629a85220484cd63e59"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 5
+      },
+      "program_version": "4.19",
+      "signature_verified": true
+    },
+    {
+      "id": "28",
+      "app": "VMMap",
+      "kind": "installed Windows program",
+      "scenario": "Capture a native memory map surrounding a known 32 MiB QA allocation.",
+      "actions": [
+        "Attach to the synthetic loader",
+        "Exercise the 32 MiB buffer",
+        "Save and verify the memory snapshot"
+      ],
+      "wave": 20,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The test program committed an exact 32 MiB buffer",
+          "passed": true
+        },
+        {
+          "name": "Windows private bytes grew by at least 31 MiB",
+          "passed": true
+        },
+        {
+          "name": "VMMap saved a nonempty native memory-map snapshot",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "9fea7570038ae7ce3cced64294b5ba9872db062bc94c7bd16205fa8bafbb2414",
+        "4ebab817f35f2218b5f45cdcf8a473e7d37f5bb71ed0e849c352a94c56a741ba",
+        "b2d47e4dc1af12464559a4bbdd728136f3931a35ece714cf6824d2997b94cc2f",
+        "4ebab817f35f2218b5f45cdcf8a473e7d37f5bb71ed0e849c352a94c56a741ba"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 11
+      },
+      "program_version": "3.4",
+      "signature_verified": true
+    },
+    {
+      "id": "29",
+      "app": "Notepad",
+      "kind": "installed Windows program",
+      "scenario": "Approve a staged release in a text manifest. Save and reopen the result.",
+      "actions": [
+        "Open the release record",
+        "Change the handoff gate",
+        "Save and reopen"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The edited release gate was saved to disk",
+          "passed": true
+        },
+        {
+          "name": "Unchanged manifest lines and text encoding match exactly",
+          "passed": true
+        },
+        {
+          "name": "The reopened handoff record still has five lines",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "c7b538a9f34c82bbbb6412d5d6177defc172798ba7abb1334d6e54466197d814",
+        "14793fb537e4d75373b7eaa5a52064f95426ec3447347e5f345948fde6229650",
+        "b4c3b7ff99eece766d9beb03097ba88990acd1292ae87a0a0e53b889cc05995d",
+        "dfb43526fcf275b3a768a91df3bf4afdfcb95363c360648e78c8d97d709e270c"
+      ],
+      "console_inputs": {
+        "mouse": 0,
+        "keyboard": 15
+      }
+    },
+    {
+      "id": "30",
+      "app": "File Explorer",
+      "kind": "installed Windows program",
+      "scenario": "Restore an evidence bundle through the compressed-folder UI and check both exported files.",
+      "actions": [
+        "Open the zipped evidence",
+        "Copy to recovery workspace",
+        "Verify both SHA-256 hashes"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Explorer recovered exactly two files",
+          "passed": true
+        },
+        {
+          "name": "Recovered checksums.txt SHA-256 matches the archive entry",
+          "passed": true
+        },
+        {
+          "name": "Recovered shipment-manifest.csv SHA-256 matches the archive entry",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "cf295c148a00a7ac5a66b74d9b268fbcfa3540308cd5d660cda4a236e498effb",
+        "029656bb5244d8251fba9281d818c81a94600651b261dfb8615878d0938f80bf",
+        "d254c9f73c55c5dc9620b3b35581c741da463f9b1d45bdf8d1ac09c13476bece",
+        "14d73d60f9dee46bdb32d546c07faab92d34d12d286e981c201fd3b3b37ab9f9"
+      ],
+      "console_inputs": {
+        "mouse": 1,
+        "keyboard": 4
+      }
+    },
+    {
+      "id": "31",
+      "app": "Paint",
+      "kind": "installed Windows program",
+      "scenario": "Fill the approval tile in a PNG and check that the surrounding artwork stays unchanged.",
+      "actions": [
+        "Open the approval artwork",
+        "Fill the review tile",
+        "Save and inspect the PNG"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Paint saved a PNG",
+          "passed": true
+        },
+        {
+          "name": "PNG dimensions survived the edit",
+          "passed": true
+        },
+        {
+          "name": "The center of the filled approval tile is black",
+          "passed": true
+        },
+        {
+          "name": "The untouched control pixel kept its RGB values",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "c7842e663b6d467b456882fb136d9816de481e0c7bbfb74e27593c91ce20272b",
+        "531b5f720e75d53ded0dd08a486fedf3f06b4e6def2144a4e67c6a53556095c2",
+        "2c5c0178555d655171494f1b32b32626505386714570c8a84c2d949a2f59cc20",
+        "b050908d0c8c2effe64218b030ff7a33d05f91f2b2aa85c43b77baa30f3e358e"
+      ],
+      "console_inputs": {
+        "mouse": 2,
+        "keyboard": 7
+      }
+    },
+    {
+      "id": "32",
+      "app": "Performance Monitor",
+      "kind": "installed Windows program",
+      "scenario": "Capture a bounded CPU regression, freeze the graph for inspection, and verify that the guest recovers.",
+      "actions": [
+        "Record the idle baseline",
+        "Run the CPU stress fixture",
+        "Freeze the observed spike",
+        "Confirm CPU recovery"
+      ],
+      "wave": 18,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The PerfMon graph visibly changed under load",
+          "passed": true
+        },
+        {
+          "name": "Guest CPU rose during the regression fixture",
+          "passed": true
+        },
+        {
+          "name": "The PerfMon freeze held the chart steady",
+          "passed": true
+        },
+        {
+          "name": "All bounded CPU workers exited normally",
+          "passed": true
+        },
+        {
+          "name": "Guest CPU returned toward baseline",
+          "passed": true
+        },
+        {
+          "name": "The unpaused PerfMon chart resumed updates",
+          "passed": true
+        }
+      ],
+      "stage_screenshot_sha256": [
+        "62c517318f44536b1aa7aef20631426924c4ba3d0d258eaec86f73fee35765c7",
+        "384221bf4e050c8ce3c98f2663c0d6456ffe1e152acefea25ce7bb1bd5102b23",
+        "fa91ed1db7aa2ed3aa7d3672e441775825de2f448851c6104d2de7db0358f4ab",
+        "2babdfa1b0ad09ea5f9834202ff0b12658ad159eb6f4b13d14a6c49285bfb49f"
+      ],
+      "console_inputs": {
+        "mouse": 8,
+        "keyboard": 5
+      }
+    }
+  ]
+}

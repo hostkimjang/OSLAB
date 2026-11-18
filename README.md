@@ -10,13 +10,13 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-![OSLab drives eight Windows VMs together and verifies workflows across 32 apps](docs/media/oslab-windows-app-matrix.gif)
+![OSLab drives real Windows release QA in 32 installed and built-in programs](docs/media/oslab-windows-product-qa.gif)
 
-> **32 apps tested on Windows 11.** OSLab MCP drove 28 offline sample apps and four native Windows apps on separate VMs. The eight screens in the opening sequence share a capture clock. The full view combines six recorded batches, and the guest evidence confirms 351 assertions.
+> **32 real Windows 11 workflows.** OSLab MCP drives 7-Zip, LibreOffice, OBS Studio, and other desktop tools in disposable Proxmox VMs. See a release archive restored, a blocked release gate corrected, a recording verified, and a SQLite migration applied. The opening aligns 4 consoles on a shared capture clock with 3 active at peak. The catalog brings together the workflows that passed 140 checks.
 
-[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-app-matrix.mp4) · [Run the 32 scenarios](docs/windows-app-matrix.md) · [Read the guest results](docs/media/oslab-windows-app-matrix-attestation.json)
+[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Reproduce the Windows QA runs](docs/windows-product-qa.md) · [Read the verification results](docs/media/oslab-windows-product-qa-attestation.json)
 
-[Dispatch Board MSI and upgrade demo](docs/release-qa-demo.md) · [Watch the Dispatch Board recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
+[Earlier Windows app matrix demo](docs/windows-app-matrix.md) · [Dispatch Board MSI and upgrade demo](docs/release-qa-demo.md) · [Watch the Dispatch Board recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
 OSLAB is an OS integration test platform for software that must be verified in a real operating system—not only in a unit test, container, or mocked environment. It clones a disposable VM, prepares the guest, transfers an artifact, executes it, evaluates assertions, writes reports, and cleans up the VM.
 
