@@ -73,6 +73,7 @@ A VM listing checks the Proxmox API connection. A description based on the captu
 | `list_vms()` | Returns the `vm_id`, `name`, and `node` of running QEMU VMs in the allowlist that the token can see. |
 | `screenshot(vm_id)` | Opens the console and returns a PNG plus `vm_id`, `frame_id`, `width`, and `height`. |
 | `click(vm_id, frame_id, x, y, button="left")` | Clicks pixel coordinates in the VM's latest frame, with `(0, 0)` at the top left. Buttons are `left`, `middle`, and `right`. |
+| `move_mouse(vm_id, frame_id, x, y)` | Moves the pointer to pixel coordinates in the VM's latest frame without clicking. Use it to hover or to move the pointer before a click. |
 | `press_key(vm_id, keys)` | Sends a key or a chord to a VM after its first capture. Examples include `['Enter']`, `['Win', 'r']`, and `['Ctrl', 'a']`. Single-character keys cover printable ASCII. |
 | `close_console(vm_id)` | Closes the console connection. The VM stays running. |
 
@@ -95,7 +96,7 @@ Call `close_console` when you finish. For a test VM kept with `--keep-vm`, verif
 
 Within an MCP process each VM has a separate WebSocket, latest frame, and lock that serializes requests. Different VMs can be controlled concurrently. Manual viewers and other MCP processes connected to the same VM share its guest screen and input devices.
 
-Clicks require the latest `frame_id` for the target VM and coordinates within that frame. If an error or timeout interrupts the console, capture the VM again to reconnect. Interrupted input is never replayed automatically. Inspect the screen before retrying an action. If the node or name for a VMID changes between connections, verify the target and restart the MCP server. Closing a console or stopping the MCP process releases connections and leaves VM power unchanged.
+Clicks and pointer moves require the latest `frame_id` for the target VM and coordinates within that frame. If an error or timeout interrupts the console, capture the VM again to reconnect. Interrupted input is never replayed automatically. Inspect the screen before retrying an action. If the node or name for a VMID changes between connections, verify the target and restart the MCP server. Closing a console or stopping the MCP process releases connections and leaves VM power unchanged.
 
 ### Run the tests
 

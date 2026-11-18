@@ -85,8 +85,11 @@ def test_console_ticket_framebuffer_and_guest_input(monkeypatch, explicit_passwo
                 assert image.getpixel((2, 0)) == (0, 0, 255)
             with pytest.raises(OslabError, match="coordinates"):
                 await console.click(3, 0)
+            with pytest.raises(OslabError, match="Pointer coordinates must be inside the 3×1 VM screen"):
+                await console.move(0, 1)
             with pytest.raises(OslabError, match="Unknown key"):
                 await console.press_key(["unknown"])
+            await console.move(1, 0)
             await console.click(2, 0, "right")
             await console.press_key(["Win", "r"])
 
@@ -104,8 +107,10 @@ def test_console_ticket_framebuffer_and_guest_input(monkeypatch, explicit_passwo
         (3, 0, 0, 0, 2, 2),
         (3, 0, 0, 0, 3, 1),
     ]
-    assert list(struct.iter_unpack(">BBHH", socket.sent[7])) == [(5, 0, 2, 0), (5, 4, 2, 0), (5, 0, 2, 0)]
-    assert list(struct.iter_unpack(">BBxxI", socket.sent[8])) == [
+    # PointerEvent: message type 5, button mask 0, big-endian x=1 and y=0.
+    assert socket.sent[7] == bytes.fromhex("05 00 0001 0000")
+    assert list(struct.iter_unpack(">BBHH", socket.sent[8])) == [(5, 0, 2, 0), (5, 4, 2, 0), (5, 0, 2, 0)]
+    assert list(struct.iter_unpack(">BBxxI", socket.sent[9])) == [
         (4, 1, 0xFFEB), (4, 1, ord("r")), (4, 0, ord("r")), (4, 0, 0xFFEB)
     ]
 

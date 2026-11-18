@@ -119,7 +119,7 @@ def build_server(client: ProxmoxClient, vm_ids: set[int]) -> FastMCP:
         "OSLab VM Computer Use",
         instructions=(
             "Use list_vms to find a VM and screenshot to see its desktop. "
-            "Send input to the same vm_id and use the latest frame_id for click. "
+            "Send input to the same vm_id and use the latest frame_id for click and move_mouse. "
             "Take another screenshot to inspect the result."
         ),
         lifespan=lifespan,
@@ -163,6 +163,20 @@ def build_server(client: ProxmoxClient, vm_ids: set[int]) -> FastMCP:
             async with connected(console, vm_id) as connection:
                 await connection.click(x, y, button)
         return "Click sent."
+
+    @server.tool()
+    async def move_mouse(vm_id: int, frame_id: str, x: int, y: int) -> str:
+        """Move the pointer to a pixel in the VM's latest screenshot without clicking, to hover or before a click."""
+        console = get_console(vm_id)
+        async with console.lock:
+            frame = console.frame
+            if frame is None or frame.id != frame_id:
+                raise OslabError("Use the frame_id from the latest screenshot of this VM.")
+            if not (0 <= x < frame.width and 0 <= y < frame.height):
+                raise OslabError("Pointer coordinates are outside the screenshot.")
+            async with connected(console, vm_id) as connection:
+                await connection.move(x, y)
+        return "Pointer moved."
 
     @server.tool()
     async def press_key(vm_id: int, keys: list[str]) -> str:

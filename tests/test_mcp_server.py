@@ -67,6 +67,9 @@ class FakeConsole:
         if self.lab.click_barrier is not None:
             await self.lab.click_barrier.wait()
 
+    async def move(self, x, y):
+        self.lab.inputs[self.vm_id].append(("move", x, y))
+
     async def press_key(self, keys):
         self.lab.inputs[self.vm_id].append(("keys", keys))
         if self.lab.failing_vm == self.vm_id:
@@ -120,13 +123,17 @@ def test_mcp_limits_console_access_and_routes_parallel_input(monkeypatch):
             old_frame = await screen(session, 101)
             frame_a, frame_b = await asyncio.gather(screen(session, 101), screen(session, 102))
             assert frame_a != old_frame
-            for frame_id, x in [(old_frame, 1), (frame_b, 1), (frame_a, 16)]:
-                result = await session.call_tool(
-                    "click", {"vm_id": 101, "frame_id": frame_id, "x": x, "y": 2},
-                )
-                assert result.isError
+            for tool in ("click", "move_mouse"):
+                for frame_id, x in [(old_frame, 1), (frame_b, 1), (frame_a, 16)]:
+                    result = await session.call_tool(
+                        tool, {"vm_id": 101, "frame_id": frame_id, "x": x, "y": 2},
+                    )
+                    assert result.isError
             assert lab.inputs == {101: [], 102: []}
 
+            moved = await session.call_tool("move_mouse", {"vm_id": 101, "frame_id": frame_a, "x": 15, "y": 8})
+            assert not moved.isError
+            assert moved.content[0].text == "Pointer moved."
             clicks = await asyncio.gather(
                 session.call_tool("click", {"vm_id": 101, "frame_id": frame_a, "x": 2, "y": 3}),
                 session.call_tool(
@@ -136,7 +143,7 @@ def test_mcp_limits_console_access_and_routes_parallel_input(monkeypatch):
             assert all(not result.isError for result in clicks)
             assert not (await session.call_tool("press_key", {"vm_id": 102, "keys": ["Ctrl", "a"]})).isError
             assert lab.inputs == {
-                101: [("click", 2, 3, "left")],
+                101: [("move", 15, 8), ("click", 2, 3, "left")],
                 102: [("click", 14, 8, "right"), ("keys", ["Ctrl", "a"])],
             }
 
@@ -169,6 +176,9 @@ def test_mcp_recovers_one_console_without_replaying_input_or_switching_vms(monke
             assert not (await session.call_tool("close_console", {"vm_id": 101})).isError
             assert (await session.call_tool(
                 "click", {"vm_id": 101, "frame_id": old_frame, "x": 1, "y": 1},
+            )).isError
+            assert (await session.call_tool(
+                "move_mouse", {"vm_id": 101, "frame_id": old_frame, "x": 1, "y": 1},
             )).isError
 
             lab.resources[0] = vm_resource(101, name="replacement-vm")
