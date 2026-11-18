@@ -162,7 +162,7 @@ uv run oslab run `
 Do not run an example scenario unchanged against a shared cluster. Review the template, VMID range, cleanup policy, guest destinations, and artifact command first.
 
 <a id="codex-mcp"></a>
-## Control a Test VM with Codex
+## Control a Test VM with Codex or Claude
 
 Start a test VM with a graphical console and note its VMID. Sign in to the Windows desktop to control apps. The VM needs no separate computer-use software. To keep the clone from the example above running, add `--keep-vm` to `oslab run`. Your OSLab Proxmox token needs permission to see the VM and the `VM.Console` privilege. Run these commands from the repository root.
 
@@ -176,6 +176,8 @@ codex mcp get oslab
 Check the registered VMID in `codex mcp get oslab`. To control more than one VM, repeat `--vm-id` in the registration command. Once Codex shows the `oslab` tools, close the VM console window and try this prompt.
 
 > Use the OSLab MCP to list the test VM and capture its screen. Press `Win+r`, enter `notepad` one key at a time, and press Enter. Capture the new screen, click the Notepad editing area, and type `oslab mcp ok`. Show me the final PNG with the text visible.
+
+Claude Code can use the same server across projects. Register it in [Claude Code's user scope](docs/computer-use-mcp.md#claude-code), or use the [Claude Desktop setup](docs/computer-use-mcp.md#claude-desktop).
 
 The MCP server gets a console ticket from the Proxmox API and exchanges screen data and input over a VNC WebSocket. The host mouse and keyboard remain available while Codex works. [Implementation and tools](docs/computer-use-mcp.md)
 
@@ -217,7 +219,7 @@ The Linux example documents the intended scenario shape. It is not an end-to-end
 | Understand the model | [Concepts](docs/concepts.md) |
 | Choose an example | [Demo Catalog](docs/demos.md) |
 | Connect a Proxmox lab | [Proxmox Connection](docs/proxmox-connection.md) |
-| Control a VM screen with Codex | [Codex setup and Notepad demo](#codex-mcp), [MCP guide](docs/computer-use-mcp.md) |
+| Control a VM screen with Codex or Claude | [Codex setup and Notepad demo](#codex-mcp), [MCP guide](docs/computer-use-mcp.md) |
 | Write scenario YAML | [Scenarios](docs/scenarios.md) |
 | Prepare guest state | [Fixtures](docs/fixtures.md) |
 | Understand assertions and JUnit | [Validation](docs/validation.md) |

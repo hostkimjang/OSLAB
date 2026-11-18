@@ -14,13 +14,35 @@ The OSLab CLI can clone and boot a test VM as part of a scenario. The MCP server
 
 For CLI setup, see the README's [Codex setup and Notepad demo](../README.md#codex-mcp). If an open chat does not show `oslab` after registration, restart the desktop app, reopen the same chat, and check `/mcp`. [Codex MCP setup](https://learn.chatgpt.com/docs/extend/mcp#configure-in-the-chatgpt-desktop-app)
 
-Here is a configuration for clients that use `mcpServers`. Set the checkout, config, and environment file paths for your machine. Replace the sample VMIDs `123` and `124` with your own. Repeat `--vm-id` once for each VM you plan to control.
+<a id="claude-code"></a>
+### Claude Code
+
+Use `--scope user` to make OSLab available across projects for your OS account. The registration also applies to local sessions in Claude Desktop's Code tab. Claude launches the same local stdio server as Codex. The VM allowlist still applies in every project. [Claude Code user scope](https://code.claude.com/docs/en/mcp#user-scope) · [Claude Desktop Code tab](https://code.claude.com/docs/en/desktop#mcp-servers-from-the-claude-desktop-chat-app)
+
+Run this PowerShell example from the OSLab checkout and enter the VMID of your test VM. To allow more VMs, add one `--vm-id` option for each VMID.
+
+```powershell
+$repoPath = (Get-Location).Path
+$uvPath = (Get-Command uv -CommandType Application).Source
+$vmId = Read-Host 'Test VMID'
+claude mcp add --transport stdio --scope user oslab -- $uvPath --directory $repoPath `
+  run --locked --extra computer-use oslab-mcp --config config/oslab.local.yaml `
+  --env-file config/oslab.local.env --vm-id $vmId
+claude mcp get oslab
+```
+
+Start a Claude Code session and use `/mcp` to check that `oslab` is connected.
+
+<a id="claude-desktop"></a>
+### Claude Desktop chat
+
+In Claude Desktop, open **Settings → Developer → Edit Config**. Add `oslab` alongside any existing entries in `mcpServers` in `claude_desktop_config.json`. Use the absolute path to `uv` as the command and the absolute path to the OSLab checkout after `--directory`. Replace the sample VMIDs `123` and `124` with the VMIDs you want to allow. The same entry works with other local clients that accept `mcpServers`. [MCP client setup](https://py.sdk.modelcontextprotocol.io/get-started/real-host/)
 
 ```json
 {
   "mcpServers": {
     "oslab": {
-      "command": "uv",
+      "command": "C:/path/to/uv.exe",
       "args": [
         "--directory", "C:/path/to/oslab",
         "run", "--locked", "--extra", "computer-use", "oslab-mcp",
@@ -33,6 +55,16 @@ Here is a configuration for clients that use `mcpServers`. Set the checkout, con
   }
 }
 ```
+
+Fully quit Claude Desktop and reopen it. Check that `oslab` appears in the chat's tool list. [Claude Desktop setup](https://py.sdk.modelcontextprotocol.io/get-started/real-host/#claude-desktop)
+
+### Verify the connection
+
+Try the following request in Codex, Claude Code, or Claude Desktop.
+
+> Use OSLab to list the allowed VMs. Capture the test VM's screen and describe one visible detail from the image.
+
+A VM listing checks the Proxmox API connection. A description based on the captured screen checks that the client passes MCP images to the model.
 
 ## Capture and control the VM
 

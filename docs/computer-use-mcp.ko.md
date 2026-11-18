@@ -14,13 +14,35 @@ OSLab CLI의 시나리오 실행은 테스트용 VM을 복제하고 부팅할 �
 
 Codex에서는 README의 [CLI 등록과 메모장 데모](../README.ko.md#codex-mcp)를 따릅니다. 등록 후 이미 열려 있던 채팅의 도구 목록에 `oslab`이 보이지 않으면 데스크톱 앱을 재시작하고 같은 채팅의 `/mcp`에서 확인합니다. [Codex MCP 설정](https://learn.chatgpt.com/docs/extend/mcp#configure-in-the-chatgpt-desktop-app)
 
-아래는 `mcpServers` 형식을 쓰는 클라이언트의 예시입니다. 저장소와 config·env 파일 경로를 환경에 맞게 지정합니다. 예시 VMID `123`, `124`를 실제 VMID로 바꾸고 조작할 VM마다 `--vm-id`를 한 번 지정합니다.
+<a id="claude-code"></a>
+### Claude Code
+
+`--scope user`로 등록하면 같은 OS 계정에서 어느 프로젝트를 열어도 OSLab을 사용할 수 있습니다. Claude Desktop의 로컬 Code 세션에서도 이 설정을 읽습니다. Claude는 Codex와 같은 로컬 stdio 서버를 실행하며, 모든 프로젝트에서 등록한 VMID만 제어할 수 있습니다. [Claude Code 사용자 범위](https://code.claude.com/docs/en/mcp#user-scope) · [Claude Desktop Code 탭](https://code.claude.com/docs/en/desktop#mcp-servers-from-the-claude-desktop-chat-app)
+
+OSLab 저장소에서 아래 PowerShell 명령을 실행하고 테스트 VM의 VMID를 입력합니다. 여러 VM에 연결하려면 VMID마다 `--vm-id`를 추가합니다.
+
+```powershell
+$repoPath = (Get-Location).Path
+$uvPath = (Get-Command uv -CommandType Application).Source
+$vmId = Read-Host '테스트 VM의 VMID'
+claude mcp add --transport stdio --scope user oslab -- $uvPath --directory $repoPath `
+  run --locked --extra computer-use oslab-mcp --config config/oslab.local.yaml `
+  --env-file config/oslab.local.env --vm-id $vmId
+claude mcp get oslab
+```
+
+Claude Code를 열고 `/mcp`에서 `oslab`이 연결되었는지 확인합니다.
+
+<a id="claude-desktop"></a>
+### Claude Desktop 채팅
+
+Claude Desktop의 **Settings → Developer → Edit Config**를 열고 `claude_desktop_config.json`의 `mcpServers`에 `oslab` 항목을 추가합니다. `command`에는 `uv` 실행 파일의 절대 경로를, `--directory` 뒤에는 OSLab 저장소의 절대 경로를 넣습니다. 예시 VMID `123`, `124`는 제어할 VM의 번호로 바꿉니다. `mcpServers` 형식을 쓰는 다른 로컬 클라이언트에도 같은 설정을 사용할 수 있습니다. [MCP 클라이언트 설정](https://py.sdk.modelcontextprotocol.io/get-started/real-host/)
 
 ```json
 {
   "mcpServers": {
     "oslab": {
-      "command": "uv",
+      "command": "C:/path/to/uv.exe",
       "args": [
         "--directory", "C:/path/to/oslab",
         "run", "--locked", "--extra", "computer-use", "oslab-mcp",
@@ -33,6 +55,16 @@ Codex에서는 README의 [CLI 등록과 메모장 데모](../README.ko.md#codex-
   }
 }
 ```
+
+Claude Desktop을 완전히 종료한 뒤 다시 열고 채팅의 도구 목록에서 `oslab`을 확인합니다. [Claude Desktop 설정](https://py.sdk.modelcontextprotocol.io/get-started/real-host/#claude-desktop)
+
+### 연결 확인
+
+Codex, Claude Code, Claude Desktop에서 다음과 같이 요청할 수 있습니다.
+
+> OSLab으로 허용된 VM을 조회해 줘. 테스트 VM의 화면을 캡처하고 이미지에서 실제로 보이는 요소 하나를 알려 줘.
+
+VM 목록이 나오면 Proxmox API 연결을 확인한 것입니다. 화면을 보고 답하면 MCP 이미지가 모델에도 전달된 것입니다.
 
 ## 캡처하고 조작하기
 
