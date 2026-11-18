@@ -10,13 +10,13 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-![Dispatch Board release QA on four Windows VMs, from MSI install to a verified patch](docs/media/oslab-release-qa.gif)
+![OSLab drives eight Windows VMs together and verifies workflows across 32 apps](docs/media/oslab-windows-app-matrix.gif)
 
-> **A Windows release tested end to end.** Four Windows 11 VMs run the Dispatch Board demo. OSLab MCP clicks through a real MSI install and operates the desktop app. The suite verifies saved state across an upgrade, catches an intentional defect that drops a shipment, and confirms the patch restores the original CSV.
+> **32 apps tested on Windows 11.** OSLab MCP drove 28 offline sample apps and four native Windows apps on separate VMs. The eight screens in the opening sequence share a capture clock. The full view combines six recorded batches, and the guest evidence confirms 351 assertions.
 
-[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4) · [Run the scenarios](docs/release-qa-demo.md) · [Read the guest results](docs/media/oslab-release-qa-attestation.json)
+[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-app-matrix.mp4) · [Run the 32 scenarios](docs/windows-app-matrix.md) · [Read the guest results](docs/media/oslab-windows-app-matrix-attestation.json)
 
-[32-VM recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-live.mp4) · [32-VM results](docs/media/oslab-32vm-live-attestation.json) · [32-screen design concept](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4)
+[Dispatch Board MSI and upgrade demo](docs/release-qa-demo.md) · [Watch the Dispatch Board recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
 OSLAB is an OS integration test platform for software that must be verified in a real operating system—not only in a unit test, container, or mocked environment. It clones a disposable VM, prepares the guest, transfers an artifact, executes it, evaluates assertions, writes reports, and cleans up the VM.
 

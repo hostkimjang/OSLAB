@@ -10,13 +10,13 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-![Windows VM 네 대에서 Dispatch Board MSI 설치부터 패치 검증까지 실행한 영상](docs/media/oslab-release-qa.gif)
+![OSLab으로 Windows VM 여덟 대를 함께 조작하고 앱 32개의 작업을 검증하는 영상](docs/media/oslab-windows-app-matrix.gif)
 
-> **Windows 앱의 설치부터 패치 검증까지.** Windows 11 VM 네 대에서 배송 관리 예제 앱 Dispatch Board를 테스트했습니다. OSLab MCP로 MSI 설치 마법사와 데스크톱 앱을 조작했습니다. 업그레이드 후 보류 상태를 확인하고, 배송 한 건을 빠뜨리는 결함을 잡은 뒤 패치에서 원래 CSV와 동일한 결과가 나오는지 확인했습니다.
+> **Windows 11에서 앱 32개 검증.** OSLab MCP로 각각의 VM에서 오프라인 예제 앱 28개와 Windows 기본 앱 4개를 조작해 검증 항목 351개를 통과했습니다. 첫 장면은 동시에 촬영한 여덟 대를 보여 주고, 전체 32칸에는 여섯 배치의 화면을 모았습니다.
 
-[1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4) · [시나리오 실행 방법](docs/release-qa-demo.ko.md) · [VM에서 확인한 결과](docs/media/oslab-release-qa-attestation.json)
+[1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-app-matrix.mp4) · [32개 시나리오 실행 방법](docs/windows-app-matrix.ko.md) · [VM 검증 결과](docs/media/oslab-windows-app-matrix-attestation.json)
 
-[32대 VM 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-live.mp4) · [32대 VM 검증 기록](docs/media/oslab-32vm-live-attestation.json) · [32개 화면 디자인 콘셉트](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4)
+[Dispatch Board MSI 설치·업그레이드 예제](docs/release-qa-demo.ko.md) · [Dispatch Board 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
 OSLAB은 단위 테스트나 컨테이너, 모의 환경만으로 확인하기 어려운 소프트웨어를 **실제 운영체제에서 검증하는 OS 통합 테스트 플랫폼**입니다. 일회용 VM을 복제하고, 게스트 환경을 준비한 뒤, 테스트할 파일을 전송해 실행합니다. 이어서 결과 판정과 보고서 생성을 마치고 VM을 정리합니다.
 

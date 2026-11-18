@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Windows app QA</title>
+<style>
+  :root {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+    --accent: #3177c3;
+    --surface: #f8fafc;
+    --ink: #182739;
+    --border: color-mix(in srgb, var(--ink) 18%, transparent);
+    --marker: #15e9ab;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .run-shell {
+    margin-inline: 6vw;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: calc(100vh - 115px);
+  }
+  .run-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin: 0 0 17px;
+    min-height: 105px;
+    border-bottom: 1px solid var(--border);
+  }
+  .run-kicker {
+    margin: 0 0 3px;
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .run-kicker::before {
+    content: "";
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 8px;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+  .run-title {
+    font-size: clamp(28px, 3.2vw, 42px);
+    font-weight: 720;
+    letter-spacing: -.05em;
+    line-height: 1.06;
+    margin: 0;
+  }
+  .run-scenario {
+    max-width: 78ch;
+    margin: 5px 0 10px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .run-state {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    background: color-mix(in srgb, var(--surface) 87%, var(--ink));
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font: 650 12px "Cascadia Code", Consolas, monospace;
+  }
+  .run-state[data-kind="blocked"] {
+    background: #472125;
+    border-color: #d38076;
+    color: #ffeeea;
+  }
+  .run-state[data-kind="verified"] {
+    background: #103d30;
+    border-color: #63b99c;
+    color: #eafff6;
+  }
+  #stage {
+    min-height: 0;
+    overflow: auto;
+    scrollbar-width: thin;
+  }
+  .run-controls {
+    position: fixed;
+    left: 6vw;
+    right: 6vw;
+    bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 13px;
+  }
+  .run-button {
+    height: 52px;
+    position: relative;
+    appearance: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--surface) 87%, var(--ink));
+    color: var(--ink);
+    font: 650 14px "Segoe UI", system-ui, sans-serif;
+    text-align: left;
+    padding: 0 43px 0 15px;
+    cursor: pointer;
+  }
+  .run-button:not(:disabled) {
+    background: color-mix(in srgb, var(--surface) 78%, var(--accent));
+    outline: 1px solid var(--accent);
+  }
+  .run-button:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .run-button:disabled {
+    cursor: default;
+    opacity: .55;
+  }
+  .run-marker {
+    display: none;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    right: 16px;
+    top: 20px;
+    background: #15e9ab;
+  }
+  .run-button:not(:disabled) .run-marker { display: block; }
+  .run-button[data-done] .run-phase { color: var(--accent); }
+  .run-phase {
+    display: inline-block;
+    margin-right: 9px;
+    opacity: .85;
+    font: 600 12px "Cascadia Code", Consolas, monospace;
+  }
+  .run-notice {
+    position: fixed;
+    bottom: 84px;
+    left: 6vw;
+    max-width: 85vw;
+    margin: 0;
+    color: #ffded9;
+    background: #701b21;
+    border-radius: 5px;
+    padding: 6px 10px;
+  }
+  .run-notice[hidden] { display: none; }
+</style>
+<div class="run-shell">
+  <header class="run-heading">
+    <div>
+      <p class="run-kicker"></p>
+      <h1 class="run-title"></h1>
+      <p class="run-scenario"></p>
+    </div>
+    <span class="run-state" aria-live="polite">Ready</span>
+  </header>
+  <main id="stage"></main>
+</div>
+<p class="run-notice" role="alert" hidden></p>
+<footer class="run-controls" aria-label="Workflow actions"></footer>
+<script>/* CASE_SCRIPT */</script>
+<script>
+  (() => {
+    const config = window.caseDefinition;
+    const stage = document.querySelector('#stage');
+    const state = document.querySelector('.run-state');
+    const error = document.querySelector('.run-notice');
+    const controls = document.querySelector('.run-controls');
+    const root = document.documentElement;
+    let step = 0;
+    let previous = null;
+    let busy = true;
+
+    document.title = config.title;
+    root.style.setProperty('--surface', config.surface);
+    root.style.setProperty('--ink', config.text);
+    root.style.setProperty('--accent', config.accent);
+    document.querySelector('.run-title').textContent = config.title;
+    document.querySelector('.run-kicker').textContent = config.kicker;
+    document.querySelector('.run-scenario').textContent = config.scenario;
+    document.body.dataset.layout = config.layout;
+    stage.dataset.layout = config.layout;
+    if (config.style) {
+      const styles = document.createElement('style');
+      styles.textContent = config.style;
+      document.head.append(styles);
+    }
+
+    const buttons = config.actions.map((label, index) => {
+      const button = document.createElement('button');
+      const phase = document.createElement('span');
+      const marker = document.createElement('span');
+      button.className = 'run-button';
+      button.type = 'button';
+      button.accessKey = String(index + 1);
+      phase.className = 'run-phase';
+      phase.textContent = String(index + 1).padStart(2, '0');
+      marker.className = 'run-marker';
+      marker.setAttribute('aria-hidden', 'true');
+      button.append(phase, document.createTextNode(label), marker);
+      button.addEventListener('click', () => advance(index + 1));
+      controls.append(button);
+      return button;
+    });
+
+    function updateButtons() {
+      buttons.forEach((button, index) => {
+        button.disabled = busy || index !== step;
+        button.toggleAttribute('data-done', index < step);
+      });
+    }
+
+    async function record(phase, result) {
+      const message = { id: config.id, step: phase };
+      if (phase > 0) message.result = result;
+      const response = await fetch('/evidence/' + phase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(message),
+      });
+      if (!response.ok) throw new Error('Evidence receipt returned ' + response.status);
+    }
+
+    function showError(cause) {
+      error.textContent = String(cause.message || cause);
+      error.hidden = false;
+    }
+
+    async function advance(next) {
+      if (busy || next !== step + 1) return;
+      error.hidden = true;
+      busy = true;
+      updateButtons();
+      try {
+        const result = await config.run(next, previous);
+        const html = config.render(next, result);
+        await record(next, result);
+        stage.innerHTML = html;
+        stage.scrollTop = 0;
+        previous = result;
+        step = next;
+        if (result.releaseAllowed === false) {
+          state.textContent = 'Release blocked';
+          state.dataset.kind = 'blocked';
+        } else if (step === buttons.length) {
+          state.textContent = 'Evidence recorded';
+          state.dataset.kind = 'verified';
+        } else {
+          state.textContent = 'Step ' + step + ' recorded';
+          state.dataset.kind = '';
+        }
+      } catch (cause) {
+        showError(cause);
+      } finally {
+        busy = false;
+        updateButtons();
+      }
+    }
+
+    stage.innerHTML = config.render(0, null);
+    updateButtons();
+    record(0).then(() => {
+      busy = false;
+      updateButtons();
+    }).catch(showError);
+  })();
+</script>
+</html>

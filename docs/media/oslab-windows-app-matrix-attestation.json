@@ -1,0 +1,3710 @@
+{
+  "demo": "Windows app workflow matrix",
+  "guest_os": "Windows 11",
+  "fixture": "Synthetic scenario data in 28 separate offline apps and four native Windows apps",
+  "capture": "OSLab MCP screenshots and input on Proxmox VNC. Selected screenshots edited into time-compressed sequences.",
+  "verification": "Expected outcomes compared with guest-side file or UI evidence collected by QEMU Guest Agent.",
+  "app_count": 32,
+  "passed_checks": 351,
+  "max_verified_concurrent_vms": 8,
+  "wave_results": [
+    {
+      "wave": 1,
+      "case_ids": [
+        "02",
+        "05",
+        "08",
+        "15",
+        "16",
+        "22",
+        "26",
+        "27"
+      ],
+      "verified_guests": 8,
+      "shared_capture_interval_seconds": 43.758,
+      "mouse_input_spread_seconds_by_action": [
+        0.9,
+        1.437,
+        0.907
+      ]
+    },
+    {
+      "wave": 2,
+      "case_ids": [
+        "01",
+        "07",
+        "17",
+        "21",
+        "29"
+      ],
+      "verified_guests": 5,
+      "shared_capture_interval_seconds": 2.099,
+      "mouse_input_spread_seconds_by_action": []
+    },
+    {
+      "wave": 3,
+      "case_ids": [
+        "03",
+        "04",
+        "06",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13"
+      ],
+      "verified_guests": 8,
+      "shared_capture_interval_seconds": 42.22,
+      "mouse_input_spread_seconds_by_action": [
+        1.164,
+        1.047,
+        1.491
+      ]
+    },
+    {
+      "wave": 4,
+      "case_ids": [
+        "14",
+        "18",
+        "19",
+        "23",
+        "24",
+        "25",
+        "28"
+      ],
+      "verified_guests": 7,
+      "shared_capture_interval_seconds": 40.35,
+      "mouse_input_spread_seconds_by_action": [
+        0.713,
+        0.804,
+        1.199
+      ]
+    },
+    {
+      "wave": 5,
+      "case_ids": [
+        "20",
+        "30"
+      ],
+      "verified_guests": 2,
+      "shared_capture_interval_seconds": 25.313,
+      "mouse_input_spread_seconds_by_action": []
+    },
+    {
+      "wave": 6,
+      "case_ids": [
+        "31",
+        "32"
+      ],
+      "verified_guests": 2,
+      "shared_capture_interval_seconds": 51.3,
+      "mouse_input_spread_seconds_by_action": []
+    }
+  ],
+  "cases": [
+    {
+      "id": "01",
+      "title": "Stockroom Reconciler",
+      "scenario": "Block a duplicate-labeled warehouse cycle count, then release a verified recount.",
+      "kicker": "Inventory control",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load handheld scans",
+        "Reconcile against ledger",
+        "Apply verified recount"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load handheld scans / rawScans",
+          "expected": 9,
+          "observed": 9,
+          "passed": true
+        },
+        {
+          "name": "Load handheld scans / rawUnits",
+          "expected": 283,
+          "observed": 283,
+          "passed": true
+        },
+        {
+          "name": "Load handheld scans / ledgerUnits",
+          "expected": 254,
+          "observed": 254,
+          "passed": true
+        },
+        {
+          "name": "Reconcile against ledger / uniqueScans",
+          "expected": 8,
+          "observed": 8,
+          "passed": true
+        },
+        {
+          "name": "Reconcile against ledger / duplicateLabels",
+          "expected": [
+            "CA-02"
+          ],
+          "observed": [
+            "CA-02"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Reconcile against ledger / countedUnits",
+          "expected": 255,
+          "observed": 255,
+          "passed": true
+        },
+        {
+          "name": "Reconcile against ledger / variance",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Reconcile against ledger / discrepancies",
+          "expected": [
+            "GC17",
+            "CC31"
+          ],
+          "observed": [
+            "GC17",
+            "CC31"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Reconcile against ledger / released",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Apply verified recount / countedUnits",
+          "expected": 254,
+          "observed": 254,
+          "passed": true
+        },
+        {
+          "name": "Apply verified recount / variance",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Apply verified recount / discrepancies",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Apply verified recount / recountsApplied",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Apply verified recount / released",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "d60332fcf569ef38f674b4fcc6cee1e1d002fc667ae4b99862981e5c1bd8d9ae",
+        "bd1b87006c169d6ec993e4b8c869012843daf2a6bd15d84f07e2bbcb84db1862",
+        "c69c24dda037be9fda1b0371236c406427af0cb238b7823af0471a4b6e8772d7",
+        "f2871d403073cb7108e24a4d38f906bb738a9422d7652405c3c1fecddcb825a7"
+      ],
+      "sample_offsets_seconds": [
+        28.296,
+        34.137,
+        35.666,
+        36.526,
+        41.798,
+        42.485,
+        43.493,
+        48.667,
+        49.621,
+        50.532,
+        55.617
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "02",
+      "title": "Build Plate Planner",
+      "scenario": "Detect overlapping and out-of-bounds footprints, then nest a printable plate.",
+      "kicker": "Additive manufacturing",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load part footprints",
+        "Inspect the plate",
+        "Auto-nest the parts"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load part footprints / partCount",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Load part footprints / footprintArea",
+          "expected": 11600,
+          "observed": 11600,
+          "passed": true
+        },
+        {
+          "name": "Inspect the plate / overflowIds",
+          "expected": [
+            "C"
+          ],
+          "observed": [
+            "C"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Inspect the plate / collisions",
+          "expected": [
+            {
+              "pair": "A+B",
+              "area": 725
+            }
+          ],
+          "observed": [
+            {
+              "pair": "A+B",
+              "area": 725
+            }
+          ],
+          "passed": true
+        },
+        {
+          "name": "Inspect the plate / clearance",
+          "expected": -27,
+          "observed": -27,
+          "passed": true
+        },
+        {
+          "name": "Inspect the plate / fits",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Auto-nest the parts / overflowIds",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Auto-nest the parts / collisions",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Auto-nest the parts / clearance",
+          "expected": 10,
+          "observed": 10,
+          "passed": true
+        },
+        {
+          "name": "Auto-nest the parts / fits",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "6c30244a1e51d9b7ac7f08f356ccdace5a118451edb0fe1499857a97bdb71f2b",
+        "d211391b9a908a1b19a4838a8610d6f67afc925842d79d101c91da00c68bfabb",
+        "774bbf61d43377aca777de59e9afaeddc1805c6bd9b43e41fe7c67c22edf8914",
+        "c365de942afdb55cd9ffcda7dac2e651657c03ff3ec3a21dae00d49a0bf4aca5"
+      ],
+      "sample_offsets_seconds": [
+        26.055,
+        47.638,
+        49.242,
+        50.721,
+        60.532,
+        64.041,
+        65.565,
+        74.918,
+        77.352,
+        78.184,
+        85.955
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "03",
+      "title": "Photo Proof Studio",
+      "scenario": "Reject a duplicate photo, correct a rotated exposure, and assemble a bitmap contact sheet.",
+      "kicker": "Photography production",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load six captures",
+        "Inspect the proof",
+        "Assemble corrected sheet"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load six captures / files",
+          "expected": 6,
+          "observed": 6,
+          "passed": true
+        },
+        {
+          "name": "Load six captures / pixelCount",
+          "expected": 24000,
+          "observed": 24000,
+          "passed": true
+        },
+        {
+          "name": "Inspect the proof / distinctPhotos",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Inspect the proof / duplicatePairs",
+          "expected": [
+            "D06→D04"
+          ],
+          "observed": [
+            "D06→D04"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Inspect the proof / orientationWarnings",
+          "expected": [
+            "D03"
+          ],
+          "observed": [
+            "D03"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Assemble corrected sheet / tiles",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Assemble corrected sheet / dimensions",
+          "expected": [
+            268,
+            121
+          ],
+          "observed": [
+            268,
+            121
+          ],
+          "passed": true
+        },
+        {
+          "name": "Assemble corrected sheet / bitmapBytes",
+          "expected": 97338,
+          "observed": 97338,
+          "passed": true
+        },
+        {
+          "name": "Assemble corrected sheet / assetOrder",
+          "expected": [
+            "D01",
+            "D02",
+            "D03",
+            "D04",
+            "D05"
+          ],
+          "observed": [
+            "D01",
+            "D02",
+            "D03",
+            "D04",
+            "D05"
+          ],
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "c699ff2c5cd0bdc7aff0b6e3b48882a4f7090a233ae86c35ed6a3600f57de984",
+        "6b6b3226bd4a8bd4b23a447d2c17298f0d8e1fddceeb528a16c2bdfec6678f7d",
+        "2f6c24b5abd8992702bb7da3a56f03fae961105bab585e2e30b9e5d91e778f18",
+        "755b4f3bf428b15363d78e9cd93a4d03567762266d8169f3291d2587f5346eb5"
+      ],
+      "sample_offsets_seconds": [
+        29.186,
+        48.856,
+        51.022,
+        52.965,
+        62.028,
+        64.319,
+        66.105,
+        75.82,
+        76.555,
+        77.657,
+        87.154
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "04",
+      "title": "Streetlight Itinerary",
+      "scenario": "Catch missed reservation windows and find the fastest route that honors every booking.",
+      "kicker": "Travel operations",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Import timed bookings",
+        "Check requested route",
+        "Find an on-time route"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Import timed bookings / reservations",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Import timed bookings / requested",
+          "expected": [
+            "C",
+            "D",
+            "B",
+            "A"
+          ],
+          "observed": [
+            "C",
+            "D",
+            "B",
+            "A"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Check requested route / missedReservations",
+          "expected": [
+            "B",
+            "A"
+          ],
+          "observed": [
+            "B",
+            "A"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Check requested route / drivingMinutes",
+          "expected": 55,
+          "observed": 55,
+          "passed": true
+        },
+        {
+          "name": "Check requested route / waitingMinutes",
+          "expected": 18,
+          "observed": 18,
+          "passed": true
+        },
+        {
+          "name": "Check requested route / roundTripMinutes",
+          "expected": 148,
+          "observed": 148,
+          "passed": true
+        },
+        {
+          "name": "Find an on-time route / route",
+          "expected": [
+            "B",
+            "A",
+            "C",
+            "D"
+          ],
+          "observed": [
+            "B",
+            "A",
+            "C",
+            "D"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Find an on-time route / missedReservations",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Find an on-time route / assessed",
+          "expected": 24,
+          "observed": 24,
+          "passed": true
+        },
+        {
+          "name": "Find an on-time route / drivingMinutes",
+          "expected": 53,
+          "observed": 53,
+          "passed": true
+        },
+        {
+          "name": "Find an on-time route / roundTripMinutes",
+          "expected": 128,
+          "observed": 128,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "0601c4fdf073a760316f7eb7a1f92dfd52a12ac7473cd09a04820bc162fcb08a",
+        "b98dd76d4dd3a326cfa702783dfed833162e80a54cf5a9b2cf51b39fbd965096",
+        "3351d6f50454ae0c2d365249bc9d776520b670b39ee76be2c308109c59125b4c",
+        "6129c30dfb58598f67a7e9f7fc78b1008bfd477caee9f45d8e40dcf008573fc5"
+      ],
+      "sample_offsets_seconds": [
+        28.829,
+        48.856,
+        51.022,
+        51.815,
+        58.61,
+        64.319,
+        65.481,
+        73.058,
+        76.555,
+        78.044,
+        87.395
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "05",
+      "title": "Binder Desk",
+      "scenario": "Prevent release of a delivery packet with a missing page and a duplicate page.",
+      "kicker": "Document collation",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Open source bundle",
+        "Check page sequence",
+        "Replace scan and collate"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Open source bundle / files",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Open source bundle / pages",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Check page sequence / missing",
+          "expected": [
+            3
+          ],
+          "observed": [
+            3
+          ],
+          "passed": true
+        },
+        {
+          "name": "Check page sequence / duplicates",
+          "expected": [
+            2
+          ],
+          "observed": [
+            2
+          ],
+          "passed": true
+        },
+        {
+          "name": "Check page sequence / releaseAllowed",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Replace scan and collate / missing",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Replace scan and collate / duplicates",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Replace scan and collate / releaseAllowed",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Replace scan and collate / pageOrder",
+          "expected": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "observed": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "1d52f71d991d0693b377db24c2841c05da2e36a1a11830ad0f42ef84d4ae28ac",
+        "dfec07adfb9f9e402dbef3520d8e5ba6dbc4367358de67728b10fdf7454f6896",
+        "cd025c67dd13839ad5f55d1c75ad679fb49cc1832150cc3fc00ef7d97522f678",
+        "90eaff8c1a2fd00111d160c7a92322e69dd56a72c74571ef0b480d42f122a425"
+      ],
+      "sample_offsets_seconds": [
+        28.668,
+        47.638,
+        49.242,
+        50.51,
+        58.316,
+        64.041,
+        65.397,
+        72.668,
+        77.352,
+        79.071,
+        88.256
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "06",
+      "title": "Contrast Studio",
+      "scenario": "Detect unreadable text colors and verify revised theme tokens against a 4.5:1 target.",
+      "kicker": "Accessibility review",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load billing theme",
+        "Measure text contrast",
+        "Apply and audit repair"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load billing theme / tokenCount",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Load billing theme / background",
+          "expected": "#ffffff",
+          "observed": "#ffffff",
+          "passed": true
+        },
+        {
+          "name": "Measure text contrast / failed",
+          "expected": [
+            "Secondary text",
+            "Critical text"
+          ],
+          "observed": [
+            "Secondary text",
+            "Critical text"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Measure text contrast / worstContrast",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Measure text contrast / releaseAllowed",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Apply and audit repair / failed",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Apply and audit repair / worstContrast",
+          "expected": 7,
+          "observed": 7,
+          "passed": true
+        },
+        {
+          "name": "Apply and audit repair / releaseAllowed",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "a597c1c70ab2e5e07b403dfad75aad9a71da04e1931630779c1333d9123307f0",
+        "17bafbcec88446b3e1d51ce2da4d94f62be48e8ad2644778aaf0c79275dc4247",
+        "a33cf64f0c79747b95dd26ee97c379ec5ffbdd45abb4f9f8978ab0a0c5f04bda",
+        "46d27e73cefe682a5e88d6bc4faa941762a340791ef45a14afeedb10422a1061"
+      ],
+      "sample_offsets_seconds": [
+        28.782,
+        48.856,
+        51.022,
+        52.234,
+        60.898,
+        64.319,
+        66.012,
+        75.293,
+        76.555,
+        77.626,
+        84.926
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "07",
+      "title": "Wavecut",
+      "scenario": "Detect a clipped transient and trim a clean one-second segment to 16-bit PCM WAV.",
+      "kicker": "Audio export",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load PCM track",
+        "Scan for clipping",
+        "Trim and encode WAV"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load PCM track / sampleCount",
+          "expected": 24000,
+          "observed": 24000,
+          "passed": true
+        },
+        {
+          "name": "Load PCM track / rateHz",
+          "expected": 12000,
+          "observed": 12000,
+          "passed": true
+        },
+        {
+          "name": "Load PCM track / durationMs",
+          "expected": 2000,
+          "observed": 2000,
+          "passed": true
+        },
+        {
+          "name": "Scan for clipping / clipped",
+          "expected": 120,
+          "observed": 120,
+          "passed": true
+        },
+        {
+          "name": "Scan for clipping / releaseAllowed",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / clipped",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / sampleCount",
+          "expected": 12000,
+          "observed": 12000,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / durationMs",
+          "expected": 1000,
+          "observed": 1000,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / wavBytes",
+          "expected": 24044,
+          "observed": 24044,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / format",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / bitsPerSample",
+          "expected": 16,
+          "observed": 16,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / dataBytes",
+          "expected": 24000,
+          "observed": 24000,
+          "passed": true
+        },
+        {
+          "name": "Trim and encode WAV / releaseAllowed",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "d308eeeb41bf43ed96c315db33a650599484ffd4991b5ef681d57f0a743eedae",
+        "01d17d2700f1c1231beb56c72f52f6f7739a815d806bf9811af7e8c13a218156",
+        "40dfa17723e79b5496228731a7b31197d9a954ff36606cb6a9daef2d58356f16",
+        "1890fb83ac7b08819c9f52b15f57af685016e29000965073f9674ff4850faefa"
+      ],
+      "sample_offsets_seconds": [
+        22.03,
+        34.137,
+        35.666,
+        36.401,
+        41.354,
+        42.485,
+        43.493,
+        48.518,
+        49.621,
+        50.532,
+        55.637
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "08",
+      "title": "Glyph Atlas",
+      "scenario": "Reject a sprite sheet with an overlap and regenerate a compact texture manifest.",
+      "kicker": "Icon production",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load toolbar icons",
+        "Find overlapping cells",
+        "Repack and build manifest"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load toolbar icons / spriteCount",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Load toolbar icons / width",
+          "expected": 8,
+          "observed": 8,
+          "passed": true
+        },
+        {
+          "name": "Load toolbar icons / height",
+          "expected": 6,
+          "observed": 6,
+          "passed": true
+        },
+        {
+          "name": "Find overlapping cells / overlaps",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Find overlapping cells / outOfBounds",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Find overlapping cells / usedCells",
+          "expected": 28,
+          "observed": 28,
+          "passed": true
+        },
+        {
+          "name": "Find overlapping cells / releaseAllowed",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Repack and build manifest / overlaps",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Repack and build manifest / outOfBounds",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Repack and build manifest / usedCells",
+          "expected": 30,
+          "observed": 30,
+          "passed": true
+        },
+        {
+          "name": "Repack and build manifest / releaseAllowed",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "9acd8086a64ae075f58b2616fb2a3438f204e2baa797ebf6ea84bbada1ade922",
+        "4079842399339c8c7912804e978d3e0e49a4b8ea10315e2df4f250d36e93b65e",
+        "29d74686c570fdb70a737e87abc46b895c4b5e1d942a10ed0ff46ced1fb272a0",
+        "5fb3a494601c84472e63d1676524b6178fe22c7dffc2f44e0912a114ea71a543"
+      ],
+      "sample_offsets_seconds": [
+        28.668,
+        47.638,
+        49.242,
+        50.55,
+        59.819,
+        64.041,
+        65.565,
+        75.401,
+        77.352,
+        78.169,
+        86.014
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "09",
+      "title": "LedgerMatch",
+      "scenario": "Catch overlapping bank-feed rows before posting a supplier payment batch.",
+      "kicker": "FINANCE / BANK RECONCILIATION",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load ledger and bank feed",
+        "Reconcile payment batch",
+        "Apply correction and post"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load ledger and bank feed / invoiceCount",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Load ledger and bank feed / paymentCount",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Load ledger and bank feed / invoiceTotalCents",
+          "expected": 529825,
+          "observed": 529825,
+          "passed": true
+        },
+        {
+          "name": "Load ledger and bank feed / paymentTotalCents",
+          "expected": 570150,
+          "observed": 570150,
+          "passed": true
+        },
+        {
+          "name": "Reconcile payment batch / matchedCount",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Reconcile payment batch / transferTotalCents",
+          "expected": 409950,
+          "observed": 409950,
+          "passed": true
+        },
+        {
+          "name": "Reconcile payment batch / exceptionIds",
+          "expected": [
+            "INV-209",
+            "INV-211",
+            "INV-212"
+          ],
+          "observed": [
+            "INV-209",
+            "INV-211",
+            "INV-212"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Reconcile payment batch / duplicateCount",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Reconcile payment batch / mismatchCount",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Reconcile payment batch / unpaidTotalCents",
+          "expected": 9875,
+          "observed": 9875,
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / matchedCount",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / transferTotalCents",
+          "expected": 519950,
+          "observed": 519950,
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / exceptionIds",
+          "expected": [
+            "INV-212"
+          ],
+          "observed": [
+            "INV-212"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / duplicateCount",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / mismatchCount",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / unpaidTotalCents",
+          "expected": 9875,
+          "observed": 9875,
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / removedFeedRows",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Apply correction and post / postedInvoiceIds",
+          "expected": [
+            "INV-208",
+            "INV-209",
+            "INV-210",
+            "INV-211"
+          ],
+          "observed": [
+            "INV-208",
+            "INV-209",
+            "INV-210",
+            "INV-211"
+          ],
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "03403a0fca211e9afa38b6812e6680e2a878b288002b38db13c939bf481bf680",
+        "4e1d83518010dfaab584bc12cf6c7bbd8d44ba9744c33c87c438016d98375b0c",
+        "c485c80dfa3efc4738749f93289e504342358ae7bc53f1554d21d1c4b3f1352d",
+        "c84918b16212321b9c75867a46efac91cd16d214ec41d110cc7271b92638c77d"
+      ],
+      "sample_offsets_seconds": [
+        26.605,
+        48.856,
+        51.022,
+        52.772,
+        62.263,
+        64.319,
+        65.481,
+        73.066,
+        76.555,
+        78.044,
+        87.314
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "10",
+      "title": "Return Relay",
+      "scenario": "Reject an invalid postal code and group valid return labels into weight-compliant bags.",
+      "kicker": "WAREHOUSE / CARRIER HANDOFF",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Read return manifest",
+        "Validate and pack",
+        "Apply confirmed ZIP and print"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Read return manifest / requestCount",
+          "expected": 6,
+          "observed": 6,
+          "passed": true
+        },
+        {
+          "name": "Read return manifest / hubCount",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Read return manifest / totalGrams",
+          "expected": 15200,
+          "observed": 15200,
+          "passed": true
+        },
+        {
+          "name": "Validate and pack / rejected",
+          "expected": [
+            "RMA-5210"
+          ],
+          "observed": [
+            "RMA-5210"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Validate and pack / bagCount",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Validate and pack / bagGrams",
+          "expected": [
+            7700,
+            2200,
+            2700
+          ],
+          "observed": [
+            7700,
+            2200,
+            2700
+          ],
+          "passed": true
+        },
+        {
+          "name": "Validate and pack / accepted",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Validate and pack / printCount",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Apply confirmed ZIP and print / rejected",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Apply confirmed ZIP and print / bagCount",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Apply confirmed ZIP and print / bagGrams",
+          "expected": [
+            7700,
+            2200,
+            5300
+          ],
+          "observed": [
+            7700,
+            2200,
+            5300
+          ],
+          "passed": true
+        },
+        {
+          "name": "Apply confirmed ZIP and print / accepted",
+          "expected": 6,
+          "observed": 6,
+          "passed": true
+        },
+        {
+          "name": "Apply confirmed ZIP and print / printCount",
+          "expected": 6,
+          "observed": 6,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "b4248e9d27be8cbd08c796df9f52759dca12f210fe336e425b2d1df4d579f80d",
+        "f739e3737c3a2f762f64e8751354fc6dec0a7ef5849f10b006f84a98449c358c",
+        "7e59d6ff98f42d0330a01fbe8c86664b2c521c7f953292bb7f94bc2a9a0c60d7",
+        "decb40648d210278567823b857264c5758cbe7fa2a6121d56da415f6827b413f"
+      ],
+      "sample_offsets_seconds": [
+        30.132,
+        48.856,
+        51.022,
+        52.483,
+        62.679,
+        64.319,
+        65.062,
+        73.552,
+        76.555,
+        79.119,
+        87.869
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "11",
+      "title": "Signal Budget",
+      "scenario": "Block an overspent production plan and verify an approved deferral clears two independent caps.",
+      "kicker": "OPERATIONS / SPEND CONTROL",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load Q2 commitment plan",
+        "Run budget policy",
+        "Approve deferred purchase"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load Q2 commitment plan / lineCount",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Load Q2 commitment plan / projected",
+          "expected": 19000,
+          "observed": 19000,
+          "passed": true
+        },
+        {
+          "name": "Load Q2 commitment plan / ceiling",
+          "expected": 18000,
+          "observed": 18000,
+          "passed": true
+        },
+        {
+          "name": "Run budget policy / projected",
+          "expected": 19000,
+          "observed": 19000,
+          "passed": true
+        },
+        {
+          "name": "Run budget policy / ceiling",
+          "expected": 18000,
+          "observed": 18000,
+          "passed": true
+        },
+        {
+          "name": "Run budget policy / violations",
+          "expected": [
+            "PORTFOLIO_CAP",
+            "STUDIO_CAP"
+          ],
+          "observed": [
+            "PORTFOLIO_CAP",
+            "STUDIO_CAP"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Run budget policy / headroom",
+          "expected": -1000,
+          "observed": -1000,
+          "passed": true
+        },
+        {
+          "name": "Run budget policy / gate",
+          "expected": "blocked",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / projected",
+          "expected": 17800,
+          "observed": 17800,
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / ceiling",
+          "expected": 18000,
+          "observed": 18000,
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / violations",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / headroom",
+          "expected": 200,
+          "observed": 200,
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / gate",
+          "expected": "approved",
+          "observed": "approved",
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / deferredId",
+          "expected": "PO-718",
+          "observed": "PO-718",
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / deferredValue",
+          "expected": 1200,
+          "observed": 1200,
+          "passed": true
+        },
+        {
+          "name": "Approve deferred purchase / deferredPeriod",
+          "expected": "Q3",
+          "observed": "Q3",
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "8df7ca6c97fbfa5ad712ec69fbc10787ffa8ac40c6c251ebd5bf6ad362ba0ea7",
+        "52c0049b9cc14a1e19e5cdc7dbf88d71ca5708d2bc6e4cafe5255ef897cc381b",
+        "37ea59da62d758e5b22ddcef10359852a9b658c28f2c89b9b6751350d4a0d716",
+        "86c228c934ce8e2300fb725703d2bf73b2283a665986d7d7252c2b379b068820"
+      ],
+      "sample_offsets_seconds": [
+        39.39,
+        48.856,
+        51.022,
+        52.358,
+        59.979,
+        64.319,
+        66.012,
+        75.034,
+        76.555,
+        77.766,
+        85.541
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "12",
+      "title": "Approval Lanes",
+      "scenario": "Catch self-approval and missing finance signatures, then release only independently authorized purchases.",
+      "kicker": "PROCUREMENT / POLICY REVIEW",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Open purchase intake",
+        "Route through approval policy",
+        "Apply signed amendments"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Open purchase intake / requestCount",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Open purchase intake / queuedTotal",
+          "expected": 5355,
+          "observed": 5355,
+          "passed": true
+        },
+        {
+          "name": "Open purchase intake / financeThreshold",
+          "expected": 1500,
+          "observed": 1500,
+          "passed": true
+        },
+        {
+          "name": "Route through approval policy / approvedIds",
+          "expected": [
+            "PR-069",
+            "PR-072"
+          ],
+          "observed": [
+            "PR-069",
+            "PR-072"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Route through approval policy / approvedTotal",
+          "expected": 2810,
+          "observed": 2810,
+          "passed": true
+        },
+        {
+          "name": "Route through approval policy / financeHolds",
+          "expected": [
+            "PR-070"
+          ],
+          "observed": [
+            "PR-070"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Route through approval policy / conflicts",
+          "expected": [
+            "PR-071"
+          ],
+          "observed": [
+            "PR-071"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Route through approval policy / gate",
+          "expected": "held",
+          "observed": "held",
+          "passed": true
+        },
+        {
+          "name": "Apply signed amendments / approvedIds",
+          "expected": [
+            "PR-069",
+            "PR-070",
+            "PR-071",
+            "PR-072"
+          ],
+          "observed": [
+            "PR-069",
+            "PR-070",
+            "PR-071",
+            "PR-072"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Apply signed amendments / approvedTotal",
+          "expected": 5355,
+          "observed": 5355,
+          "passed": true
+        },
+        {
+          "name": "Apply signed amendments / financeHolds",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Apply signed amendments / conflicts",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Apply signed amendments / gate",
+          "expected": "released",
+          "observed": "released",
+          "passed": true
+        },
+        {
+          "name": "Apply signed amendments / addedSignatures",
+          "expected": [
+            "PR-070/Omar",
+            "PR-071/Dani"
+          ],
+          "observed": [
+            "PR-070/Omar",
+            "PR-071/Dani"
+          ],
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "8915d7f37664f6c11e43c3d9f9b2ff2fb9264f23bf4c4f724257a8daec55c829",
+        "09d667a096b3c88fe635f02e8ee65c2b1a238988826aa8004bc27e9dc1a4803b",
+        "6708e3c5f87ea30c2f78648ec3a9a0d82612de176b97c9f16bce523452f7b6c9",
+        "ca5105eb591983de39af6391fcc116276be845912567ec691ce2de1d8bbdae71"
+      ],
+      "sample_offsets_seconds": [
+        35.418,
+        48.857,
+        51.022,
+        52.483,
+        60.369,
+        64.319,
+        65.062,
+        72.676,
+        76.555,
+        77.626,
+        85.059
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "13",
+      "title": "Carton Fit",
+      "scenario": "Fit a mixed order into approved cartons, then repack one oversize item.",
+      "kicker": "PACK STATION",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load shipping order",
+        "Check carton fit",
+        "Split tripod and release labels"
+      ],
+      "wave": 3,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load shipping order / items",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Load shipping order / inputGrams",
+          "expected": 5140,
+          "observed": 5140,
+          "passed": true
+        },
+        {
+          "name": "Check carton fit / fitted",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Check carton fit / oversizeSku",
+          "expected": "TP-475",
+          "observed": "TP-475",
+          "passed": true
+        },
+        {
+          "name": "Check carton fit / excessMm",
+          "expected": 35,
+          "observed": 35,
+          "passed": true
+        },
+        {
+          "name": "Split tripod and release labels / labels",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Split tripod and release labels / small",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Split tripod and release labels / medium",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Split tripod and release labels / packedGrams",
+          "expected": 5140,
+          "observed": 5140,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "90486112a662f10b883599458b0f005320b3b47f829912412d6fd0a4f426f08a",
+        "356da7e0c4a15bdb75fadd8649705e55b3e40b3426beea6dfa71c28ae62d1834",
+        "f1aa66658e84cb5929e849aa90761dad5bcb970c7fbadc77ae144e87acff7c8b",
+        "6b1c42faf4ec05d7d824e9b54feafb190c981ef1f8355a7b9d8eb6c284f85cf9"
+      ],
+      "sample_offsets_seconds": [
+        42.705,
+        48.857,
+        51.022,
+        52.018,
+        63.261,
+        64.319,
+        66.012,
+        75.326,
+        76.555,
+        77.766,
+        85.165
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "14",
+      "title": "Platform Desk",
+      "scenario": "Audit occupied platform intervals and reassign two services without moving their times.",
+      "kicker": "RAIL OPERATIONS",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load morning timetable",
+        "Run clearance audit",
+        "Reassign and verify timetable"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load morning timetable / scheduled",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Load morning timetable / platforms",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Load morning timetable / minimumClearance",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Run clearance audit / conflicts",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Run clearance audit / affected",
+          "expected": "MK708,LM557",
+          "observed": "MK708,LM557",
+          "passed": true
+        },
+        {
+          "name": "Run clearance audit / shortestGap",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Reassign and verify timetable / conflicts",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Reassign and verify timetable / reassigned",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Reassign and verify timetable / unchangedTimes",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Reassign and verify timetable / minimumActualGap",
+          "expected": 7,
+          "observed": 7,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "b7a205f67f2be8150b2d120ed51df57679ad2c13a744ee18580e6085bf7a3c5c",
+        "de25589cc590e606c105c3b6e320198d5872f3be4037b541559f49649beb2fca",
+        "8ab4e862e294c5c350e7146c3462e130fb2eacbd088dc610f4d688215ceda3fa",
+        "8ac8ddf7de8633ec35a418b31c7166c3c51122cd6c3f2d9f70ea1e235040b51a"
+      ],
+      "sample_offsets_seconds": [
+        28.263,
+        46.698,
+        48.328,
+        49.487,
+        58.619,
+        60.031,
+        61.257,
+        71.127,
+        73.318,
+        75.094,
+        84.142
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "15",
+      "title": "Pick Path",
+      "scenario": "Reject a pick route that crosses two racks and reroute through open aisles.",
+      "kicker": "WAREHOUSE ROUTES",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load pick wave",
+        "Audit rack clearance",
+        "Calculate safe route"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load pick wave / gridCells",
+          "expected": 42,
+          "observed": 42,
+          "passed": true
+        },
+        {
+          "name": "Load pick wave / closed",
+          "expected": 9,
+          "observed": 9,
+          "passed": true
+        },
+        {
+          "name": "Load pick wave / stops",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Audit rack clearance / cellsWalked",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        },
+        {
+          "name": "Audit rack clearance / blockedCells",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Audit rack clearance / picksVisited",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Audit rack clearance / hasCompleteRoute",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Calculate safe route / cellsWalked",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        },
+        {
+          "name": "Calculate safe route / blockedCells",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Calculate safe route / picksVisited",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Calculate safe route / hasCompleteRoute",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "d8f58b1dc9419a0e73d026e91a6057eb73bf50a7bcb7f15c34f6d5f6f784f9ac",
+        "f8cab2e4045d1782ca3df5319c30933235ef4104387a94f8e2cf8a540d4e7ea0",
+        "f66fcaad8827f8c554a290b96d13d8147887d7cf48affa626b4cc11ab8529cae",
+        "975a947a21bccf678cfc10f658910f256b7bd3b755e4edc7e9a6cdda7fb0688a"
+      ],
+      "sample_offsets_seconds": [
+        29.275,
+        47.638,
+        49.242,
+        50.954,
+        60.951,
+        64.041,
+        64.71,
+        72.694,
+        77.352,
+        78.387,
+        85.959
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "16",
+      "title": "Gauge Lab",
+      "scenario": "Calibrate a biased digital gauge and isolate the one part still out of tolerance.",
+      "kicker": "QUALITY CONTROL",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load gauge readings",
+        "Apply tolerance rules",
+        "Calibrate and quarantine"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load gauge readings / readingCount",
+          "expected": 8,
+          "observed": 8,
+          "passed": true
+        },
+        {
+          "name": "Load gauge readings / nominal",
+          "expected": "20.00",
+          "observed": "20.00",
+          "passed": true
+        },
+        {
+          "name": "Load gauge readings / rawReference",
+          "expected": "20.35",
+          "observed": "20.35",
+          "passed": true
+        },
+        {
+          "name": "Apply tolerance rules / passed",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Apply tolerance rules / rejects",
+          "expected": 7,
+          "observed": 7,
+          "passed": true
+        },
+        {
+          "name": "Apply tolerance rules / quarantine",
+          "expected": "1,2,3,4,5,7,8",
+          "observed": "1,2,3,4,5,7,8",
+          "passed": true
+        },
+        {
+          "name": "Calibrate and quarantine / passed",
+          "expected": 7,
+          "observed": 7,
+          "passed": true
+        },
+        {
+          "name": "Calibrate and quarantine / rejects",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Calibrate and quarantine / quarantine",
+          "expected": "4",
+          "observed": "4",
+          "passed": true
+        },
+        {
+          "name": "Calibrate and quarantine / offsetMicrons",
+          "expected": 350,
+          "observed": 350,
+          "passed": true
+        },
+        {
+          "name": "Calibrate and quarantine / maxDeviationMicrons",
+          "expected": 330,
+          "observed": 330,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "36d7a73864dd35ad6a58478e7e657a6bcd081e4a813368228b6d28fdc6b8151f",
+        "52ddf43220bcb93b778196060bb7e77664437a0bd9f8b9b028f2e8f01dadc42e",
+        "79e37e7996823f734db5d4f7609082d48fb8a2b5673de1405bc5d9cf510fe6fe",
+        "2d2db5c32a4677d5355a08c55b946cd3d89bf24e22cdee20a4f90f757f7bffd4"
+      ],
+      "sample_offsets_seconds": [
+        34.26,
+        47.638,
+        49.242,
+        50.55,
+        58.72,
+        64.041,
+        65.115,
+        73.846,
+        77.352,
+        78.993,
+        88.403
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "17",
+      "title": "Change Graph",
+      "scenario": "Block a circular deployment plan, then publish a safe execution order.",
+      "kicker": "RELEASE ORCHESTRATION",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Import change set",
+        "Simulate rollout",
+        "Remove cycle and publish"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Import change set / count",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Import change set / edges",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Simulate rollout / runnable",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Simulate rollout / blocked",
+          "expected": "api,smoke,traffic",
+          "observed": "api,smoke,traffic",
+          "passed": true
+        },
+        {
+          "name": "Simulate rollout / approved",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Remove cycle and publish / runnable",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Remove cycle and publish / approved",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Remove cycle and publish / sequence",
+          "expected": "db,api,smoke,traffic",
+          "observed": "db,api,smoke,traffic",
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "702d509ef5a6c6028df45a759cba6c68b583a217c95a2f28fddcaf60fa3526a8",
+        "bef7878bd8a84db8b077b27271c46e21e629bf3c824a3ef1057605f7b34f4a23",
+        "803c9661afc26e35e65bf0fa5c1b16dae91dbc7f215125182e9e987af825cce3",
+        "92991a6083b77d6fba69899dc9701973da7b94328309a428839215780bbb0942"
+      ],
+      "sample_offsets_seconds": [
+        22.451,
+        34.137,
+        35.666,
+        36.401,
+        41.447,
+        42.485,
+        43.493,
+        48.463,
+        49.621,
+        50.532,
+        55.666
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "18",
+      "title": "Package Ledger",
+      "scenario": "Compare staged release files with known CRC32 checksums before approval.",
+      "kicker": "OFFLINE RELEASE INTEGRITY",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load release package",
+        "Verify file checksums",
+        "Restore baseline copy"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load release package / files",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Load release package / pending",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Verify file checksums / matched",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Verify file checksums / mismatches",
+          "expected": "regions.csv",
+          "observed": "regions.csv",
+          "passed": true
+        },
+        {
+          "name": "Verify file checksums / observed",
+          "expected": "61A8D2B6",
+          "observed": "61A8D2B6",
+          "passed": true
+        },
+        {
+          "name": "Verify file checksums / approved",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Restore baseline copy / matched",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Restore baseline copy / mismatches",
+          "expected": "",
+          "observed": "",
+          "passed": true
+        },
+        {
+          "name": "Restore baseline copy / approved",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "2473dcc85b05c975b59dcf1ca2b4390dcb54a49b10a8dca62a6746284ac1581d",
+        "d1ce71df83fb0de20771cde7bacfafa7713d341e92627f833606e9b3cf5c9857",
+        "5820ddaad0a04143b5d9e3edd659b3b25d1f57333ad4191f0e42864033fa1bda",
+        "ce4c9d0d6b946b1cd040c7a679159209e54e0729eff89eefcdd4023f8f924f59"
+      ],
+      "sample_offsets_seconds": [
+        28.963,
+        46.698,
+        48.328,
+        49.487,
+        56.846,
+        60.031,
+        61.023,
+        68.403,
+        73.318,
+        74.721,
+        82.385
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "19",
+      "title": "Slotline",
+      "scenario": "Find a conflict-free room booking while keeping the launch handoff one hour long.",
+      "kicker": "ROOM SCHEDULING",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load room calendars",
+        "Check booking conflicts",
+        "Move to the first free slot"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load room calendars / bookings",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Load room calendars / rooms",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Check booking conflicts / conflictCount",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Check booking conflicts / conflict",
+          "expected": "Product review",
+          "observed": "Product review",
+          "passed": true
+        },
+        {
+          "name": "Check booking conflicts / minutes",
+          "expected": 45,
+          "observed": 45,
+          "passed": true
+        },
+        {
+          "name": "Check booking conflicts / approved",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Move to the first free slot / conflictCount",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Move to the first free slot / start",
+          "expected": "11:15",
+          "observed": "11:15",
+          "passed": true
+        },
+        {
+          "name": "Move to the first free slot / end",
+          "expected": "12:15",
+          "observed": "12:15",
+          "passed": true
+        },
+        {
+          "name": "Move to the first free slot / duration",
+          "expected": 60,
+          "observed": 60,
+          "passed": true
+        },
+        {
+          "name": "Move to the first free slot / approved",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "15272fa5cea05f1b78df5a8ead49faaca73f7edace46eef67cce0677554a10fa",
+        "79b7911e773da3593ebe7e4251525df4fe2689a4aebe05db560c11953f07dd9d",
+        "01b823d916e57535e8d88815540a33be30bf033f1ad16ca61fcf3285c6ba00a2",
+        "fc84c58de27962bc75a686be517eb26ad335b88e8c8d9999851eea7a4fc0ca90"
+      ],
+      "sample_offsets_seconds": [
+        27.811,
+        46.698,
+        48.328,
+        49.751,
+        59.047,
+        60.031,
+        61.304,
+        70.843,
+        73.318,
+        74.97,
+        82.394
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "20",
+      "title": "Locale Proof",
+      "scenario": "Reject translation strings that omit or duplicate required runtime placeholders.",
+      "kicker": "LOCALIZATION QA",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load language bundle",
+        "Audit placeholders",
+        "Apply fixes and preview"
+      ],
+      "wave": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load language bundle / strings",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Load language bundle / locale",
+          "expected": "es-ES",
+          "observed": "es-ES",
+          "passed": true
+        },
+        {
+          "name": "Audit placeholders / problems",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Audit placeholders / missing",
+          "expected": "count",
+          "observed": "count",
+          "passed": true
+        },
+        {
+          "name": "Audit placeholders / duplicate",
+          "expected": "customer",
+          "observed": "customer",
+          "passed": true
+        },
+        {
+          "name": "Audit placeholders / exportable",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Apply fixes and preview / problems",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Apply fixes and preview / exportable",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Apply fixes and preview / receipt",
+          "expected": "Pedido A-1049 para R. Vega",
+          "observed": "Pedido A-1049 para R. Vega",
+          "passed": true
+        },
+        {
+          "name": "Apply fixes and preview / summary",
+          "expected": "7 artículos listos para envío",
+          "observed": "7 artículos listos para envío",
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "66d3c012f3673eab29a28812368d7e783a36a63a166b771649de7e15a42ab14c",
+        "dc84385d97a511eb6216fb6a2c4566bfb61eeb919f0d61e5ebe82c63aa3160ea",
+        "17e06e0c40db41337f3080afed902c6218435e085befc7e6fa5c4a737a28c36e",
+        "94a4c06123e998146477f4762ea9000a88d40b1173145321f251047c2bfa00a3"
+      ],
+      "sample_offsets_seconds": [
+        17.628,
+        22.845,
+        23.473,
+        24.327,
+        29.426,
+        30.14,
+        31.139,
+        36.247,
+        36.951,
+        37.952,
+        42.941
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "21",
+      "title": "Meter Ledger",
+      "scenario": "Reconcile a duplicate and a missing meter reading before issuing a time-of-use bill.",
+      "kicker": "ENERGY SETTLEMENT",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Import interval readings",
+        "Audit tariff settlement",
+        "Apply certified reading"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Import interval readings / readings",
+          "expected": 9,
+          "observed": 9,
+          "passed": true
+        },
+        {
+          "name": "Import interval readings / distinctReadings",
+          "expected": 8,
+          "observed": 8,
+          "passed": true
+        },
+        {
+          "name": "Import interval readings / windowMinutes",
+          "expected": 120,
+          "observed": 120,
+          "passed": true
+        },
+        {
+          "name": "Import interval readings / tariffCutover",
+          "expected": "07:00",
+          "observed": "07:00",
+          "passed": true
+        },
+        {
+          "name": "Audit tariff settlement / duplicates",
+          "expected": [
+            "06:45"
+          ],
+          "observed": [
+            "06:45"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Audit tariff settlement / missing",
+          "expected": [
+            "07:00"
+          ],
+          "observed": [
+            "07:00"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Audit tariff settlement / offpeak",
+          "expected": 39,
+          "observed": 39,
+          "passed": true
+        },
+        {
+          "name": "Audit tariff settlement / peak",
+          "expected": 39,
+          "observed": 39,
+          "passed": true
+        },
+        {
+          "name": "Audit tariff settlement / kWh",
+          "expected": 78,
+          "observed": 78,
+          "passed": true
+        },
+        {
+          "name": "Audit tariff settlement / billCents",
+          "expected": 1716,
+          "observed": 1716,
+          "passed": true
+        },
+        {
+          "name": "Audit tariff settlement / billable",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Apply certified reading / duplicates",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Apply certified reading / missing",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Apply certified reading / offpeak",
+          "expected": 55,
+          "observed": 55,
+          "passed": true
+        },
+        {
+          "name": "Apply certified reading / peak",
+          "expected": 56,
+          "observed": 56,
+          "passed": true
+        },
+        {
+          "name": "Apply certified reading / kWh",
+          "expected": 111,
+          "observed": 111,
+          "passed": true
+        },
+        {
+          "name": "Apply certified reading / billCents",
+          "expected": 2449,
+          "observed": 2449,
+          "passed": true
+        },
+        {
+          "name": "Apply certified reading / billable",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "318b59421baecc3cb83a20f18d95827fdff466b6d2f7e18464f035281c747f61",
+        "1017c20429790ddbef20f1151062051bbf58e34545e7890926e387eb0d97d481",
+        "e954c976990189f381e3785890aeacef0b796c7f68c7ae7df2e6cb9201460817",
+        "22a4dfdfbfae1d8d02908fe77ea218bffbecaceb6385c02616e0efab7eb2cc81"
+      ],
+      "sample_offsets_seconds": [
+        27.394,
+        34.137,
+        35.666,
+        36.526,
+        41.364,
+        42.485,
+        43.493,
+        48.646,
+        49.621,
+        50.532,
+        55.817
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "22",
+      "title": "Framebridge",
+      "scenario": "Find a skipped cel in an animation cut and rebuild a frame-accurate master.",
+      "kicker": "ANIMATION CONFORM",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load rough cut",
+        "Conform against source",
+        "Restore original cel"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load rough cut / fps",
+          "expected": 24,
+          "observed": 24,
+          "passed": true
+        },
+        {
+          "name": "Load rough cut / sourceFrames",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        },
+        {
+          "name": "Load rough cut / timelineFrames",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        },
+        {
+          "name": "Load rough cut / durationMs",
+          "expected": 500,
+          "observed": 500,
+          "passed": true
+        },
+        {
+          "name": "Conform against source / missing",
+          "expected": [
+            107
+          ],
+          "observed": [
+            107
+          ],
+          "passed": true
+        },
+        {
+          "name": "Conform against source / repeated",
+          "expected": [
+            108
+          ],
+          "observed": [
+            108
+          ],
+          "passed": true
+        },
+        {
+          "name": "Conform against source / jumps",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Conform against source / timelineFrames",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        },
+        {
+          "name": "Conform against source / durationMs",
+          "expected": 500,
+          "observed": 500,
+          "passed": true
+        },
+        {
+          "name": "Conform against source / conforms",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Restore original cel / missing",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Restore original cel / repeated",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Restore original cel / jumps",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Restore original cel / timelineFrames",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        },
+        {
+          "name": "Restore original cel / durationMs",
+          "expected": 500,
+          "observed": 500,
+          "passed": true
+        },
+        {
+          "name": "Restore original cel / conforms",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "7f59bf4f3b92f6eea85c22c1add9502ec6c305a986c1a83cc913097344b15937",
+        "cc52567cc431574d6654d4679093162e3a4358dbe81817635564715fc60418e6",
+        "27524cc71552908746c49c5668355778e048dc37d6babec64ce539fe6a950dbe",
+        "c8d8a741967839e63c48e1f77155bfb21a0ab3576654b80fcc10795482a56478"
+      ],
+      "sample_offsets_seconds": [
+        38.628,
+        47.638,
+        49.242,
+        50.054,
+        57.482,
+        64.041,
+        64.944,
+        72.791,
+        77.352,
+        78.31,
+        88.294
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "23",
+      "title": "Signature Press",
+      "scenario": "Catch transposed booklet pages in the folding proof before releasing an imposed press job.",
+      "kicker": "PRINT PRODUCTION",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load booklet specification",
+        "Proof supplied imposition",
+        "Rebuild and release plates"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load booklet specification / sourcePages",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        },
+        {
+          "name": "Load booklet specification / pressSheets",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Load booklet specification / signatureCount",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Load booklet specification / blankSlots",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Load booklet specification / pressStock",
+          "expected": "A3",
+          "observed": "A3",
+          "passed": true
+        },
+        {
+          "name": "Proof supplied imposition / signatureCount",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Proof supplied imposition / sides",
+          "expected": 8,
+          "observed": 8,
+          "passed": true
+        },
+        {
+          "name": "Proof supplied imposition / blankSlots",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Proof supplied imposition / stockFits",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Proof supplied imposition / readyForPress",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Proof supplied imposition / foldErrors",
+          "expected": [
+            {
+              "position": "1.1 back R",
+              "expected": 7,
+              "printed": 4
+            },
+            {
+              "position": "1.2 back L",
+              "expected": 4,
+              "printed": 7
+            }
+          ],
+          "observed": [
+            {
+              "position": "1.1 back R",
+              "expected": 7,
+              "printed": 4
+            },
+            {
+              "position": "1.2 back L",
+              "expected": 4,
+              "printed": 7
+            }
+          ],
+          "passed": true
+        },
+        {
+          "name": "Rebuild and release plates / signatureCount",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Rebuild and release plates / sides",
+          "expected": 8,
+          "observed": 8,
+          "passed": true
+        },
+        {
+          "name": "Rebuild and release plates / blankSlots",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Rebuild and release plates / stockFits",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Rebuild and release plates / readyForPress",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Rebuild and release plates / foldErrors",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "ea5a1686b8eccf7d915e2ec30a4fa0d8c92b65d45025f05788ebf863e059b4a1",
+        "80edca94c4f04f6424fad5a2763c925891da09d673c76e581e97f874c06de7f7",
+        "7a1504504b0577cc412f312313560be23d3bb85e8d829a21a660ca500d8ae0ed",
+        "17974787b32198f2c1b28a9f1a9024c49d2ffc081fee23ed497b03fc4d40dcfb"
+      ],
+      "sample_offsets_seconds": [
+        33.39,
+        46.698,
+        48.328,
+        49.456,
+        57.113,
+        60.031,
+        60.945,
+        68.215,
+        73.318,
+        74.501,
+        81.881
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "24",
+      "title": "Focus Path",
+      "scenario": "Detect a keyboard-only checkout blocker and restore the intended reading order.",
+      "kicker": "ACCESSIBILITY PREFLIGHT",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load checkout prototype",
+        "Audit native tab order",
+        "Restore reading order"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load checkout prototype / controls",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Load checkout prototype / expectedFirst",
+          "expected": "basket",
+          "observed": "basket",
+          "passed": true
+        },
+        {
+          "name": "Load checkout prototype / expectedLast",
+          "expected": "help",
+          "observed": "help",
+          "passed": true
+        },
+        {
+          "name": "Load checkout prototype / positiveOverrides",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Audit native tab order / order",
+          "expected": [
+            "payment",
+            "basket",
+            "place",
+            "help"
+          ],
+          "observed": [
+            "payment",
+            "basket",
+            "place",
+            "help"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Audit native tab order / omitted",
+          "expected": [
+            "review"
+          ],
+          "observed": [
+            "review"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Audit native tab order / positiveOverrides",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Audit native tab order / inversions",
+          "expected": 1,
+          "observed": 1,
+          "passed": true
+        },
+        {
+          "name": "Audit native tab order / reachable",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Audit native tab order / approved",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Restore reading order / order",
+          "expected": [
+            "basket",
+            "review",
+            "payment",
+            "place",
+            "help"
+          ],
+          "observed": [
+            "basket",
+            "review",
+            "payment",
+            "place",
+            "help"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Restore reading order / omitted",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Restore reading order / positiveOverrides",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Restore reading order / inversions",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Restore reading order / reachable",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Restore reading order / approved",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "14ccb0eaccd7bf8a35e3294dd86928b595967934c9f3c3f2f079c10f5569e78f",
+        "95fbefaa8a14842991ba8815c441a9aa8c0e834535cd6480c3e1970266fea714",
+        "afb1811a58039a11a9c903dd2474f940d90e998ac9e0b97e17fb60be2c04ad1f",
+        "151831841335cef757a9837f60053af5883932d946d79a95af1480f1ad543ef4"
+      ],
+      "sample_offsets_seconds": [
+        37.387,
+        46.698,
+        48.328,
+        49.051,
+        56.372,
+        60.031,
+        61.755,
+        70.814,
+        73.318,
+        74.222,
+        81.638
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "25",
+      "title": "Plotter Prep",
+      "scenario": "Reject a vinyl job outside the cut window, then fit the toolpaths without distorting the logo.",
+      "kicker": "VECTOR PRODUCTION",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load cut file",
+        "Check cut boundaries",
+        "Fit to material"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load cut file / toolpaths",
+          "expected": 3,
+          "observed": 3,
+          "passed": true
+        },
+        {
+          "name": "Load cut file / artworkWidth",
+          "expected": 298,
+          "observed": 298,
+          "passed": true
+        },
+        {
+          "name": "Load cut file / checked",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Check cut boundaries / safe",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Check cut boundaries / outsideVertices",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        },
+        {
+          "name": "Check cut boundaries / artworkWidth",
+          "expected": 298,
+          "observed": 298,
+          "passed": true
+        },
+        {
+          "name": "Fit to material / safe",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Fit to material / outsideVertices",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Fit to material / artworkWidth",
+          "expected": 286,
+          "observed": 286,
+          "passed": true
+        },
+        {
+          "name": "Fit to material / margin",
+          "expected": 12,
+          "observed": 12,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "5a734d4aeb0bc51e98d74a0c35a49b56352c95b83a94ae97700f5c41f386c90c",
+        "4eb0274f82b6f192bf90cb7c1176e3af17c61ae358b815ea90bd7ccf5d9ae764",
+        "daf60a49f93cd7cba99055bac2effa5dc7411bb9d3426715733896b63ba53b09",
+        "c067eb5ed3cb27dd4ecb9a96baa9141c117eb0c82db59fd3816e96be57e6b4ce"
+      ],
+      "sample_offsets_seconds": [
+        34.634,
+        46.698,
+        48.328,
+        49.751,
+        58.979,
+        60.031,
+        61.257,
+        70.693,
+        73.318,
+        74.97,
+        83.898
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "26",
+      "title": "Civic Transit",
+      "scenario": "Find stops that bring every rider within a two-block walk and add at most nine minutes to the route.",
+      "kicker": "SERVICE PLANNING",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load route",
+        "Calculate walking coverage",
+        "Select best stop pair"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load route / missedBlocks",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Load route / detourMinutes",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Load route / totalRiders",
+          "expected": 205,
+          "observed": 205,
+          "passed": true
+        },
+        {
+          "name": "Calculate walking coverage / ridersCovered",
+          "expected": 110,
+          "observed": 110,
+          "passed": true
+        },
+        {
+          "name": "Calculate walking coverage / missedBlocks",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Calculate walking coverage / goalMet",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Select best stop pair / ridersCovered",
+          "expected": 205,
+          "observed": 205,
+          "passed": true
+        },
+        {
+          "name": "Select best stop pair / missedBlocks",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Select best stop pair / detourMinutes",
+          "expected": 9,
+          "observed": 9,
+          "passed": true
+        },
+        {
+          "name": "Select best stop pair / newStops",
+          "expected": [
+            "Riverside",
+            "Mill Gate"
+          ],
+          "observed": [
+            "Riverside",
+            "Mill Gate"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Select best stop pair / goalMet",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "b24194a6fb9043604e5c143669936aef4ab53e35a41caf6b1da346740f56dcd8",
+        "26286b427a98aa933b3e81b19ae89926573b84826f4bc71cf6725003b9656b80",
+        "b3c30c2f7f58221c8f525349aed521bdfedead16620a9f3da871f29899eaffe0",
+        "7c512cc3ab54dda3d42cdeb505317af22372dfa171f631ea529d9eda990d3dba"
+      ],
+      "sample_offsets_seconds": [
+        35.3,
+        47.638,
+        49.242,
+        50.55,
+        59.855,
+        64.041,
+        66.155,
+        76.069,
+        77.352,
+        78.62,
+        86.053
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "27",
+      "title": "Crossfade Timeline",
+      "scenario": "Validate a three-track handoff, then shorten the second crossfade to protect the middle track.",
+      "kicker": "AUDIO PLAYOUT",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load transition cues",
+        "Run overlap check",
+        "Rebuild safe fades"
+      ],
+      "wave": 1,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load transition cues / fades",
+          "expected": [
+            12,
+            38
+          ],
+          "observed": [
+            12,
+            38
+          ],
+          "passed": true
+        },
+        {
+          "name": "Load transition cues / runtime",
+          "expected": 104,
+          "observed": 104,
+          "passed": true
+        },
+        {
+          "name": "Run overlap check / collisionSeconds",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Run overlap check / safe",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Run overlap check / maxFade",
+          "expected": 38,
+          "observed": 38,
+          "passed": true
+        },
+        {
+          "name": "Run overlap check / soloSeconds",
+          "expected": -4,
+          "observed": -4,
+          "passed": true
+        },
+        {
+          "name": "Rebuild safe fades / collisionSeconds",
+          "expected": 0,
+          "observed": 0,
+          "passed": true
+        },
+        {
+          "name": "Rebuild safe fades / safe",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Rebuild safe fades / fades",
+          "expected": [
+            12,
+            16
+          ],
+          "observed": [
+            12,
+            16
+          ],
+          "passed": true
+        },
+        {
+          "name": "Rebuild safe fades / runtime",
+          "expected": 126,
+          "observed": 126,
+          "passed": true
+        },
+        {
+          "name": "Rebuild safe fades / soloSeconds",
+          "expected": 18,
+          "observed": 18,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "c919e2c6bfd08c343f784ecc33fb02e8627b69a030beaf4230993cbfc53029dd",
+        "144f7b9f6fd55213e18d7bbfbd45567de59f69d52cef627bcdddb98848e6a2b0",
+        "08f811b6cd7afcba42e045b5b630b3b4434faeee8a7e72366b8dfd24ff4c8134",
+        "a29146a828c7fef9744f84ac03428cfab4f96b13b96d5d0ac7d37f9afe1c8a29"
+      ],
+      "sample_offsets_seconds": [
+        42.197,
+        47.638,
+        49.242,
+        50.51,
+        62.802,
+        64.041,
+        65.471,
+        75.036,
+        77.352,
+        78.185,
+        88.678
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "28",
+      "title": "Flow Lane",
+      "scenario": "Catch a start-of-day work-in-progress breach and admit urgent work without displacing a live change.",
+      "kicker": "DELIVERY CONTROL",
+      "kind": "offline Chromium app",
+      "actions": [
+        "Load team board",
+        "Preview intake",
+        "Rebalance by priority"
+      ],
+      "wave": 4,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Load team board / inProgress",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Load team board / review",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Load team board / receivedTickets",
+          "expected": 7,
+          "observed": 7,
+          "passed": true
+        },
+        {
+          "name": "Load team board / pinnedRetained",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Preview intake / inProgress",
+          "expected": 4,
+          "observed": 4,
+          "passed": true
+        },
+        {
+          "name": "Preview intake / overLimit",
+          "expected": [
+            "work"
+          ],
+          "observed": [
+            "work"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Preview intake / safe",
+          "expected": false,
+          "observed": false,
+          "passed": true
+        },
+        {
+          "name": "Preview intake / receivedTickets",
+          "expected": 7,
+          "observed": 7,
+          "passed": true
+        },
+        {
+          "name": "Rebalance by priority / inProgress",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Rebalance by priority / overLimit",
+          "expected": [],
+          "observed": [],
+          "passed": true
+        },
+        {
+          "name": "Rebalance by priority / safe",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Rebalance by priority / pinnedRetained",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "Rebalance by priority / workIds",
+          "expected": [
+            "PLAT-17",
+            "CSV-03"
+          ],
+          "observed": [
+            "PLAT-17",
+            "CSV-03"
+          ],
+          "passed": true
+        },
+        {
+          "name": "Rebalance by priority / deferred",
+          "expected": [
+            "WEB-08",
+            "API-26"
+          ],
+          "observed": [
+            "WEB-08",
+            "API-26"
+          ],
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "145bdbebe5af57cb1c2a7fa9d37884e3fff1872a53d77ebcb9a5bdd050c85342",
+        "0352e5ac32cd9a2e90b1b1621d66a3f77526781cfadbfd63612a2246cf3e22f5",
+        "a0670ea34c3e488bf42b2e8d6df769288875cceaa0ab5183cdc7a1c27cea3e3d",
+        "a1adb76ad8a30c1c158ca18447a90534e5064e2181ea271f1b1104f5f1533530"
+      ],
+      "sample_offsets_seconds": [
+        41.288,
+        46.698,
+        48.328,
+        49.487,
+        56.748,
+        60.031,
+        61.052,
+        72.911,
+        73.318,
+        75.421,
+        84.687
+      ],
+      "mcp_mouse_inputs": 3,
+      "mcp_key_inputs": 1
+    },
+    {
+      "id": "29",
+      "title": "Notepad",
+      "scenario": "Approve a staged release in a text manifest. Save and reopen the result.",
+      "kicker": "WINDOWS NATIVE · RELEASE HANDOFF",
+      "kind": "Windows native app",
+      "actions": [
+        "Open the release record",
+        "Change the handoff gate",
+        "Save and reopen"
+      ],
+      "wave": 2,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "The edited release gate was saved to disk",
+          "expected": "gate=ready",
+          "observed": "gate=ready",
+          "passed": true
+        },
+        {
+          "name": "Unchanged manifest lines and text encoding match exactly",
+          "expected": "d2dcdec4f81372317b9daa8b87cdf6df88d3917efef8b8c822cab5d87ece6c07",
+          "observed": "d2dcdec4f81372317b9daa8b87cdf6df88d3917efef8b8c822cab5d87ece6c07",
+          "passed": true
+        },
+        {
+          "name": "The reopened handoff record still has five lines",
+          "expected": 5,
+          "observed": 5,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "c4e1cea9bb407cf7586f975c461fd55bb4f60c5509c0f0c92dc9fcdf92322837",
+        "edc6a8af1f1ddf14ac931340d2323b109135d933e7e1679f65288073951c8cc4",
+        "5e46e7946a416ea83ecaa3b9b9b28bfd03d1dd16153ec6543aa361c147455920",
+        "50d44d8d9067cd1246f4bdf12d3a5e72e46c7a0218ed87bc50c8f3880787fcd7"
+      ],
+      "sample_offsets_seconds": [
+        12.861,
+        18.678,
+        19.918,
+        21.022,
+        30.395
+      ],
+      "mcp_mouse_inputs": 0,
+      "mcp_key_inputs": 15
+    },
+    {
+      "id": "30",
+      "title": "File Explorer",
+      "scenario": "Restore an evidence bundle through the compressed-folder UI and check both exported files.",
+      "kicker": "WINDOWS NATIVE · EVIDENCE RECOVERY",
+      "kind": "Windows native app",
+      "actions": [
+        "Open the zipped evidence",
+        "Copy to recovery workspace",
+        "Verify both SHA-256 hashes"
+      ],
+      "wave": 5,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Explorer recovered exactly two files",
+          "expected": 2,
+          "observed": 2,
+          "passed": true
+        },
+        {
+          "name": "Recovered checksums.txt SHA-256 matches the archive entry",
+          "expected": "76e386259dd3a4d8c8a2437324d428f7a92debd923647cb6a4321c7d28ff76ca",
+          "observed": "76e386259dd3a4d8c8a2437324d428f7a92debd923647cb6a4321c7d28ff76ca",
+          "passed": true
+        },
+        {
+          "name": "Recovered shipment-manifest.csv SHA-256 matches the archive entry",
+          "expected": "f899048f0ad4ff5a0363cfbd7b5e820c36dc4ebd35e1933af6a253fd0e3d89f1",
+          "observed": "f899048f0ad4ff5a0363cfbd7b5e820c36dc4ebd35e1933af6a253fd0e3d89f1",
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "a1dda6396827e1511eaee15111fcbb143ef3c0b5069bc5ea9f9a74a5934d7a80",
+        "a822201f8a09e6ebb9290fed2667d6ebae76b790764f844c3047aac68fcf4737",
+        "0c7746b442df2944c8e245305dce1d41affeb83f3dae81c77212ccb82afb7a40",
+        "61bacd2cef10ccb5fe369032be17c6ef7cac60650fe189da02c605a65ee0fdbf"
+      ],
+      "sample_offsets_seconds": [
+        10.468,
+        16.371,
+        51.589,
+        53.176,
+        58.139,
+        61.559
+      ],
+      "mcp_mouse_inputs": 1,
+      "mcp_key_inputs": 4
+    },
+    {
+      "id": "31",
+      "title": "Paint",
+      "scenario": "Fill the approval tile in a PNG and check that the surrounding artwork stays unchanged.",
+      "kicker": "WINDOWS NATIVE · ARTWORK REVIEW",
+      "kind": "Windows native app",
+      "actions": [
+        "Open the approval artwork",
+        "Fill the review tile",
+        "Save and inspect the PNG"
+      ],
+      "wave": 6,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Paint saved a PNG",
+          "expected": true,
+          "observed": true,
+          "passed": true
+        },
+        {
+          "name": "PNG dimensions survived the edit",
+          "expected": [
+            720,
+            428
+          ],
+          "observed": [
+            720,
+            428
+          ],
+          "passed": true
+        },
+        {
+          "name": "The center of the filled approval tile is black",
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "observed": [
+            0,
+            0,
+            0
+          ],
+          "passed": true
+        },
+        {
+          "name": "The untouched control pixel kept its RGB values",
+          "expected": [
+            19,
+            47,
+            67
+          ],
+          "observed": [
+            19,
+            47,
+            67
+          ],
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "9a5e73c043206afbed1b1d972e624a8f7abfe6fbe6f62b41b2b45ac6221dd5ac",
+        "e32a1a87f7ba9d6f2c8b24abfecbfe76ffdd98cec7dd3d2f9148eebb44cad201",
+        "9442e1f728516fa485d659f2340f29bba1bb9e87c3839bec8cbcc24f724925e2",
+        "7bb7408278d0cb9cb96bedab4a1f5a7ccabec6c3fd88777e66af8a0cd3183039"
+      ],
+      "sample_offsets_seconds": [
+        20.52,
+        49.709,
+        51.079,
+        54.838,
+        69.038,
+        69.989,
+        71.028,
+        72.084
+      ],
+      "mcp_mouse_inputs": 2,
+      "mcp_key_inputs": 7
+    },
+    {
+      "id": "32",
+      "title": "Calculator",
+      "scenario": "Multiply a carton order, deduct the reserve, and get the exact number of pallet loads.",
+      "kicker": "WINDOWS NATIVE · ORDER VALIDATION",
+      "kind": "Windows native app",
+      "actions": [
+        "Calculate 375 × 24",
+        "Deduct 240 reserve units",
+        "Divide by 120 units per pallet"
+      ],
+      "wave": 6,
+      "result": "pass",
+      "checks": [
+        {
+          "name": "Calculator displayed 375 cartons × 24 units",
+          "expected": 9000,
+          "observed": 9000,
+          "passed": true
+        },
+        {
+          "name": "Removing 240 reserve units left exactly 8,760",
+          "expected": 8760,
+          "observed": 8760,
+          "passed": true
+        },
+        {
+          "name": "Calculator displayed exactly 73 pallets",
+          "expected": 73,
+          "observed": 73,
+          "passed": true
+        }
+      ],
+      "frame_hashes": [
+        "7a4ecfb31f800acff2f59be3eb565b55129c1d7f7376cb2d5d52a555ab89ddd7",
+        "bf22fbe9f1700c19a0a3ca666fc0a72d00c3651acdca754327d34e27d1b3036c",
+        "a7e8b4cd23ffd9ced26851d707a13b0c08618f9bb708adca8e206d050e9039aa",
+        "df2e206dbce39a307516d60b299d647eaeca9f388f5388473e4e1e06b665e1cb"
+      ],
+      "sample_offsets_seconds": [
+        5.68,
+        11.57,
+        24.36,
+        26.001,
+        40.551,
+        42.096,
+        56.658,
+        71.82
+      ],
+      "mcp_mouse_inputs": 2,
+      "mcp_key_inputs": 19
+    }
+  ],
+  "featured_case_ids": [
+    "02",
+    "22",
+    "15",
+    "31"
+  ],
+  "cleanup": {
+    "vms_absent": true,
+    "disks_absent": true,
+    "reservations_released": true
+  },
+  "media": [
+    {
+      "file": "oslab-windows-app-matrix.mp4",
+      "width": 1920,
+      "height": 1080,
+      "frames": 1176,
+      "duration_seconds": 49.0,
+      "bytes": 1602318,
+      "sha256": "1848d05214f717caca52ed9479fc55a67333b1a8f2315bb5a1be700995112759"
+    },
+    {
+      "file": "oslab-windows-app-matrix.gif",
+      "width": 960,
+      "height": 540,
+      "frames": 490,
+      "duration_seconds": 49.0,
+      "bytes": 1310702,
+      "sha256": "2f83f41cbac997fb6f0b56035fdbbeb7121ea92e871550395dc0683acab706c1"
+    }
+  ]
+}
