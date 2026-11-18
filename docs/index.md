@@ -21,6 +21,7 @@ README:
 | [Fixture Authoring](fixtures.md) | Guest setup script rules, evidence manifests, and fixture debugging |
 | [Validation And JUnit](validation.md) | Validation ladder, smoke commands, JUnit status, and CI contract |
 | [Proxmox Connection Guide](proxmox-connection.md) | API token, template, QEMU Guest Agent, preflight |
+| [VM Computer Use MCP](computer-use-mcp.md) | Capture and control VM screens, set up Codex, and understand the console transport |
 | [Reports And Results](reports.md) | `runs/<run-id>` layout, JUnit/JSON/HTML, progress logs |
 | [Web Dashboard](web-dashboard.md) | LAN/team dashboard for wrapping CLI execution and browsing results |
 | [Web Dashboard Server Guide](web-dashboard-server.md) | Start API/Web servers, configure LAN access, and troubleshoot local dashboard runtime |

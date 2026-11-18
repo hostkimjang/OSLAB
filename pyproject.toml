@@ -12,8 +12,18 @@ dependencies = [
   "PyYAML>=6.0.2",
 ]
 
+[project.optional-dependencies]
+computer-use = [
+  "anyio>=4.6",
+  "cryptography>=44",
+  "mcp>=1.26,<2",
+  "Pillow>=11",
+  "websockets>=15,<17",
+]
+
 [project.scripts]
 oslab = "oslab.cli:main"
+oslab-mcp = "oslab.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -161,6 +161,24 @@ uv run oslab run `
 
 공용 클러스터에서 예제 시나리오를 그대로 실행하지 마세요. template, VMID 범위, 정리 정책, 게스트 내부 경로, artifact 실행 명령을 먼저 검토해야 합니다.
 
+<a id="codex-mcp"></a>
+## Codex로 테스트 VM 조작하기
+
+그래픽 콘솔이 있는 테스트 VM을 켜고 VMID를 확인합니다. Windows 앱을 조작하려면 데스크톱에 로그인합니다. VM에 Computer Use 프로그램을 별도로 설치할 필요는 없습니다. 위 예제로 테스트 VM을 복제·부팅하고 나서 연결하려면 `oslab run`에 `--keep-vm`을 추가합니다. OSLab의 Proxmox 토큰에는 해당 VM을 조회할 권한과 `VM.Console` 권한이 필요합니다. 저장소 루트에서 실행합니다.
+
+```powershell
+$vmId = Read-Host '테스트 VM의 VMID'
+codex mcp add oslab -- uv --directory (Get-Location).Path run --locked --extra computer-use oslab-mcp `
+  --config config/oslab.local.yaml --env-file config/oslab.local.env --vm-id $vmId
+codex mcp get oslab
+```
+
+`codex mcp get oslab`에서 등록한 VMID를 확인합니다. 여러 VM을 조작할 때는 등록 명령에 VM마다 `--vm-id`를 추가합니다. Codex에 `oslab` 도구가 보이면 VM 콘솔 창을 닫고 다음과 같이 요청합니다.
+
+> OSLab MCP의 `list_vms`로 내 테스트 VM을 확인하고 화면을 캡처해 줘. `Win+r`을 누른 뒤 `notepad`를 한 글자씩 입력하고 Enter를 눌러 메모장을 열어 줘. 새 캡처를 보고 메모장 편집 영역을 클릭해 `oslab mcp ok`를 입력한 다음, 문구가 보이는 최종 화면을 PNG로 캡처해 보여 줘.
+
+MCP 서버는 Proxmox API로 콘솔 티켓을 받고 VNC WebSocket으로 해당 VM의 화면과 입력을 주고받습니다. 작업 중에도 호스트에서 마우스와 키보드를 사용할 수 있습니다. [구현 방식과 도구 사용법](docs/computer-use-mcp.ko.md)
+
 ## 실행 증거와 보고서
 
 각 실행 결과는 `runs/<run-id>/`에 저장됩니다. 시나리오에 따라 파일 구성은 달라지지만 기본 구조는 다음과 같습니다.
@@ -199,6 +217,7 @@ Linux 예제는 앞으로 지원할 시나리오 형식을 보여 주기 위한 
 | 핵심 모델 이해 | [핵심 개념](docs/concepts.ko.md) |
 | 예제 선택 | [데모 목록](docs/demos.ko.md) |
 | Proxmox 랩 연결 | [Proxmox 연결](docs/proxmox-connection.ko.md) |
+| Codex로 VM 화면 캡처·조작 | [Codex 등록과 메모장 데모](#codex-mcp), [MCP 가이드](docs/computer-use-mcp.ko.md) |
 | 시나리오 YAML 작성 | [시나리오](docs/scenarios.ko.md) |
 | 게스트 상태 준비 | [Fixture](docs/fixtures.ko.md) |
 | Assertion과 JUnit 이해 | [검증](docs/validation.ko.md) |

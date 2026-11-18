@@ -21,6 +21,7 @@ README:
 | [Fixture 작성](fixtures.ko.md) | Guest setup script 규칙, evidence manifest, fixture debugging |
 | [검증과 JUnit](validation.ko.md) | 검증 계층, smoke command, JUnit 구현 상태, CI contract |
 | [Proxmox 연결 가이드](proxmox-connection.ko.md) | API token, template, QEMU Guest Agent, preflight |
+| [VM 화면 조작 MCP](computer-use-mcp.ko.md) | Proxmox 콘솔을 통한 화면 캡처·클릭·키 입력, Codex 등록과 구현 방식 |
 | [보고서와 결과](reports.ko.md) | `runs/<run-id>` layout, JUnit/JSON/HTML, progress logs |
 | [웹 대시보드](web-dashboard.ko.md) | CLI 실행과 결과 탐색을 감싸는 LAN/team dashboard |
 | [웹 대시보드 서버 실행 가이드](web-dashboard-server.ko.md) | API/Web 서버 실행, LAN 접근 설정, local dashboard runtime troubleshooting |

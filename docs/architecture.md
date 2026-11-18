@@ -10,3 +10,7 @@ For the product-neutral `oslab` platform architecture, start here:
 - [docs/proxmox-connection.md](proxmox-connection.md)
 - [docs/reports.md](reports.md)
 - [docs/oslab-platform-plan.md](oslab-platform-plan.md)
+
+## VM Computer Use MCP
+
+The local MCP server connects to a running VM's Proxmox VNC console to capture its screen and send clicks and keystrokes. The Proxmox API grants console access and the VNC WebSocket carries the screen and input. [Implementation and tools](computer-use-mcp.md)
