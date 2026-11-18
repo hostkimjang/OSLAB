@@ -10,11 +10,11 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-[![OSLAB Computer Use clicks two Windows VMs and verifies both tests](docs/media/oslab-computer-use-demo.gif)](docs/media/oslab-computer-use-demo.mp4)
+![32 VM consoles running different illustrated OSLAB test scenarios](docs/media/oslab-32vm-concept.gif)
 
-> Watch OSLAB MCP start a SHA-256 check and a file round-trip check in two real Windows VMs. The 15-second edit adds animated pointers at the recorded click positions. Select the preview for the MP4.
+> **Concept scenario.** Watch 32 illustrated VM consoles run different checks. The camera moves in on package installation, a file transfer, a terminal smoke suite, and a visual comparison.
 
-[Capture and verification notes](docs/media/oslab-computer-use-demo-attestation.json) · [Illustrated OSLAB overview](docs/media/oslab-overview.mp4)
+[Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-32vm-concept.mp4) · [All 32 scenarios](docs/media/oslab-32vm-concept.json) · [Real two-VM capture](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-computer-use-demo.mp4) · [Live capture notes](docs/media/oslab-computer-use-demo-attestation.json)
 
 OSLAB is an OS integration test platform for software that must be verified in a real operating system—not only in a unit test, container, or mocked environment. It clones a disposable VM, prepares the guest, transfers an artifact, executes it, evaluates assertions, writes reports, and cleans up the VM.
 

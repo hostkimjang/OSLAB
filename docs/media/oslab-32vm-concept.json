@@ -1,0 +1,151 @@
+{
+  "kind": "illustrated_concept",
+  "scenario_count": 32,
+  "scenarios": [
+    {
+      "console": 1,
+      "check": "MSI install"
+    },
+    {
+      "console": 2,
+      "check": "File transfer"
+    },
+    {
+      "console": 3,
+      "check": "Service health"
+    },
+    {
+      "console": 4,
+      "check": "CLI smoke"
+    },
+    {
+      "console": 5,
+      "check": "Text entry"
+    },
+    {
+      "console": 6,
+      "check": "Layout check"
+    },
+    {
+      "console": 7,
+      "check": "CPU profile"
+    },
+    {
+      "console": 8,
+      "check": "Keyboard nav"
+    },
+    {
+      "console": 9,
+      "check": "JUnit summary"
+    },
+    {
+      "console": 10,
+      "check": "Locale switch"
+    },
+    {
+      "console": 11,
+      "check": "Screenshot diff"
+    },
+    {
+      "console": 12,
+      "check": "HTTP health"
+    },
+    {
+      "console": 13,
+      "check": "Silent update"
+    },
+    {
+      "console": 14,
+      "check": "Archive extract"
+    },
+    {
+      "console": 15,
+      "check": "Startup recovery"
+    },
+    {
+      "console": 16,
+      "check": "Python tests"
+    },
+    {
+      "console": 17,
+      "check": "CSV export"
+    },
+    {
+      "console": 18,
+      "check": "Render snapshot"
+    },
+    {
+      "console": 19,
+      "check": "Disk latency"
+    },
+    {
+      "console": 20,
+      "check": "Dialog submit"
+    },
+    {
+      "console": 21,
+      "check": "Evidence index"
+    },
+    {
+      "console": 22,
+      "check": "Unicode input"
+    },
+    {
+      "console": 23,
+      "check": "HiDPI layout"
+    },
+    {
+      "console": 24,
+      "check": "Proxy route"
+    },
+    {
+      "console": 25,
+      "check": "Uninstall"
+    },
+    {
+      "console": 26,
+      "check": "File cleanup"
+    },
+    {
+      "console": 27,
+      "check": "Service restart"
+    },
+    {
+      "console": 28,
+      "check": "PowerShell suite"
+    },
+    {
+      "console": 29,
+      "check": "Notes save"
+    },
+    {
+      "console": 30,
+      "check": "A11y review"
+    },
+    {
+      "console": 31,
+      "check": "Memory sample"
+    },
+    {
+      "console": 32,
+      "check": "Login flow"
+    }
+  ],
+  "separate_live_capture": "oslab-computer-use-demo-attestation.json",
+  "exports": [
+    {
+      "file": "oslab-32vm-concept.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration_seconds": 18.0,
+      "sha256": "be99d40dbf2b92a85e2ca7f539048fd033614b10c9a8f698a0be35e7a05196a8"
+    },
+    {
+      "file": "oslab-32vm-concept.gif",
+      "width": 880,
+      "height": 496,
+      "duration_seconds": 18.0,
+      "sha256": "a860b913c40b32f558a6e0b6040b2553c3ed984555b4f3f3926e848c4563b6f2"
+    }
+  ]
+}
