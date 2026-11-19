@@ -274,7 +274,13 @@ async def sumatra(desktop):
     await desktop.key("Win", "Up")
     await desktop.key("Ctrl", "6")
     await desktop.key("Ctrl", "0")
-    _, initial = await snap(desktop, "stage-0")
+    # A busy guest can show the window a few seconds before the first page is drawn.
+    _, initial = await snap(desktop, "sumatra-render")
+    for _ in range(10):
+        if displayed_page(initial) == 1:
+            break
+        _, initial = await snap(desktop, "sumatra-render", 1.0)
+    _, initial = await snap(desktop, "stage-0", .2)
     await desktop.key("Ctrl", "g")
     await desktop.key("Ctrl", "a")
     await desktop.key("2")

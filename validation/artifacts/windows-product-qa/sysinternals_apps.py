@@ -167,7 +167,10 @@ async def procmon(desktop):
     await desktop.key("Alt", "F4")
     await asyncio.sleep(1.2)
     await desktop.launch("procmon", ["/AcceptEula", "/Quiet", "/OpenLog", pml, "/SaveAs", csv])
-    await desktop.wait(rf"(Test-Path -LiteralPath '{csv}') -and ((Get-Item '{csv}').Length -gt 32)", seconds=60)
+    # Read the CSV only after Procmon has finished writing and released it.
+    await desktop.wait(rf"(Test-Path -LiteralPath '{csv}') -and ((Get-Item '{csv}').Length -gt 32) -and "
+                       rf"(& {{ try {{ [IO.File]::Open('{csv}','Open','Read','None').Dispose(); $true }} catch {{ $false }} }})",
+                       seconds=90)
     observed = await powershell_json(desktop, rf"""
         $rows = @(Import-Csv -LiteralPath '{csv}' |
             Where-Object {{ $_.'Process Name' -ieq 'QAConfigLoader.exe' -and $_.Path -eq '{path('qa-fixture.json')}' }})
@@ -200,9 +203,17 @@ async def explorer_search(desktop, text, screenshot=None):
 
 
 async def save_handle_search(desktop, filename):
-    controls = await desktop.inspect(r"(?i)^(procexp|procexp64)$", r"^Save(?:\.\.\.|…)$")
-    frame, _ = await desktop.screenshot("handle-export-button")
-    if not await click_control(desktop, frame, controls, "ControlType.Button"):
+    # A busy guest can finish the handle search a few seconds after the dialog appears.
+    for _ in range(6):
+        try:
+            controls = await desktop.inspect(r"(?i)^(procexp|procexp64)$", r"^Save(?:\.\.\.|…)$")
+        except TimeoutError:
+            controls = []
+        frame, _ = await desktop.screenshot("handle-export-button")
+        if await click_control(desktop, frame, controls, "ControlType.Button"):
+            break
+        await asyncio.sleep(1.5)
+    else:
         raise RuntimeError("Process Explorer Search did not expose its Save button")
     await capture(desktop, "handle-export-dialog")
     await desktop.key("Alt", "n")

@@ -396,7 +396,13 @@ async def obs(d):
                            "--collection", "OSLab Release QA", "--profile", "OSLab Release QA"])
     await snapshot(d, "obs-launch", 6)
     await d.key("Win", "Up")
-    _, preview = await snapshot(d, "stage-0", 1.5)
+    # A busy guest can draw the preview a few seconds after the window appears.
+    _, preview = await snapshot(d, "obs-preview", 1.5)
+    for _ in range(10):
+        if optical_match(preview, OBS_COLOR):
+            break
+        _, preview = await snapshot(d, "obs-preview", 1.2)
+    _, preview = await snapshot(d, "stage-0", .2)
     process = r"^(obs64|obs32)$"
     record_button = await click_named(d, process, r"^Start Recording$|^녹화 시작$", "obs-start-button")
     await snapshot(d, "stage-1", 1)
@@ -625,10 +631,19 @@ async def finish_audacity(d, output_name):
         frame, image = await snapshot(d, f"audacity-onboarding-{page + 1}", .6)
     if audacity_wizard_pixel(image):
         raise RuntimeError("Audacity's first-launch setup did not close")
-    await d.key("Win", "Up")
-    await d.key("Ctrl", "f")
-    frame, image = await snapshot(d, "stage-0", 1)
-    x, y = audacity_slate_position(image)
+    for attempt in range(3):
+        # Maximize through the system menu, which works even when the window lost its snap state.
+        await d.key("Alt", "Space")
+        await asyncio.sleep(.3)
+        await d.key("x")
+        await d.key("Ctrl", "f")
+        frame, image = await snapshot(d, "stage-0", 1 + attempt)
+        try:
+            x, y = audacity_slate_position(image)
+            break
+        except RuntimeError:
+            if attempt == 2:
+                raise
     await d.click(frame, x, y)
     await d.key("Shift", "j")
     await snapshot(d, "stage-1", .7)

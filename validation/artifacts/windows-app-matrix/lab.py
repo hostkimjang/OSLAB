@@ -118,7 +118,7 @@ class Lab:
             raise ValueError("Unsafe guest artifact name")
         self.guest.upload_bytes(vm, ROOT + "\\" + basename, content)
 
-    def create(self, role, template, *, full=False):
+    def create(self, role, template, *, full=False, memory=5120, cores=2, start=True):
         if role in self.owned:
             raise RuntimeError(f"{role} already belongs to this capture")
         lease = LocalVmidLock(self.lease_dir).reserve(self.ids, used_vmids=self.resources())
@@ -129,14 +129,15 @@ class Lab:
         self.client.wait_for_task(task, timeout_seconds=400)
         state = self.verify(vm)
         ports = [key for key in state if re.fullmatch(r"net\d+", key)]
-        settings = {"memory": 5120, "balloon": 0, "cores": 2, "sockets": 1}
+        settings = {"memory": memory, "balloon": 0, "cores": cores, "sockets": 1}
         if ports:
             settings["delete"] = ",".join(ports)
         self.client.request("PUT", f"{self.api}/qemu/{vm.vm_id}/config", settings)
         if any(re.fullmatch(r"net\d+", key) for key in self.verify(vm)):
             raise RuntimeError("Guest still has a network adapter")
-        self.provider.start_vm(vm)
-        log(f"{role}: offline Windows VM started")
+        if start:
+            self.provider.start_vm(vm)
+            log(f"{role}: offline Windows VM started")
         return vm
 
     def prepare(self):
@@ -181,9 +182,9 @@ class Lab:
             raise RuntimeError("Filming source did not become an isolated template")
         log("Offline filming source ready")
 
-    def start_desktop(self, vm):
+    def start_desktop(self, vm, boot_seconds=175, login_seconds=190):
         self.verify(vm)
-        self.wait(vm, "$true", 175)
+        self.wait(vm, "$true", boot_seconds)
         password = "Win9!" + secrets.token_hex(22)
         self.ps(vm, rf"""
             Set-LocalUser -Name '{USER}' -Password (ConvertTo-SecureString '{password}' -AsPlainText -Force)
@@ -191,7 +192,7 @@ class Lab:
         """)
         self.autologon(vm, password)
         self.ps(vm, "shutdown.exe /r /f /t 2")
-        self.wait(vm, f"Test-Path '{READY}'", 190)
+        self.wait(vm, f"Test-Path '{READY}'", login_seconds)
         log(f"{vm.name.rsplit('-', 1)[-1]}: Windows desktop ready")
 
     def autologon(self, vm, password):
