@@ -1042,11 +1042,11 @@ class Story:
         brand(canvas, film.fonts, 48, 42, 26)
         return canvas
 
-    def pull_out(self, t, length=.7):
+    def pull_out(self, t, length=.7, last=None):
         film = self.film
         p = ease(t / length)
         canvas = self.diagram_background()
-        last = self.features[-1]
+        last = last or self.features[-1]
         scale = mix(1.0, .82, p)
         rect = (CARD[0] + CARD[2] * (1 - scale) / 2, CARD[1] + CARD[3] * (1 - scale) / 2, CARD[2] * scale, CARD[3] * scale)
         film.screen(canvas, last, last.duration, rect, alpha=1 - p, overlays=False)
