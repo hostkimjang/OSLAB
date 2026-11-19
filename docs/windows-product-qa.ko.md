@@ -4,7 +4,7 @@
 
 일회용 Windows 11 VM에서 실제 프로그램을 조작하는 릴리스 QA 시나리오 32개입니다. VM마다 프로그램 하나 또는 LibreOffice 앱 하나를 실행하고 합성 릴리스 데이터를 사용합니다. OSLab MCP는 Proxmox 콘솔로 클릭과 키 입력을 보냅니다. 실행기는 QEMU Guest Agent(QGA)를 통해 파일 해시, 계산 결과, 화면 상태를 별도로 확인합니다. [시나리오 소스](../validation/artifacts/windows-product-qa) · [콘솔 MCP](computer-use-mcp.ko.md)
 
-README 영상에서 일회용 Windows 11 VM으로 시나리오 32개를 실행해 검사 140개를 통과했습니다. [1080p 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [검증 기록](media/oslab-windows-product-qa-attestation.json)
+README 영상에서 일회용 Windows 11 VM으로 시나리오 32개를 실행했고, 검사 140개를 모두 통과했습니다. [영상 소개](intro-video.ko.md) · [1080p 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [검증 기록](media/oslab-windows-product-qa-attestation.json)
 
 ## 시나리오 목록
 
@@ -81,6 +81,30 @@ uv run --locked --extra computer-use python "$demo/run.py" run @lab --wave-size 
 - `case-<ID>.json`에 프로그램, 배치, 기대값과 관찰값, 검사 판정, 프레임 해시, MCP 입력 시간을 기록합니다. 기대값과 다른 검사는 `unmatched-<ID>.json`에서 확인할 수 있습니다.
 - `<ID>-stage-0.png`부터 `<ID>-stage-3.png`까지 주요 단계의 실제 게스트 화면입니다. 추가 프레임도 같은 배치의 촬영 시각을 기록합니다. 영상에서 같은 시간대의 화면은 시간축을 맞춰 압축하고, 여러 배치에서 가져온 32칸 화면에는 편집본임을 표시합니다.
 - 다음 실행은 출력 디렉터리에 이미 결과가 있는 항목을 건너뜁니다. 남겨 둔 VM을 정리하고 다시 실행하려면 같은 설정으로 `cleanup-wave`를 사용합니다. 요청한 항목 중 결과가 빠져 있으면 실행기는 종료 코드 0을 반환하지 않습니다.
+
+## README 영상 녹화
+
+`fleet.py`는 같은 시나리오를 여러 묶음으로 나눠 실행하고, VM마다 콘솔 화면을 별도 영상으로 녹화합니다. 묶음마다 봉인한 원본에서 연결 복제본을 만들고, 노드의 가용 메모리를 확인하면서 몇 대씩 켭니다. 모든 콘솔을 30fps로 녹화하면서 묶음 안의 작업을 동시에 시작하고, 다음 묶음을 시작하기 전에 VM을 지웁니다. 실패한 작업은 다음 묶음에서 한 번 더 실행합니다. 명령을 다시 실행하면 아직 통과하지 못한 작업만 반복합니다.
+
+녹화하려면 Proxmox 노드에 직접 연결해야 하므로 `--lan-address`에 노드의 LAN 주소를 지정합니다. 실행기는 설정된 API에서 클러스터 CA를 받아 출력 디렉터리에 LAN용 설정을 만들고, 노드 인증서를 그 CA로 검증합니다. `screen_recorder.py`는 QEMU에 바뀐 화면 영역만 요청하고 MCP 입력 세션과 콘솔을 함께 씁니다. 녹화 중에도 클릭과 키 입력은 그대로 전달됩니다.
+
+`edit_video.py`는 이 녹화본으로 영상을 편집합니다. 녹화본마다 해당 작업의 시작 시점에 맞춰 한 화면에 모두 배치하고, 주요 작업은 확대해서 보여 줍니다. 기다리는 구간은 빠르게, 조작하는 구간은 실제 속도에 가깝게 재생합니다. 각 작업은 게스트 안에서 검사를 통과한 시점에 PASS로 표시합니다. 작업마다 테스트 에이전트를 색이 다른 커서로 보여 주는데, 커서는 `case-<ID>.json`에 기록된 MCP 클릭 위치와 시각을 따르고 클릭 사이 경로는 보간합니다. 편집기는 [Geist](https://github.com/vercel/geist-font) 글꼴을 사용하며, 오디오 트랙 없는 `oslab-intro-master.mp4`를 만듭니다.
+
+README용 파일은 원본을 2-pass로 다시 인코딩해 GitHub 무료 플랜의 영상 한도인 10MB 아래로 맞춘 것입니다. `--receipt`를 지정하면 프로그램, 검사 결과, 해당 파일의 해시를 담은 JSON 기록을 같은 위치에 만듭니다. [장면 구성](intro-video.ko.md)
+
+```powershell
+uv run --locked --extra computer-use python "$demo/fleet.py" run @lab --lan-address 192.168.0.10 --wave-size 8 --ffmpeg ffmpeg
+$edit = @('--run-dir', 'runs/windows-product-qa-demo', '--fonts', 'fonts/geist', '--out', 'runs/windows-product-qa-demo/video', '--ffmpeg', 'ffmpeg')
+uv run --locked --extra computer-use python "$demo/edit_video.py" @edit
+$encode = @('-y', '-i', 'runs/windows-product-qa-demo/video/oslab-intro-master.mp4', '-an', '-c:v', 'libx264', '-preset', 'slower',
+    '-b:v', '1150k', '-maxrate', '2600k', '-bufsize', '5200k', '-pix_fmt', 'yuv420p')
+ffmpeg @encode -pass 1 -f mp4 NUL
+ffmpeg @encode -pass 2 -movflags +faststart docs/media/oslab-windows-product-qa.mp4
+uv run --locked --extra computer-use python "$demo/edit_video.py" @edit --receipt docs/media/oslab-windows-product-qa.mp4
+uv run --locked --extra computer-use python "$demo/fleet.py" cleanup @lab --lan-address 192.168.0.10
+```
+
+GitHub 댓글 작성창에 첨부만 하고 게시하지 않은 파일은 로그아웃한 방문자에게 404로 보입니다. README에 넣을 첨부 파일은 게시한 댓글이나 PR 설명에 먼저 올린 뒤 연결합니다.
 
 ## 임시 자원 정리
 

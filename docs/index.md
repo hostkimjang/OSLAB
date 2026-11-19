@@ -15,6 +15,7 @@ README:
 | --- | --- |
 | [Getting Started](getting-started.md) | Run the generic demos in a Proxmox Windows VM |
 | [Demo Catalog](demos.md) | Public demo scenarios and what each one teaches |
+| [Introduction Video](intro-video.md) | What the README video shows and which parts are recorded or edited |
 | [Adoption Guide](adoption-guide.md) | Adapt the demos to your own product artifact |
 | [Concepts](concepts.md) | Scenario, provider, guest channel, fixture, artifact, adapter, assertion, report |
 | [Scenario Authoring](scenarios.md) | YAML contract and generic examples |

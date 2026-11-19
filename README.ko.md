@@ -10,11 +10,11 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-![OSLab으로 실제 Windows 프로그램 32개에서 릴리스 QA를 실행하는 영상](docs/media/oslab-windows-product-qa.gif)
+https://github.com/user-attachments/assets/52e5a594-a439-44a6-b461-f3e94d1c1c04
 
-> **실제 Windows 11 프로그램으로 검증한 작업 32개.** OSLab MCP로 일회용 Proxmox VM에서 7-Zip, LibreOffice, OBS Studio 등을 조작했습니다. 압축 복원, 릴리스 판정 수정, 녹화 파일 검증, SQLite 마이그레이션을 확대해 보여 줍니다. 첫 장면은 같은 시간축에 콘솔 4개를 배치했고, 촬영은 최대 3대에서 겹쳤습니다. 전체 시나리오에서 검사 140개를 통과했습니다.
+> **Windows VM 32대, 실제 프로그램 32개.** 일회용 Windows 11 VM마다 테스트 에이전트 하나가 OSLab MCP 서버로 7-Zip, LibreOffice, OBS Studio, VS Code, Sysinternals 도구 등을 조작합니다. 화면은 모두 해당 VM의 콘솔 녹화본이며, 최대 8대씩 나눠 녹화한 뒤 작업 시작 시점에 맞춰 배치했습니다. OSLab이 모든 결과를 게스트 안에서 확인했고 검사 140개를 모두 통과했습니다.
 
-[1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Windows QA 재현 방법](docs/windows-product-qa.ko.md) · [검증 결과](docs/media/oslab-windows-product-qa-attestation.json)
+[영상 소개](docs/intro-video.ko.md) · [1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Windows QA 재현 방법](docs/windows-product-qa.ko.md) · [검증 결과](docs/media/oslab-windows-product-qa-attestation.json)
 
 [이전 Windows 앱 매트릭스 데모](docs/windows-app-matrix.ko.md) · [Dispatch Board MSI 설치·업그레이드 예제](docs/release-qa-demo.ko.md) · [Dispatch Board 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 

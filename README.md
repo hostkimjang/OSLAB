@@ -10,11 +10,11 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-![OSLab drives real Windows release QA in 32 installed and built-in programs](docs/media/oslab-windows-product-qa.gif)
+https://github.com/user-attachments/assets/52e5a594-a439-44a6-b461-f3e94d1c1c04
 
-> **32 real Windows 11 workflows.** OSLab MCP drives 7-Zip, LibreOffice, OBS Studio, and other desktop tools in disposable Proxmox VMs. See a release archive restored, a blocked release gate corrected, a recording verified, and a SQLite migration applied. The opening aligns 4 consoles on a shared capture clock with 3 active at peak. The catalog brings together the workflows that passed 140 checks.
+> **32 Windows VMs, 32 real programs.** On each disposable Windows 11 VM, a test agent drives one real program, such as 7-Zip, LibreOffice, OBS Studio, VS Code or a Sysinternals tool, through the OSLab MCP server. Every screen is a console recording of its own VM, recorded in waves of up to 8 and lined up at each run's start. OSLab checked every result inside the guest, and all 140 checks passed.
 
-[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Reproduce the Windows QA runs](docs/windows-product-qa.md) · [Read the verification results](docs/media/oslab-windows-product-qa-attestation.json)
+[About this video](docs/intro-video.md) · [Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Reproduce the Windows QA runs](docs/windows-product-qa.md) · [Read the verification results](docs/media/oslab-windows-product-qa-attestation.json)
 
 [Earlier Windows app matrix demo](docs/windows-app-matrix.md) · [Dispatch Board MSI and upgrade demo](docs/release-qa-demo.md) · [Watch the Dispatch Board recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
