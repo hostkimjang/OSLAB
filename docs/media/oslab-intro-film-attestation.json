@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "title": "OSLab introduction film",
+  "cli_run": {
+    "run_id": "intro-cli-20261119-213335",
+    "scenario": "demo.powershell-system.windows",
+    "status": "passed",
+    "assertions": {
+      "failed": 0,
+      "total": 2
+    },
+    "vm_destroyed": true,
+    "run_seconds": 67.2,
+    "steps": [
+      {
+        "name": "Clone",
+        "seconds": 4.0
+      },
+      {
+        "name": "Boot",
+        "seconds": 4.5
+      },
+      {
+        "name": "Guest agent",
+        "seconds": 17.8
+      },
+      {
+        "name": "Preflight",
+        "seconds": 16.0
+      },
+      {
+        "name": "Upload",
+        "seconds": 9.0
+      },
+      {
+        "name": "Run",
+        "seconds": 2.9
+      },
+      {
+        "name": "Assert",
+        "seconds": 0.6
+      },
+      {
+        "name": "Destroy",
+        "seconds": 10.7
+      }
+    ],
+    "console_recording": {
+      "fps": 30,
+      "frames": 1786,
+      "seconds": 59.533
+    },
+    "report_recording": {
+      "fps": 30,
+      "frames": 332,
+      "seconds": 11.067
+    }
+  },
+  "dashboard_run": {
+    "run_id": "20261119-223531-demo-agent-steps-windows",
+    "scenario": "demo.agent-steps.windows",
+    "status": "passed",
+    "assertions": {
+      "failed": 0,
+      "total": 2
+    },
+    "vm_destroyed": true,
+    "run_seconds": 85.7,
+    "browser_recording": {
+      "fps": 30,
+      "frames": 4283,
+      "seconds": 142.767
+    }
+  },
+  "agent_session": {
+    "client": "Codex",
+    "prompt": "Open Notepad on the Windows test VM, type \"release 2.4 checked by OSLab agent\" and save it to the Desktop as agent-note.txt. Then open File Explorer on the Desktop so I can see the file.",
+    "mcp_calls": 86,
+    "calls_by_tool": {
+      "list_vms": 1,
+      "screenshot": 14,
+      "press_key": 60,
+      "move_mouse": 5,
+      "click": 5,
+      "close_console": 1
+    },
+    "guest_checks": [
+      {
+        "name": "File saved on the Desktop",
+        "passed": true
+      },
+      {
+        "name": "Text matches the typed line",
+        "passed": true
+      },
+      {
+        "name": "SHA-256 matches",
+        "passed": true
+      }
+    ],
+    "console_recording": {
+      "fps": 30,
+      "frames": 9348,
+      "seconds": 311.6
+    }
+  },
+  "windows_fleet": {
+    "programs": 32,
+    "checks_passed": 140,
+    "record": "oslab-windows-product-qa-attestation.json"
+  },
+  "edits": [
+    "Chapters 02 and 03 show one CLI run, chapter 04 a separate run that a Playwright script launched from the dashboard, and chapter 05 a separate Codex session. The opening and chapter 06 reuse the 32-VM Windows QA recordings.",
+    "Waits play faster, and each recorded chapter shows its playback speed.",
+    "The YAML and terminal panels are typeset from the scenario file and the recorded CLI output. Command typing is animated.",
+    "Local host names, user folders and private variable names are replaced in the terminal text, the HTML report and the dashboard.",
+    "The editor draws the cursors at the recorded pointer positions and interpolates the movement between them.",
+    "The 32-VM wall aligns recordings made in waves of up to 8 at each run's start, and the finished wall is held for 2 seconds."
+  ],
+  "video": {
+    "file": "oslab-intro-film.mp4",
+    "bytes": 9340985,
+    "sha256": "b25ffd3ddb37963d9cdc1c6546c6b1485d2cdbd386e586f95e61c9db072fb26d",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  }
+}

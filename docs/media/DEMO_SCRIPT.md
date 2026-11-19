@@ -1,12 +1,23 @@
 # README 데모 미디어 제작
 
-README 상단의 릴리스 QA 영상은 실제 Proxmox Windows 게스트에서 캡처한 화면을 사용합니다.
+README 상단의 소개 영상과 32대 릴리스 QA 영상은 실제 Proxmox Windows 게스트에서 녹화한 화면을 사용합니다.
 
 ## 구성
 
+### OSLab 소개 영상
+
+README 상단 영상은 OSLab의 전체 흐름을 2분 45초 동안 보여 줍니다. [소개 영상 문서](../intro-video.ko.md)의 제작 방법에 따라 세 가지를 따로 녹화한 뒤 `edit_intro.py`로 한 편으로 편집합니다.
+
+1. `capture_cli.py`가 `oslab run` 한 번의 터미널 출력, 그 실행이 만든 VM의 콘솔, 실행 폴더, HTML 보고서를 녹화합니다. 02장과 03장에 씁니다.
+2. `capture_dashboard.mjs`가 별도 포트로 띄운 대시보드에서 실행 하나를 시작하고, 실시간 로그와 결과 화면을 headless Chromium으로 녹화합니다. 04장에 씁니다.
+3. `capture_agent.py`가 VM 하나의 콘솔을 녹화하는 동안 Codex가 OSLab MCP로 메모장과 파일 탐색기를 조작하고, 끝난 뒤 QGA로 저장된 파일을 확인합니다. 05장에 씁니다.
+4. 첫 장면과 06장은 아래 32대 릴리스 QA 녹화본을 다시 씁니다.
+
+공개 전에 각 장의 PASS 표시가 `run.json`, assertion 결과, 게스트 검사 결과와 일치하는지 확인합니다. 터미널 텍스트, HTML 보고서, 대시보드에 비공개 이름이 남지 않았는지 프레임 단위로 확인하고, 공개한 MP4의 SHA-256을 `oslab-intro-film-attestation.json`에 기록합니다.
+
 ### 실제 Windows 프로그램으로 릴리스 QA
 
-[실행 가이드](../windows-product-qa.ko.md#readme-영상-녹화)에 따라 `fleet.py`로 일회용 Windows 11 VM 32대에서 릴리스 QA를 실행하고, VM마다 콘솔 화면을 30fps로 녹화합니다. 결과는 MCP 화면과 별도로 QGA로 읽어 온 파일, 해시, 데이터베이스, 미디어 정보로 검증합니다. 장면 구성과 편집 범위는 [소개 영상 문서](../intro-video.ko.md)에 정리했습니다.
+[실행 가이드](../windows-product-qa.ko.md#32대-영상-녹화)에 따라 `fleet.py`로 일회용 Windows 11 VM 32대에서 릴리스 QA를 실행하고, VM마다 콘솔 화면을 30fps로 녹화합니다. 결과는 MCP 화면과 별도로 QGA로 읽어 온 파일, 해시, 데이터베이스, 미디어 정보로 검증합니다. 장면 구성과 편집 범위는 [소개 영상 문서](../intro-video.ko.md#32대-windows-qa-영상)에 정리했습니다.
 
 1. 첫 장면은 녹화본 32개를 각 작업의 시작 시점에 맞춰 8열로 배치하고 8배속으로 재생합니다. 처음에 에이전트 커서가 빈 칸으로 날아드는 부분은 타이틀 애니메이션입니다. 그 뒤로 커서는 `case-*.json`에 기록된 MCP 클릭 위치와 시각을 따르고, 클릭 사이 경로는 보간합니다.
 2. 확대 장면에는 Calc의 판정표 수정, OBS의 로컬 녹화, VS Code 설정 수정, 7-Zip의 압축 복원을 담습니다. FOUND와 PASS 표시는 각 단계가 기록된 시각에 맞춥니다.

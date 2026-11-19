@@ -1060,6 +1060,21 @@
   - `output/web-dashboard/artifact-studio-mobile-layout.png`
   - `output/web-dashboard/artifact-studio-directory-run-launcher-applied.png`
 
+### 2026-11-19 소개 영상 대시보드 캡처에서 관찰한 문제
+
+소개 영상 04장을 `validation/artifacts/intro-video/capture_dashboard.mjs`로 녹화하면서 대시보드에서 실제 실행(`demo-agent-steps`, passed)을 진행했습니다. 아래 항목은 캡처를 맡은 에이전트가 관찰한 문제이며 수정하지 않았습니다. 고치기 전에 재현부터 다시 확인합니다.
+
+- [ ] Run Launcher가 `*.local.yaml` 시나리오를 목록에서 숨기고 `.local.`이 든 경로의 실행을 거부합니다. 실제 실행용 로컬 사본을 쓰려면 `scenarios/<os>/private/` 아래 사본이나 `qa-*.example.yaml` 이름이 필요했습니다.
+- [ ] `getApiBaseUrl()`이 API 포트를 3001로 고정해서, 다른 포트로 띄운 대시보드의 실시간 로그(SSE)와 업로드 요청이 3001로 갑니다.
+- [ ] 1501px 이상 폭에서 Run Launcher 문서가 내용보다 길어 페이지 전체가 스크롤되고 아래쪽에 빈 띠가 생깁니다.
+- [ ] 1501px 이상 폭에서 Live console 높이가 제한 없이 늘어나 자동 스크롤이 새 로그를 따라가지 않습니다. 1280px 폭에서는 콘솔이 화면 높이의 약 44%인 스크롤 상자가 되어 정상입니다.
+- [ ] 영어 화면의 Results Explorer 결과 목록 제목이 "6 Results Explorer"로 표시됩니다.
+- [ ] 실행이 끝날 때까지 "Another launch is being started." 안내가 남습니다.
+- [ ] 비활성 상태인 Run selected suite 버튼이 주 버튼 모양이고, 눌러야 할 Run selected scenario 버튼은 보조 버튼 모양입니다.
+- [ ] 폴더형 아티팩트를 쓰는 시나리오에서 추천 테스트 파일로 폴더 대신 스크립트 파일을 제시합니다.
+- [ ] Test file 경로를 한 글자씩 입력할 때마다 확인이 다시 실행되어 "Checking test file"이 깜빡입니다.
+- [ ] 새 SQLite 파일을 만들 때 Prisma 6.19.3이 `RUST_LOG` 없이 빈 "Schema engine error"로 실패했습니다(Windows 캡처 PC). README와 서버 문서의 마이그레이션 안내도 서로 다릅니다.
+
 ## 다음 작업 시 사용 방법
 
 1. 이 문서의 공통 Smoke를 위에서 아래로 다시 확인
