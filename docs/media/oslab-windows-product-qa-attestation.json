@@ -1,228 +1,45 @@
 {
-  "schema_version": 1,
-  "status": "complete",
-  "suite": "Developer QA on Windows",
-  "cases_planned": 32,
-  "cases_observed": 32,
+  "schema_version": 2,
+  "title": "OSLab introduction video: 32 Windows programs on disposable Proxmox VMs",
+  "windows_version": "10.0.26200",
   "cases_passed": 32,
   "checks_passed": 140,
-  "missing_or_unpassed_cases": [],
-  "windows_version": "10.0.26200",
   "capture": {
-    "max_simultaneous_captures": 3,
-    "opening_cases": [
-      "01",
-      "02",
-      "06",
-      "07"
-    ],
+    "fps": 30,
+    "max_vms_per_wave": 8,
     "waves": [
-      {
-        "wave": 1,
-        "cases": [
-          "04",
-          "29",
-          "30",
-          "31"
-        ],
-        "shared_seconds": 0
-      },
-      {
-        "wave": 2,
-        "cases": [
-          "01",
-          "02",
-          "06",
-          "07"
-        ],
-        "shared_seconds": 0
-      },
-      {
-        "wave": 3,
-        "cases": [
-          "03",
-          "05"
-        ],
-        "shared_seconds": 44.799
-      },
-      {
-        "wave": 4,
-        "cases": [
-          "12",
-          "13"
-        ],
-        "shared_seconds": 60.97
-      },
-      {
-        "wave": 5,
-        "cases": [
-          "16",
-          "17"
-        ],
-        "shared_seconds": 39.276
-      },
-      {
-        "wave": 6,
-        "cases": [
-          "14"
-        ],
-        "shared_seconds": 62.318
-      },
-      {
-        "wave": 7,
-        "cases": [
-          "08",
-          "09"
-        ],
-        "shared_seconds": 11.086
-      },
-      {
-        "wave": 8,
-        "cases": [
-          "21"
-        ],
-        "shared_seconds": 75.526
-      },
-      {
-        "wave": 9,
-        "cases": [
-          "18"
-        ],
-        "shared_seconds": 11.167
-      },
-      {
-        "wave": 10,
-        "cases": [
-          "19"
-        ],
-        "shared_seconds": 48.815
-      },
-      {
-        "wave": 11,
-        "cases": [
-          "11"
-        ],
-        "shared_seconds": 69.541
-      },
-      {
-        "wave": 12,
-        "cases": [
-          "25"
-        ],
-        "shared_seconds": 46.15
-      },
-      {
-        "wave": 13,
-        "cases": [
-          "20"
-        ],
-        "shared_seconds": 103.151
-      },
-      {
-        "wave": 14,
-        "cases": [
-          "24"
-        ],
-        "shared_seconds": 19.915
-      },
-      {
-        "wave": 15,
-        "cases": [
-          "15"
-        ],
-        "shared_seconds": 77.98
-      },
-      {
-        "wave": 16,
-        "cases": [
-          "22"
-        ],
-        "shared_seconds": 36.383
-      },
-      {
-        "wave": 17,
-        "cases": [
-          "27"
-        ],
-        "shared_seconds": 50.842
-      },
-      {
-        "wave": 18,
-        "cases": [
-          "32"
-        ],
-        "shared_seconds": 95.59
-      },
-      {
-        "wave": 19,
-        "cases": [
-          "10"
-        ],
-        "shared_seconds": 18.242
-      },
-      {
-        "wave": 20,
-        "cases": [
-          "28"
-        ],
-        "shared_seconds": 47.857
-      },
-      {
-        "wave": 21,
-        "cases": [
-          "26"
-        ],
-        "shared_seconds": 99.435
-      },
-      {
-        "wave": 22,
-        "cases": [
-          "23"
-        ],
-        "shared_seconds": 28.235
-      }
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10
     ],
-    "featured_cases": [
-      "01",
-      "02",
-      "03",
-      "05",
-      "08"
-    ]
+    "alignment": "The wall shows every recording from its own workflow start."
   },
-  "media": {
-    "mp4": {
-      "file": "oslab-windows-product-qa.mp4",
-      "bytes": 2728497,
-      "sha256": "23d7a8f2d34a4e4e1b34b5788bcd36e43864cc3f6ab0133ed0e69779b0ba02df",
-      "width": 1920,
-      "height": 1080,
-      "duration_seconds": 52.0,
-      "frames": 1248
-    },
-    "gif": {
-      "file": "oslab-windows-product-qa.gif",
-      "bytes": 2225867,
-      "sha256": "eb1a932339c731e8a728be8436635eb176c6eaf44229d645b32e76d3a950ced3",
-      "width": 960,
-      "height": 540,
-      "duration_seconds": 52.0,
-      "frames": 520
-    }
+  "video": {
+    "file": "oslab-windows-product-qa.mp4",
+    "bytes": 9359750,
+    "sha256": "5c4aa7c75c81b3ad9cc832e10020e81ac4308ddc2d700a8828f339a16de95119",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
   },
   "cases": [
     {
       "id": "01",
-      "app": "7-Zip File Manager",
-      "kind": "installed Windows program",
+      "program": "7-Zip File Manager",
+      "version": "26.06",
       "scenario": "Restore a build delivery ZIP and compare every recovered file to its release manifest.",
-      "actions": [
+      "steps": [
         "Inspect the release archive",
         "Set an extraction destination",
         "Verify six recovered files"
       ],
-      "wave": 2,
-      "result": "pass",
+      "wave": 1,
+      "run_seconds": 45.0,
       "checks": [
         {
           "name": "Recovered release tree",
@@ -241,45 +58,45 @@
           "passed": true
         },
         {
-          "name": "api-contract.json SHA-256",
+          "name": "checks/api-contract.json SHA-256",
           "passed": true
         },
         {
-          "name": "expected-commands.txt SHA-256",
+          "name": "checks/expected-commands.txt SHA-256",
           "passed": true
         },
         {
-          "name": "migration.md SHA-256",
+          "name": "notes/migration.md SHA-256",
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "5aae475b629a4bde7a09834e56cb879b5afa00cc3adbe36ed6bcf402c351a0a8",
-        "e9e375decce47aa1d79c3d1ee99cda9239f95042fdf468b3cb7283e3d5a44b70",
-        "6474047f9d6384dc971de458f7f6f9cab9382b59ec454d7b6f6a97afa34d1a9b",
-        "64a2fce806de55480264d916e1d6ffe089616d5eac67d56e95debe5a5eefe8ff"
-      ],
-      "console_inputs": {
-        "mouse": 1,
-        "keyboard": 11
+      "recording": {
+        "fps": 30,
+        "frames": 4202,
+        "seconds": 140.067
       },
-      "program_version": "26.06"
+      "stage_screenshot_sha256": [
+        "f099f0a7cc9e52bac16f7e3c318aa42b73e518b80e98112e003bf8d7bb0daa51",
+        "28e5ec56e0e5a67796b6891cb5867a7c565c52cd9bd604a68ff012bedf88039c",
+        "9bd1a92d3b318aaab84996e5e2f3afbe5cc5aa0283aaea33a9847c485ff65f68",
+        "7b0e426b04599d3a92309d2bfb22615a087198f95025a10f2b3593070f7eb4c0"
+      ]
     },
     {
       "id": "02",
-      "app": "LibreOffice Calc",
-      "kind": "installed Windows program",
+      "program": "LibreOffice Calc",
+      "version": "26.8.3.1",
       "scenario": "Repair a missing artifact subtotal and verify the release gate recalculates.",
-      "actions": [
+      "steps": [
         "Inspect failed artifact gate",
         "Correct the Win-x64 count",
         "Save and verify computed cells"
       ],
-      "wave": 2,
-      "result": "pass",
+      "wave": 1,
+      "run_seconds": 25.0,
       "checks": [
         {
-          "name": "The uploaded baseline contains the 42 blocked gate",
+          "name": "The uploaded baseline contains the 37/42 blocked gate",
           "passed": true
         },
         {
@@ -299,30 +116,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "288566bd963da8312925c8ccf9d5ea2b17efbf03c2b2496ffbad9a52bd5b1b20",
-        "436fd323c4257d3d9a7036631b11e18a74661856e68c19719b6e89ef414691d8",
-        "f63c6897c56a9fb7d65453624a60d1bf5e4264e8cc72fc6571c14fa0162fdca1",
-        "1cb24d63fc5c053581cd471cd7d45fe2cca38ba10264dc284c414d21d4ae4281"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 14
+      "recording": {
+        "fps": 30,
+        "frames": 4197,
+        "seconds": 139.9
       },
-      "program_version": "26.8.3.1"
+      "stage_screenshot_sha256": [
+        "f83e138ff082f20221c145cc3fb4e44bd02cc15213f3a8b987f400a49114a9ea",
+        "db3b4b55e278b5e26532a5105b173c4ebb70409f00fc4ca223264e21fa83fd53",
+        "b4e67391cbe6d30b6735070c20324119bd831a02972f4aa7344bb90c9df71507",
+        "53755446c2728be36bfaf920f91068fe2f1cf5d6b643c05e8b888e14b0e0782a"
+      ]
     },
     {
       "id": "03",
-      "app": "OBS Studio",
-      "kind": "installed Windows program",
-      "scenario": "Record a release evidence scene and check the playable AAC container.",
-      "actions": [
+      "program": "OBS Studio",
+      "version": "33.0.1",
+      "scenario": "Record a release evidence scene and check the playable H.264/AAC container.",
+      "steps": [
         "Inspect the staged evidence scene",
         "Start a software-encoded recording",
         "Stop and verify the output"
       ],
       "wave": 3,
-      "result": "pass",
+      "run_seconds": 54.7,
       "checks": [
         {
           "name": "Recording includes an H.264 video track",
@@ -334,8 +151,7 @@
         },
         {
           "name": "Container duration is within 5–18 seconds",
-          "passed": true,
-          "measured_seconds": 6.933
+          "passed": true
         },
         {
           "name": "Encoded video contains at least 60 timed samples",
@@ -354,30 +170,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "db78e204f9083d5dcff771b4aecd92d97310a0e2e4514c179409ff05973137ea",
-        "101964cce0d03f43816d4244467a268caff628d25fdfd9df26af1b5058eb4702",
-        "a3d0db4713fc3667a46f19913389a333c71da840d12e7b6a817f1a25d4dbf1b9",
-        "88de501d17e9d4cc087f1a9fa6c2fcebd5eb9803398d96a30f4a7d83273c8570"
-      ],
-      "console_inputs": {
-        "mouse": 2,
-        "keyboard": 1
+      "recording": {
+        "fps": 30,
+        "frames": 1974,
+        "seconds": 65.8
       },
-      "program_version": "33.0.1"
+      "stage_screenshot_sha256": [
+        "fbba0fb89139ffebc9dbed8db1ab1f1fb9d8a56ac47cd1a062a1e3ea54f7c43c",
+        "6a8646165610ed3853aae9af2b65c7a12d7540e2507fa01e693dd6111eb035f0",
+        "5d0e5b7a9f85c6466ba3999c7b096af399932ef895c193aa82318e1585789f1f",
+        "f66976a3637d715fd8098c5fb23b0bcd9ca771e1df94895e4c9f8ca968a59712"
+      ]
     },
     {
       "id": "04",
-      "app": "Notepad++",
-      "kind": "installed Windows program",
+      "program": "Notepad++",
+      "version": "8.9.9.1",
       "scenario": "Approve the release gate in the active INI stanza without altering its rollback template.",
-      "actions": [
+      "steps": [
         "Review the configuration",
         "Select the active release gate",
         "Save and verify exact bytes"
       ],
-      "wave": 1,
-      "result": "pass",
+      "wave": 3,
+      "run_seconds": 23.8,
       "checks": [
         {
           "name": "Active release gate",
@@ -396,31 +212,31 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "e4b80753192887f44b36892a40eef738f3a0f9737a06dd685fa657263ae93860",
-        "e6d534e899f435b21921ad59b49ed08ce8431f415cf04380b660b7274a4309fa",
-        "fe052673769ff524efde6f64f3d2994254317ec1d2b4ecc3f75b134f2af781ad",
-        "3ec56ef6289817d5921b4879bd96cf842edf0b2456489e8c6822f99d39f57344"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 6
+      "recording": {
+        "fps": 30,
+        "frames": 1975,
+        "seconds": 65.833
       },
-      "program_version": "8.9.9.1"
+      "stage_screenshot_sha256": [
+        "e3a726b0ba4a6248eabfc9142b5fca373261140dbca9c64279ac8ff7e53237bb",
+        "f70e31a738567de99e022cb344e429da381cd55c47c2d0e385d61154dbfaa018",
+        "389492ae2b406bd7e632b96902accb9d6f4b269ed0b4b3393a27ff8ceb562c32",
+        "312bcbdc6a80c73c7c5f7377f7941e6eabc9d93b089a784da3b692182b8c6547"
+      ]
     },
     {
       "id": "05",
-      "app": "Visual Studio Code",
-      "kind": "installed Windows program",
+      "program": "Visual Studio Code",
+      "version": "1.146.0",
       "scenario": "Reproduce a Windows service startup-budget regression, fix the candidate configuration and rerun the gate.",
-      "actions": [
+      "steps": [
         "Open candidate JSON",
         "Reproduce startup gate failure",
         "Correct the budget",
         "Rerun release checks"
       ],
-      "wave": 3,
-      "result": "pass",
+      "wave": 1,
+      "run_seconds": 130.0,
       "checks": [
         {
           "name": "All four cold starts exceeded the original measured budget",
@@ -439,31 +255,31 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "6d4e0f6a5b38f5190759f79a0154a959c26829509ebdbe9e1435a72d402a23c5",
-        "7fe71432490c7c9bd4bd52c84b6c08d449611ac165089912d22ef5aef7435ce4",
-        "78311668299ebdd325ce6126c168b71eaa8c9ce8188fbd7448f62f322b471b26",
-        "8c846dcd91ceaa3dc91b389d8da5f1b42d480e25cebbcd17fc4027275fc42839"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 12
+      "recording": {
+        "fps": 30,
+        "frames": 4198,
+        "seconds": 139.933
       },
-      "program_version": "1.146.0"
+      "stage_screenshot_sha256": [
+        "a9a2ba8d33fd2f197f0b8b71574a977d6739e3073df0d2d2f453c0c41d40e362",
+        "b03e792575c987485776cb2f28823e15b844b8c2a7ca66ab515b6b7dfde01208",
+        "36362f24bde4be4c175c883dd3155dc81d3e08267dbf9f03b2297b35d2fb0573",
+        "912445d533d5fbc125185507a6f9b1d8416dc6f171bee01c6e904d1b28eeeeee"
+      ]
     },
     {
       "id": "06",
-      "app": "Git GUI",
-      "kind": "installed Windows program",
+      "program": "Git GUI",
+      "version": "2.56.1.windows.1",
       "scenario": "Review the rollback guard diff, stage only that fixture change, and audit the resulting local Git tree.",
-      "actions": [
+      "steps": [
         "Open the working tree",
         "Stage the guard change",
         "Review staged diff",
         "Confirm the local commit"
       ],
-      "wave": 2,
-      "result": "pass",
+      "wave": 3,
+      "run_seconds": 36.1,
       "checks": [
         {
           "name": "One staged line switched the rollback guard on",
@@ -490,31 +306,31 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "feb06f1b2247cdf1ab1193550f3f463eca93b50d96b5a62ba388dedcf705da43",
-        "2c7b8328fa86acccd23a59779666a749dd31c2b2c8634fedba96a5ddf032ae7c",
-        "1ee553b983b60713d7796f6c2c044538e0787edb5812d75c4a1b606c63de4be9",
-        "0c803dad659ad404a72fe7593b9320e7246e68f55b3204667da00b084a3d1dc9"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 8
+      "recording": {
+        "fps": 30,
+        "frames": 1975,
+        "seconds": 65.833
       },
-      "program_version": "2.56.1.windows.1"
+      "stage_screenshot_sha256": [
+        "e62d8754a8f4d5b723a38cfc17cef693e92fe564fddd66b1263ff8ef0ef9f310",
+        "ed11cd7baa8828072a8e39efb1714955e9fb9d37fc2a04b9a8db4827bd84aebc",
+        "165b01b9bbf8758d0be9b8ff6f3aa33c66c3aa958a792314ceddc5a34adc92d5",
+        "390f5eec09595a345180d35c9f48e94d9784f8a008e3fa30bc24d562cfecb243"
+      ]
     },
     {
       "id": "07",
-      "app": "Python IDLE",
-      "kind": "installed Windows program",
+      "program": "Python IDLE",
+      "version": "3.14.10",
       "scenario": "Run three retry-budget tests, repair the off-by-one limit in IDLE, then rerun the suite.",
-      "actions": [
+      "steps": [
         "Open the test fixture",
         "Run the failing suite",
         "Repair the retry cap",
         "Confirm three passing tests"
       ],
-      "wave": 2,
-      "result": "pass",
+      "wave": 3,
+      "run_seconds": 41.2,
       "checks": [
         {
           "name": "Baseline runs three tests and isolates the off-by-one regression",
@@ -529,30 +345,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "273619bfe3b31b91b5651f008f3da301448472a03cb72ad3324d05bf269fe437",
-        "7300558d1f574c95378bbde92cca7ee7cc8604d839a780578ca9ae7d772519db",
-        "e84cde1ee615a686d78fab3de74e7c3e02e82ac112868c49de35403f924a6397",
-        "9c7255c107036ada4dcaf1e912a12eb2ea6a99f26179d2330597a3cf7f404c83"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 13
+      "recording": {
+        "fps": 30,
+        "frames": 1967,
+        "seconds": 65.567
       },
-      "program_version": "3.14.10"
+      "stage_screenshot_sha256": [
+        "870aa5def008ee91a03767d47261ec98270459e7f081bb95add364a1afcb443c",
+        "5990820eb7c002ca8e61113e71801fc95aacd390cae6afd08a3d89ea1f2f8f23",
+        "9e86ebfc1edd38fe645270d399741fffbe57d8e8994a2752664277e054f911ec",
+        "29830c61d9eab6c901f871bc19d29a8e963ed91cb4331704e7abf3e5d320ba51"
+      ]
     },
     {
       "id": "08",
-      "app": "DB Browser for SQLite",
-      "kind": "installed Windows program",
+      "program": "DB Browser for SQLite",
+      "version": "3.13.1.",
       "scenario": "Run and commit a backfill migration, then verify legacy rows and database integrity.",
-      "actions": [
+      "steps": [
         "Open the pre-upgrade database",
         "Run the SQL migration",
         "Commit and verify the backfill"
       ],
-      "wave": 7,
-      "result": "pass",
+      "wave": 3,
+      "run_seconds": 42.9,
       "checks": [
         {
           "name": "SQLite integrity check",
@@ -579,30 +395,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "6088c5c71a7e995529a73823fe21ecca5e39090d1581d52f94e86eeb36da2031",
-        "1be752f25d70ecf51783af2eccc8415da71bab16da399a13f57538b22af16526",
-        "95295075500dfa85ab4994f3b8ff66a068d8706c4836902b29c09b57788d7f8a",
-        "579e66e8a507431b1f741d83f60c5618de446f8e02e526df0d08679290f8cae9"
-      ],
-      "console_inputs": {
-        "mouse": 2,
-        "keyboard": 8
+      "recording": {
+        "fps": 30,
+        "frames": 1966,
+        "seconds": 65.533
       },
-      "program_version": "3.13.1"
+      "stage_screenshot_sha256": [
+        "603b71f42f988c4bf16a08429abc9440bdfb76afc1f992d8a9f859860a53cba9",
+        "cc7f102cfe4cec8daf7b669e9e758ac1cd1e5b668f6f000514b4273e0448c70c",
+        "07c934687105ce768834a47b35c898dc1d9f7f1a862b3343df349ed18c77e8a1",
+        "61516c39b48d291d13dc74f7c6d1e1a23c648961a9cc064add32bc1d3d551c88"
+      ]
     },
     {
       "id": "09",
-      "app": "WinMerge",
-      "kind": "installed Windows program",
+      "program": "WinMerge",
+      "version": "2.16.60.0",
       "scenario": "Merge the approved retry-policy hunk while keeping the candidate version and routing.",
-      "actions": [
+      "steps": [
         "Open baseline and candidate",
         "Review both differences",
         "Merge one hunk and save"
       ],
-      "wave": 7,
-      "result": "pass",
+      "wave": 3,
+      "run_seconds": 15.7,
       "checks": [
         {
           "name": "Baseline was never modified",
@@ -617,30 +433,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "9ab0aba959609698e0079924b9748a42105b1aa5ba32437ef97742f339e57180",
-        "25b29a38bf24f668e286a5fab6860de27fbb371002024a1273e2b48f51cdf427",
-        "79865e05405fd7437ca6819e725177998a70cb9f2e133ed5189e1498ae60f139",
-        "fe6d6b73294ca8a2f62f4e9fc3edebab8e05b4a7cf4038941cb025052ccd8f8f"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 5
+      "recording": {
+        "fps": 30,
+        "frames": 1967,
+        "seconds": 65.567
       },
-      "program_version": "2.16.60.0"
+      "stage_screenshot_sha256": [
+        "1f5471802f6f99bd414c17d93ecb0c262600215fb11f407ac11013f257871abf",
+        "b7eeae6d6607fe26dffe03518c2d5a543f926a23348a76c92919b4b68efa98ba",
+        "6cc21ff31467c7d24a039b2ae61d779c1ca00e2a36a76b8b38f8d1232935656b",
+        "776275a3da69d44ed3d748fed8ade215454786bae139de7c317eeba717a1cf32"
+      ]
     },
     {
       "id": "10",
-      "app": "VLC media player",
-      "kind": "installed Windows program",
+      "program": "VLC media player",
+      "version": "3,0,23,0",
       "scenario": "Play a fixed-length release clip, seek to the check point, and verify the player's actual position.",
-      "actions": [
+      "steps": [
         "Load and play the local clip",
         "Jump to the 12-second marker",
         "Pause and verify duration"
       ],
-      "wave": 19,
-      "result": "pass",
+      "wave": 3,
+      "run_seconds": 51.2,
       "checks": [
         {
           "name": "VLC reported the exact fixture duration",
@@ -659,30 +475,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "ddad7707b8bfaf627f9984eb29a8cc6b3dc5aa6ee61259d54731e2a4461028ec",
-        "37e5080fa4e85035bf3e0d58efb6ecbb9b65ce9a2592eb0ba18df85a4e93e1b9",
-        "6e98c20c3a1ef72bf6cca574065c31ac63cd2dd81d2d618ee8e2e6f10e07aa1a",
-        "8d72bae1b6b3924ecdc05f667e0204ac338fd19a809b9ac2d135ce5426ac23e5"
-      ],
-      "console_inputs": {
-        "mouse": 3,
-        "keyboard": 2
+      "recording": {
+        "fps": 30,
+        "frames": 1966,
+        "seconds": 65.533
       },
-      "program_version": "3.0.23.0"
+      "stage_screenshot_sha256": [
+        "15df1cd07a63613ee95fac227878f37a4cf63f1957a8eff4d00e2b0e0c6c37cc",
+        "a66133c81d26c76667783e731e4fe92af60a1235c5634854aa9d48a3f6d2823b",
+        "3bbd211feac9bda572a1b7401ee3695440b9229b92d002de46362d52b10edf9a",
+        "867fbf47e72957adeac5d9b44d2ff00a78f361b6e1d70b2bc158e4babd7365e6"
+      ]
     },
     {
       "id": "11",
-      "app": "Audacity",
-      "kind": "installed Windows program",
+      "program": "Audacity",
+      "version": "4.0.2",
       "scenario": "Remove the two-second test slate and export an exact three-second mono WAV.",
-      "actions": [
+      "steps": [
         "Import the raw audio fixture",
         "Remove the test slate",
         "Export WAV and check PCM"
       ],
-      "wave": 11,
-      "result": "pass",
+      "wave": 8,
+      "run_seconds": 106.5,
       "checks": [
         {
           "name": "Export is mono signed 16-bit PCM",
@@ -701,30 +517,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "05cd159436f6f72f05181dddcc672ecc00e22d4997437ffcfba95e3068760565",
-        "e5b974c0ce83db69426efd246ff2e346e6a43efd6353cda234439c38805ce079",
-        "8093fc318de308701a941570724c84e0fe839b470a306bd4d8f3acf5f88e4e5a",
-        "77ffb4f707ae1f830a5c2e6c9448787fc85cec1619c715748a89f3add0603aa4"
-      ],
-      "console_inputs": {
-        "mouse": 7,
-        "keyboard": 10
+      "recording": {
+        "fps": 30,
+        "frames": 6888,
+        "seconds": 229.6
       },
-      "program_version": "4.0.2"
+      "stage_screenshot_sha256": [
+        "47d2f06be9b0eb5cf86bebe22fbd193ce3d3c8c0e3399c3d690c7c6978ede0ca",
+        "d573005816090039a35d4b33ca524aee8911257d2c015ddad386e3b5f8f7bc6a",
+        "ff567c6590189871a340c221a726d18aa18975e499440bbaee88160cbe2bb8d3",
+        "c46e83ee2a622c7d48daa990a34d0abe4daa0a5bd902e88bb63179166d9464b8"
+      ]
     },
     {
       "id": "12",
-      "app": "LibreOffice Writer",
-      "kind": "installed Windows program",
+      "program": "LibreOffice Writer",
+      "version": "26.8.3.1",
       "scenario": "Add an approval receipt to the QA handoff and render the two-page report to PDF.",
-      "actions": [
+      "steps": [
         "Review release handoff",
         "Sign the decision page",
         "Verify two-page PDF"
       ],
       "wave": 4,
-      "result": "pass",
+      "run_seconds": 79.8,
       "checks": [
         {
           "name": "The release receipt was persisted exactly once",
@@ -743,30 +559,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "8bb50363a8e7f1233e4da59d69fe55462f6e7c7873911cde2d3cd442298293af",
-        "d62519375b42d06a39cde0f451a0985fabf976365f79d71617855689a6821a70",
-        "0a7aae5a174036eb976cfc67b7cba22e5a1efc18e429fa1351179127c5d5499d",
-        "278a09826187cf0028756f7166db0da742da33228f00dfa8976d2c516318c588"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 19
+      "recording": {
+        "fps": 30,
+        "frames": 3193,
+        "seconds": 106.433
       },
-      "program_version": "26.8.3.1"
+      "stage_screenshot_sha256": [
+        "bf180bafc220f5889bb4934c4f9675c60b45c64be99ec76a6f903368c330f494",
+        "e9c672ce6f316c9fcc0fae6fbbda537c9d21703a5727361d84007abcc7abfefd",
+        "db08ddd7760354348d3883f4e064a56af6937a8170d99461eb3534b2c487b2d6",
+        "ca0626c17e59bbb6a7bbfd8a2b4a4e97562cf816fe37aa85b0d0a084f9ee2248"
+      ]
     },
     {
       "id": "13",
-      "app": "LibreOffice Impress",
-      "kind": "installed Windows program",
+      "program": "LibreOffice Impress",
+      "version": "26.8.3.1",
       "scenario": "Play both incident brief slides and verify their sequence and 16:9 PDF geometry.",
-      "actions": [
+      "steps": [
         "Play the release brief",
         "Advance to the decision",
         "Verify the exported deck"
       ],
       "wave": 4,
-      "result": "pass",
+      "run_seconds": 70.4,
       "checks": [
         {
           "name": "Slide 1 filled the slideshow with the candidate navy background",
@@ -785,30 +601,30 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 3193,
+        "seconds": 106.433
+      },
       "stage_screenshot_sha256": [
-        "750aadeb748536eca59ac305234fdeea5d0a0918d4b810f5d3cb4f8c9ed5745e",
+        "b16050191ed3f997e4815ff519463e9f475b30dfc000870af0983adc86409e01",
         "3dc2467402fc50e795ffade70afd4e1bcc257b566d3a17e15a7572da4943c7ca",
         "dc907d54ac233667b885aa3a4b6d1ac9169303666944efd3a4fe8721de0ff99a",
-        "0bf26e81cea0f9cb062536b3477b8850f5c989eaffc6cb51a512a1540529b19a"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 15
-      },
-      "program_version": "26.8.3.1"
+        "8bac0b2d1bad93ccc1568466a1d091cfa4667651f9c5d3de3d1da4629c175c29"
+      ]
     },
     {
       "id": "14",
-      "app": "LibreOffice Draw",
-      "kind": "installed Windows program",
+      "program": "LibreOffice Draw",
+      "version": "26.8.3.1",
       "scenario": "Adjust a registration mark and verify its vector geometry and released PDF bounds.",
-      "actions": [
+      "steps": [
         "Locate the registration mark",
         "Move the mark away from the trim",
         "Save and verify print geometry"
       ],
-      "wave": 6,
-      "result": "pass",
+      "wave": 4,
+      "run_seconds": 67.3,
       "checks": [
         {
           "name": "The printed registration mark moved right of the original trim",
@@ -827,30 +643,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "ca2543efe2c3f2080c9030ed9e8356a5905f55902eb102f64c7b04ede0216a0f",
-        "77410af156e3d3adc394156e66e405fc6e5c0b7ff765fd9e688187901816c5bf",
-        "2f59e9765467948f77702d322172b8306cf34cd588c7f6a9f98c1d2092e82b4d",
-        "ed468a77f61cda7442127a02877c36667b74d6a422f8e29051fc4fdaf46c4c78"
-      ],
-      "console_inputs": {
-        "mouse": 1,
-        "keyboard": 19
+      "recording": {
+        "fps": 30,
+        "frames": 3192,
+        "seconds": 106.4
       },
-      "program_version": "26.8.3.1"
+      "stage_screenshot_sha256": [
+        "201a7a1121f61d7a0c937bc949297a48e4ed35946d57f1224275b0ad1ae58f9f",
+        "44d56c4bfc9a71901e46a7468f200db4d726f5487e29f2b5631a4417f6ee3665",
+        "15c85eef4fb184669658b2023ce1f979323c4db4a035bd3f1e969af4cd9f38c6",
+        "1621920b04aec9fb894081b23d55d6428a0f04a646e42eb306adefec94e609d6"
+      ]
     },
     {
       "id": "15",
-      "app": "Shotcut",
-      "kind": "installed Windows program",
+      "program": "Shotcut",
+      "version": "26.11.15",
       "scenario": "Export a verified two-shot edit and check the encoder output dimensions and duration.",
-      "actions": [
+      "steps": [
         "Open the release timeline",
         "Review the second shot",
         "Export MP4 and check the result"
       ],
-      "wave": 15,
-      "result": "pass",
+      "wave": 4,
+      "run_seconds": 96.4,
       "checks": [
         {
           "name": "Recording includes an H.264 video track",
@@ -862,8 +678,7 @@
         },
         {
           "name": "Container duration is within 3.95–4.1 seconds",
-          "passed": true,
-          "measured_seconds": 4.011
+          "passed": true
         },
         {
           "name": "Encoded video contains at least 60 timed samples",
@@ -878,31 +693,31 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "ef50e5281f951bbf5dce7180bc27c6633db637eb562e062d0b2ee1459b6920ee",
-        "b209759059069b680d1d15ca903bc2b413ced9ab024eaa006d52978025d9250a",
-        "299f3a34bd02abdd79f930c6e44144c712d8a06674b689ac6d55cbfca91e6fb1",
-        "a48f8ede1721ddb966f035b4afb63039575587d1cabe354d8b4b405546e66328"
-      ],
-      "console_inputs": {
-        "mouse": 3,
-        "keyboard": 11
+      "recording": {
+        "fps": 30,
+        "frames": 3183,
+        "seconds": 106.1
       },
-      "program_version": "26.11.15"
+      "stage_screenshot_sha256": [
+        "eff6ac09572644fcf1cad58f9cd7eb035cc2b68ba3a8e0d78e145df921712037",
+        "f91d67a313493bf4286065a30db4822ef7015a1edf646fe1d9349add819a4dbe",
+        "f7b49f00b7a02563a68e6269c47ce5c7d43de879976d7c6cba61cf132cf54374",
+        "7ff27c8b9c8ad4b92f81434c02aa8f64377dadaa90d66db3b3330b5946ff37c8"
+      ]
     },
     {
       "id": "16",
-      "app": "ILSpy",
-      "kind": "installed Windows program",
+      "program": "ILSpy",
+      "version": "11.2.0.10050+c86190ef4e24f3137c13a9275316042842d2fada",
       "scenario": "Inspect two synthetic release binaries and export the candidate's public API for signature checks.",
-      "actions": [
+      "steps": [
         "Inspect baseline IL",
         "Open candidate decompilation",
         "Export the public class",
         "Validate exported signatures"
       ],
-      "wave": 5,
-      "result": "pass",
+      "wave": 4,
+      "run_seconds": 58.1,
       "checks": [
         {
           "name": "The release candidate retains its 3.0 binary version",
@@ -921,30 +736,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "843aa9eba6f072ef1fd2500a27a1c926823a672f927fca2ba0b4761b64201426",
-        "e33139fee4cbd227e6d088d3d117210c7226d0fd47fadb0dd87ef8bb26224299",
-        "153f363743ceebc14cfcc259c3e83339ce2501efe89f5dd3f330c18f06292181",
-        "094c01d96b02bca03f152e4a47421db1c4497055429316703e1dfc68d7caaf10"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 7
+      "recording": {
+        "fps": 30,
+        "frames": 3188,
+        "seconds": 106.267
       },
-      "program_version": "11.2.0.10050+c86190ef4e24f3137c13a9275316042842d2fada"
+      "stage_screenshot_sha256": [
+        "f227019caf84a466157e452961a7e3b3a641d1fcc2a7db2e4ef885e391f4b459",
+        "53b3df2b0fe7b32ecb9cc5499aba32fb81f6931ce70a742e5453d9692fdd9aff",
+        "914329d6b18cdb37f964d3d222a37f2d582af12f4406bd33ba3f3d089b2baa64",
+        "e14d728113f8768871c24f984bf503cf16e3cde327e9d209c3e1d97f5b35eab5"
+      ]
     },
     {
       "id": "17",
-      "app": "Inkscape",
-      "kind": "installed Windows program",
+      "program": "Inkscape",
+      "version": "1.4.4",
       "scenario": "The vector source contains print bleed. A production raster must keep the page rectangle and exclude the off-page registration mark.",
-      "actions": [
+      "steps": [
         "Inspect the SVG and print bleed",
         "Export the page",
         "Verify dimensions and interior pixels"
       ],
-      "wave": 5,
-      "result": "pass",
+      "wave": 4,
+      "run_seconds": 46.9,
       "checks": [
         {
           "name": "Actual Inkscape output format",
@@ -967,30 +782,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "6f1ab9ccf8b145baae4deba375be39a94a9d58778ea00f40414bc5336c6db70e",
-        "6f1ab9ccf8b145baae4deba375be39a94a9d58778ea00f40414bc5336c6db70e",
-        "4e1c952b663730407e618b1d0bba79f002990f2438656b555e4aa2f7fd6823b3",
-        "8071865ff7cc03d04397ae2dce86a1c069b4441f12337058f10caf26a2bc7660"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 6
+      "recording": {
+        "fps": 30,
+        "frames": 3190,
+        "seconds": 106.333
       },
-      "program_version": "1.4.4"
+      "stage_screenshot_sha256": [
+        "c84bf30eb30444eee078b47389e788ae0f58b0d001c50d5c4049be4b2261beb4",
+        "c84bf30eb30444eee078b47389e788ae0f58b0d001c50d5c4049be4b2261beb4",
+        "95013c1fd24da19182d5777a3cf79fae2c0d331606f36cbb6e89a8e22842544e",
+        "98c780df333c4da2f70f004b981d745532c4f7ba604b769d0cb7c5c29b5b75ae"
+      ]
     },
     {
       "id": "18",
-      "app": "SumatraPDF",
-      "kind": "installed Windows program",
+      "program": "SumatraPDF",
+      "version": "3.6.1",
       "scenario": "Navigate a release packet to the rollback evidence and final sign-off. Check that the correct page renders at every stop.",
-      "actions": [
+      "steps": [
         "Open the three-page packet",
         "Jump to rollback evidence",
         "Navigate to sign-off"
       ],
-      "wave": 9,
-      "result": "pass",
+      "wave": 8,
+      "run_seconds": 15.7,
       "checks": [
         {
           "name": "Rendered first page is the candidate overview",
@@ -1009,30 +824,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "d1ab63e9650769985af021c9991f31b224dc26184bfa86b21f5a87855fda45e5",
-        "e840b1dbf793e7d1cbc04f0e1db2958fc5976942ee785e73b2661aacfa0371f7",
-        "1dea8f293056abdddd97dd82b6cb724a452a0fcd753a2cc37de86111f64d96a3",
-        "fefa5a8ff580e3da6c8237c74d7ec8813eec667efbfcb8540279e21a9f4cf3a5"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 8
+      "recording": {
+        "fps": 30,
+        "frames": 6888,
+        "seconds": 229.6
       },
-      "program_version": "3.6.1"
+      "stage_screenshot_sha256": [
+        "8920bf32d33644f7ee8c8a411ec8806483efbce23cb524e871acd68d96b1ec39",
+        "c84c46ce74e7cb4dcbbab11350dd1bdc3a61a253e9f709ae28052967dec49890",
+        "81b481ab6906162c44b52997e13d9b6a8219744925b7a4f555335729de0fbaea",
+        "f0184c783833bf43da55da237f6cbe6ca1095306e012c3c4ae7a54068cc45e8d"
+      ]
     },
     {
       "id": "19",
-      "app": "Everything",
-      "kind": "installed Windows program",
+      "program": "Everything",
+      "version": "1.4.1.1032",
       "scenario": "Search an actual release directory inventory, remove non-ZIP matches and check the exact set of release-candidate packages.",
-      "actions": [
+      "steps": [
         "Open the generated file inventory",
         "Find release-candidate files",
         "Restrict to ZIPs and copy verified paths"
       ],
-      "wave": 10,
-      "result": "pass",
+      "wave": 4,
+      "run_seconds": 60.4,
       "checks": [
         {
           "name": "Everything indexed five controlled release files",
@@ -1047,30 +862,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "6d66366e937d6310a44ad71607547f6976f80010fc1fa1a1e1108aeaf77e8b0f",
-        "96439eda15087e7176d247923e2d496dc4327009396b4546687b3587afaa8fdc",
-        "dd3e947dc8cb5dc80acf621d524217162ada0e1f5bbbd0412a2034631c484116",
-        "c14f1ccdaf8aca148a14d6e713160171fb924beb8ec7553bfda3beb871b2dc05"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 10
+      "recording": {
+        "fps": 30,
+        "frames": 3183,
+        "seconds": 106.1
       },
-      "program_version": "1.4.1.1032"
+      "stage_screenshot_sha256": [
+        "55d7e67729d66bcd30b95955615c390607fb010bb97b58e9af5d4d7eb4b7f140",
+        "e2780d714eaacceb765942df1633afa5eb11ab1e9bb57ed13c59ee9741cf301b",
+        "513630fcd058f7a1fc11f77de593bbce71606537215992824eb2b5843e922339",
+        "0c83c19feec6ea1f9fa74d786097d06246eca3f3ea6d07e54169dd29d304e81e"
+      ]
     },
     {
       "id": "20",
-      "app": "ImageMagick",
-      "kind": "installed Windows program",
+      "program": "ImageMagick",
+      "version": "7.1.2-35",
       "scenario": "Detect a changed release badge in a raster baseline comparison, produce a real diff, and confirm the corrected build leaves zero changed pixels.",
-      "actions": [
+      "steps": [
         "Compare reference and candidate",
         "Inspect the generated diff",
         "Compare the corrected candidate"
       ],
-      "wave": 13,
-      "result": "pass",
+      "wave": 5,
+      "run_seconds": 70.1,
       "checks": [
         {
           "name": "ImageMagick identifies the precise changed bounding box",
@@ -1093,30 +908,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "4d277fc3e113ea10126a363d939d977a33bfb5606b85e991aac88676fc773df5",
-        "021d53016df11435873eb2e7452d736a98b56dd5f2d71bfc3b9bc3565919ab9f",
-        "f27ed8b0413b3609599aef8a4eb48350e433d527b39a8cb05ab51975c25d44f6",
-        "ca554390c3e235f4456dfac5a7f56c9f15d8c4f9b6b15aa397a75570b450e4d8"
-      ],
-      "console_inputs": {
-        "mouse": 2,
-        "keyboard": 5
+      "recording": {
+        "fps": 30,
+        "frames": 2410,
+        "seconds": 80.333
       },
-      "program_version": "7.1.2-35"
+      "stage_screenshot_sha256": [
+        "79af57c065a18effad67e52954bed8f20f5e0e5bd5508d80ca1aeb7fac0aaf37",
+        "03bd350c320546dda86b17d7109dcc3464ac9f3e84e2bbd834058d2aba96581a",
+        "afaef34d5c08946cca18fe9140b287da18271e6311f9183d635e0d761c41f4f7",
+        "78d2005178b0c6a3109233df3fbe0b7fcd4bd90f9f747c8a26ad3c0466be21f7"
+      ]
     },
     {
       "id": "21",
-      "app": "Event Viewer",
-      "kind": "installed Windows program",
+      "program": "Event Viewer",
+      "version": "10.0.26200",
       "scenario": "Inspect a filtered deployment incident and verify that recovery followed the missing-manifest error.",
-      "actions": [
+      "steps": [
         "Open the incident log",
         "Inspect the blocked release",
         "Compare the recovery event"
       ],
-      "wave": 8,
-      "result": "pass",
+      "wave": 5,
+      "run_seconds": 39.0,
       "checks": [
         {
           "name": "Incident and recovery event IDs",
@@ -1139,29 +954,30 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 2408,
+        "seconds": 80.267
+      },
       "stage_screenshot_sha256": [
-        "5d6fe258abc32975e65eab703258089f34889a33c90e32683bbcc3dc117e9340",
-        "cf86b49e3017cca704ab3094af36e4c79f28703b9362c6cd43344959c588d7c7",
-        "cf86b49e3017cca704ab3094af36e4c79f28703b9362c6cd43344959c588d7c7",
-        "f1a33eff74aabb2221c3c0db4c0ed23aa427c13c74e443d25868867b357aca7c"
-      ],
-      "console_inputs": {
-        "mouse": 1,
-        "keyboard": 5
-      }
+        "748e179283ab1852c68d8995bf6f95ee0651ac5676a2061ffcb8d4bdee670c5b",
+        "4df7533732da7891a6e4a4c41daca02c67722b7d50107722583f361abd7015b0",
+        "4df7533732da7891a6e4a4c41daca02c67722b7d50107722583f361abd7015b0",
+        "60bf878d6e62b549bad034da8b127c8b0c5081d6bc270cfe181976fa56705167"
+      ]
     },
     {
       "id": "22",
-      "app": "Task Scheduler",
-      "kind": "installed Windows program",
+      "program": "Task Scheduler",
+      "version": "10.0.26200",
       "scenario": "Run the release-manifest task on demand and match its output hashes against the fixture bytes.",
-      "actions": [
+      "steps": [
         "Locate the isolated task folder",
         "Run the manifest job",
         "Verify result and artifact hashes"
       ],
-      "wave": 16,
-      "result": "pass",
+      "wave": 5,
+      "run_seconds": 31.1,
       "checks": [
         {
           "name": "On-demand task finished with exit code zero",
@@ -1180,29 +996,30 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 2406,
+        "seconds": 80.2
+      },
       "stage_screenshot_sha256": [
-        "3332da8fd926f432985e77ed0cac7b281eec1d2f7c2b9b77200bc7dbf234c554",
-        "ea976927789acaa6c7ea0fe9bd652387fd1527b746f2c216ec8a38f387f1b61f",
-        "5ca0c55f84db65d41430dfd5b55e158d69fb3b6188ba7307457318aa1b2f9764",
-        "ac9a50be9c1d3fd7e225ee300bb1a269751749acc4ce860d1784fcb62a43f608"
-      ],
-      "console_inputs": {
-        "mouse": 4,
-        "keyboard": 7
-      }
+        "7e5bcd8d659fc8c1dd368a4c5ea8c4dd38fd8ad29d32aab7c6a1d0ad507e84fc",
+        "652bcd1c5b6b0403a5d0ab7a2d21a95082ab0025d84768f29950cad5ac30a33f",
+        "e0a5ac5e182b4d032d434313a857637bda99a7ce4d175be467b6c7246d92daf4",
+        "655ae1a1ce6f39cae9a75b9287d61517644417e0c46c0f5619f72ad7fbe1e90a"
+      ]
     },
     {
       "id": "23",
-      "app": "Windows PowerShell ISE",
-      "kind": "installed Windows program",
+      "program": "Windows PowerShell ISE",
+      "version": "10.0.26200",
       "scenario": "Run a package-file test, correct a stale expected file count, and compare both test receipts.",
-      "actions": [
+      "steps": [
         "Review the smoke test",
         "Reproduce the count mismatch",
         "Correct the expectation and rerun"
       ],
-      "wave": 22,
-      "result": "pass",
+      "wave": 5,
+      "run_seconds": 38.3,
       "checks": [
         {
           "name": "Stale package count blocked the release",
@@ -1217,29 +1034,30 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 2408,
+        "seconds": 80.267
+      },
       "stage_screenshot_sha256": [
-        "c8e0875fb8fe013505987a52857abf9e6f2ade17079ec268641214c286e93690",
-        "e1b5bf2635208188a15729b560d56fd7f90c7b355f1f4b8241e9e5f9dc9fd680",
-        "c5beb077158cf79529442aa7e92cd6638bb622a3f87cfc25cbc4ae0103c83b80",
-        "5eddad6d5d9a6a2edd1171d9ca974e30f8aa0b73588ff5781edb8e9e0f11a9e7"
-      ],
-      "console_inputs": {
-        "mouse": 3,
-        "keyboard": 3
-      }
+        "65cb02e6aa75d9650524e55dea6e4ba0a0864271c4691659d4d7009a79f065fd",
+        "d8924f3d312146bdc1a8d479caeb4f460d2ea17f12353a1024a039a662414183",
+        "28e5a243672f056b96afb7614de321eb8edfe71638938399f67baa5705226f98",
+        "ee8e297cb56e9c1f3c0b441666bf658dbc99c6f6da6eee55f301260eaba7019e"
+      ]
     },
     {
       "id": "24",
-      "app": "ODBC Data Source Administrator",
-      "kind": "installed Windows program",
+      "program": "ODBC Data Source Administrator",
+      "version": "10.0.26200",
       "scenario": "Inspect a migrated 64-bit test data source and verify that its offline driver and routing settings survived.",
-      "actions": [
+      "steps": [
         "Open the system data sources",
         "Inspect the release QA data source",
         "Verify the installed driver and registry values"
       ],
-      "wave": 14,
-      "result": "pass",
+      "wave": 5,
+      "run_seconds": 26.0,
       "checks": [
         {
           "name": "System DSN uses the intended installed driver",
@@ -1262,29 +1080,30 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 2409,
+        "seconds": 80.3
+      },
       "stage_screenshot_sha256": [
-        "833b6669f2b63458ed59189b9f265adb2a5919e8dc405da1bd3703ba742abd4f",
-        "1d1508d3d1f3a955d8d8439fef9e509bddc37b02f5a3a8d9ed144096ca13937a",
-        "1aa683b20939069ec344d85bbbe2c00f9dd79fdfbc7342c2b4a53886bfc16033",
-        "924096c594667d820ce9322b7d945f3dfb52ae984a881746398b55ece3c9fd4f"
-      ],
-      "console_inputs": {
-        "mouse": 4,
-        "keyboard": 2
-      }
+        "315476181a6ce381e51873fc81bd5516a46d6ee1267ab5f1947999985eac4244",
+        "b2b6b02da8569c53bf55ec07f7a987347f6a62327db6cf973048b411f91393cc",
+        "9ceadcb38c2def84df11f1e8a40dfbb80a9d76575e2ae7f492fcdbccdc5ab169",
+        "a56f25b03146e7a6d58bde83efa881fda4dbda55dd6cc8074b39861105f7d145"
+      ]
     },
     {
       "id": "25",
-      "app": "Process Monitor",
-      "kind": "installed Windows program",
+      "program": "Process Monitor",
+      "version": "4.13",
       "scenario": "Trace a staged app that cannot find its settings, then verify the recovered file access.",
-      "actions": [
+      "steps": [
         "Start a guest file trace",
         "Reproduce the failed startup",
         "Verify the successful rerun"
       ],
-      "wave": 12,
-      "result": "pass",
+      "wave": 8,
+      "run_seconds": 68.7,
       "checks": [
         {
           "name": "Synthetic loader reproduced the missing settings",
@@ -1303,31 +1122,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "8898421eee282e8910e7dcd0412bfac321e9f56c83e50375f2180b972e1b8747",
-        "af7742da778b3c1686bc168733a3b9a13c29300c149519fc7f140ece86e023d9",
-        "4f5fd8e2708d9dfc39d0e063e2e17a3150ce24796f28e4cee13a0e1f9b125356",
-        "4f5fd8e2708d9dfc39d0e063e2e17a3150ce24796f28e4cee13a0e1f9b125356"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 15
+      "recording": {
+        "fps": 30,
+        "frames": 6888,
+        "seconds": 229.6
       },
-      "program_version": "4.13",
-      "signature_verified": true
+      "stage_screenshot_sha256": [
+        "9ae498677414248611e3d0752cb68fdde4512589565f7303207fead6219dd342",
+        "67101d3634a9405711f60ff39ba5d6d33e64e6586fcb222864e7a29d10960468",
+        "1eadffcb93641138cd63e5a92d9d49ef6b85bae4f9bd037300701f4bdf9d16e2",
+        "1eadffcb93641138cd63e5a92d9d49ef6b85bae4f9bd037300701f4bdf9d16e2"
+      ]
     },
     {
       "id": "26",
-      "app": "Process Explorer",
-      "kind": "installed Windows program",
+      "program": "Process Explorer",
+      "version": "17.21",
       "scenario": "Identify the QA process holding a release manifest and verify that it releases the lock.",
-      "actions": [
+      "steps": [
         "Start the dedicated exporter",
         "Find its manifest handle",
         "Verify the released file"
       ],
-      "wave": 21,
-      "result": "pass",
+      "wave": 7,
+      "run_seconds": 98.4,
       "checks": [
         {
           "name": "Windows identified the dedicated manifest exporter",
@@ -1350,31 +1168,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "0ec09937c2bb856939a6f44c584d72094d8381ebb510eb36b4a77315f5f80c75",
-        "a32e0ccc323c0d3c31e2b468a65583ec115fdbb314bf1df5346bc2c1b38d8185",
-        "1cd16ef7999bb4c116b36999d2fa48be03336cb695fd3b74d0d1619e5b4413ab",
-        "f0a5bbbfa2449c5beaaaf42e212934c14924d780deef73d279a60a17a3f2a508"
-      ],
-      "console_inputs": {
-        "mouse": 3,
-        "keyboard": 11
+      "recording": {
+        "fps": 30,
+        "frames": 3262,
+        "seconds": 108.733
       },
-      "program_version": "17.21",
-      "signature_verified": true
+      "stage_screenshot_sha256": [
+        "f86221f2f2666bfde2e6a5b0ad3e4c957dc4e1219882f86899e012880306bb8d",
+        "0ff48661ce08b598a84b3437765a4635ee6fc0963b7aac82801a86b794946f96",
+        "17fa63f7a2cec0f580eae99f50ba763ec6497977554913d9c505d2736db0f78b",
+        "c734f4f3eb4f3142685af4e863fa8d5626722ce8094c8a52a4feaa5a3aa60f4b"
+      ]
     },
     {
       "id": "27",
-      "app": "TCPView",
-      "kind": "installed Windows program",
+      "program": "TCPView",
+      "version": "4.19",
       "scenario": "Compare a QA service's listener and established loopback session against Windows socket state.",
-      "actions": [
+      "steps": [
         "Start the local fixture listener",
         "Connect the QA client",
         "Save and compare the TCP snapshot"
       ],
-      "wave": 17,
-      "result": "pass",
+      "wave": 5,
+      "run_seconds": 49.8,
       "checks": [
         {
           "name": "The QA program listened only on loopback port 46361",
@@ -1389,31 +1206,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "a927fe65c5f2c0ca53b1ceb018149a83e553110aeca4fe9d852a320a5554053f",
-        "738a92827ca495284017a40fd2418f3c17ea15c97a59332ae051aca7c7eec901",
-        "0c4e7828b85067c91d4ee18ae106959b1edfb75bb00259e6eb7e588e8484ec61",
-        "1c289a3f8baa40f7f77cab887a47f8f77c0b46c59fcee629a85220484cd63e59"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 5
+      "recording": {
+        "fps": 30,
+        "frames": 2406,
+        "seconds": 80.2
       },
-      "program_version": "4.19",
-      "signature_verified": true
+      "stage_screenshot_sha256": [
+        "95c4dcf6b5cd456a9d8cf7812e6e6aaf9c6923a58ad36caaf499283a53b1c254",
+        "4aaf18cf30c380b4283f3b70345bb3e40f8edcff9038e20e3fde66131cd9c1b9",
+        "d622c2ff66679f9cbe39107f2cac1c199a91ab618ae90e784202a483e65c0ef5",
+        "bafd2df06ef2e807d72e449034fd6b904501a4e0fad707aea06d21713082da31"
+      ]
     },
     {
       "id": "28",
-      "app": "VMMap",
-      "kind": "installed Windows program",
+      "program": "VMMap",
+      "version": "3.4",
       "scenario": "Capture a native memory map surrounding a known 32 MiB QA allocation.",
-      "actions": [
+      "steps": [
         "Attach to the synthetic loader",
         "Exercise the 32 MiB buffer",
         "Save and verify the memory snapshot"
       ],
-      "wave": 20,
-      "result": "pass",
+      "wave": 6,
+      "run_seconds": 50.1,
       "checks": [
         {
           "name": "The test program committed an exact 32 MiB buffer",
@@ -1428,31 +1244,30 @@
           "passed": true
         }
       ],
-      "stage_screenshot_sha256": [
-        "9fea7570038ae7ce3cced64294b5ba9872db062bc94c7bd16205fa8bafbb2414",
-        "4ebab817f35f2218b5f45cdcf8a473e7d37f5bb71ed0e849c352a94c56a741ba",
-        "b2d47e4dc1af12464559a4bbdd728136f3931a35ece714cf6824d2997b94cc2f",
-        "4ebab817f35f2218b5f45cdcf8a473e7d37f5bb71ed0e849c352a94c56a741ba"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 11
+      "recording": {
+        "fps": 30,
+        "frames": 2718,
+        "seconds": 90.6
       },
-      "program_version": "3.4",
-      "signature_verified": true
+      "stage_screenshot_sha256": [
+        "0e78f7b310df38cf259bcae85ae07c18d3a9ee4aa4a8f963dcf065b21664c079",
+        "600b84f36ac2660ae3fda2ca744267480ffe9df558f27ab39e605df76a0a3c78",
+        "3a940a1222a66d1a86951c86283b39a05e6d83ccf7f5f6d24b719b6f5de5f441",
+        "37443630bce927e5c4567e5f0e669815387b26bf954d26082561d6fb918843e5"
+      ]
     },
     {
       "id": "29",
-      "app": "Notepad",
-      "kind": "installed Windows program",
+      "program": "Notepad",
+      "version": "10.0.26200",
       "scenario": "Approve a staged release in a text manifest. Save and reopen the result.",
-      "actions": [
+      "steps": [
         "Open the release record",
         "Change the handoff gate",
         "Save and reopen"
       ],
-      "wave": 1,
-      "result": "pass",
+      "wave": 6,
+      "run_seconds": 18.2,
       "checks": [
         {
           "name": "The edited release gate was saved to disk",
@@ -1467,29 +1282,30 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 2720,
+        "seconds": 90.667
+      },
       "stage_screenshot_sha256": [
-        "c7b538a9f34c82bbbb6412d5d6177defc172798ba7abb1334d6e54466197d814",
-        "14793fb537e4d75373b7eaa5a52064f95426ec3447347e5f345948fde6229650",
-        "b4c3b7ff99eece766d9beb03097ba88990acd1292ae87a0a0e53b889cc05995d",
-        "dfb43526fcf275b3a768a91df3bf4afdfcb95363c360648e78c8d97d709e270c"
-      ],
-      "console_inputs": {
-        "mouse": 0,
-        "keyboard": 15
-      }
+        "6a5072c052a57c69ab74c680cdcefe2cddcf2302bb7e4ce23b4ff2375c5bb8cd",
+        "9ad67c0e48d3aed1ff4f55ee2d88aae0cb9a2f92b9fb4cefa9e2e91e7d9e1d96",
+        "34d611cb047d1c61080487ada92adf64f0a63eb00dbf71d7d1176b4539f00831",
+        "484ab9d53d532e123e8f8c18d104f60460001aee1bc5d9250cf3dd48d8a8b2dc"
+      ]
     },
     {
       "id": "30",
-      "app": "File Explorer",
-      "kind": "installed Windows program",
+      "program": "File Explorer",
+      "version": "10.0.26200",
       "scenario": "Restore an evidence bundle through the compressed-folder UI and check both exported files.",
-      "actions": [
+      "steps": [
         "Open the zipped evidence",
         "Copy to recovery workspace",
         "Verify both SHA-256 hashes"
       ],
-      "wave": 1,
-      "result": "pass",
+      "wave": 7,
+      "run_seconds": 29.4,
       "checks": [
         {
           "name": "Explorer recovered exactly two files",
@@ -1504,29 +1320,30 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 3262,
+        "seconds": 108.733
+      },
       "stage_screenshot_sha256": [
-        "cf295c148a00a7ac5a66b74d9b268fbcfa3540308cd5d660cda4a236e498effb",
-        "029656bb5244d8251fba9281d818c81a94600651b261dfb8615878d0938f80bf",
-        "d254c9f73c55c5dc9620b3b35581c741da463f9b1d45bdf8d1ac09c13476bece",
-        "14d73d60f9dee46bdb32d546c07faab92d34d12d286e981c201fd3b3b37ab9f9"
-      ],
-      "console_inputs": {
-        "mouse": 1,
-        "keyboard": 4
-      }
+        "a6a86ff8e02c9fd71d8f82e726f9ae45e880cfff28f32991a010b2e75df65770",
+        "71a6254fea4d29d50cb53d3133ee96f114044a609699af21daca50a13985449e",
+        "ca1655e6ca67af8d07c0c099f7cc5470275301d7845fa9483efd612b0216aa53",
+        "6367069049d2968b7fd5f6eef34a5a0aae16599776b6987ea1f959a4df09cba3"
+      ]
     },
     {
       "id": "31",
-      "app": "Paint",
-      "kind": "installed Windows program",
+      "program": "Paint",
+      "version": "10.0.26200",
       "scenario": "Fill the approval tile in a PNG and check that the surrounding artwork stays unchanged.",
-      "actions": [
+      "steps": [
         "Open the approval artwork",
         "Fill the review tile",
         "Save and inspect the PNG"
       ],
-      "wave": 1,
-      "result": "pass",
+      "wave": 6,
+      "run_seconds": 57.0,
       "checks": [
         {
           "name": "Paint saved a PNG",
@@ -1545,30 +1362,31 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 2718,
+        "seconds": 90.6
+      },
       "stage_screenshot_sha256": [
-        "c7842e663b6d467b456882fb136d9816de481e0c7bbfb74e27593c91ce20272b",
-        "531b5f720e75d53ded0dd08a486fedf3f06b4e6def2144a4e67c6a53556095c2",
-        "2c5c0178555d655171494f1b32b32626505386714570c8a84c2d949a2f59cc20",
-        "b050908d0c8c2effe64218b030ff7a33d05f91f2b2aa85c43b77baa30f3e358e"
-      ],
-      "console_inputs": {
-        "mouse": 2,
-        "keyboard": 7
-      }
+        "96a8daed2b93a0b9545a4b8c480fa4b11f50957231bd3303600eaee4f623880d",
+        "49d48dcf56ae8dd53142c87802795d62ef42148425a3a651ea503a926a8d9aba",
+        "1697734a3adba9782b5fe6bf471c1c2801103da8826703f8bd1d6cfe2ff4647f",
+        "736f4d80b6f8afd0b92f26ca504c86b211417ddc8b6cd1886b07dacfc59ca10a"
+      ]
     },
     {
       "id": "32",
-      "app": "Performance Monitor",
-      "kind": "installed Windows program",
+      "program": "Performance Monitor",
+      "version": "10.0.26200",
       "scenario": "Capture a bounded CPU regression, freeze the graph for inspection, and verify that the guest recovers.",
-      "actions": [
+      "steps": [
         "Record the idle baseline",
         "Run the CPU stress fixture",
         "Freeze the observed spike",
         "Confirm CPU recovery"
       ],
-      "wave": 18,
-      "result": "pass",
+      "wave": 10,
+      "run_seconds": 111.8,
       "checks": [
         {
           "name": "The PerfMon graph visibly changed under load",
@@ -1595,16 +1413,17 @@
           "passed": true
         }
       ],
+      "recording": {
+        "fps": 30,
+        "frames": 3684,
+        "seconds": 122.8
+      },
       "stage_screenshot_sha256": [
-        "62c517318f44536b1aa7aef20631426924c4ba3d0d258eaec86f73fee35765c7",
-        "384221bf4e050c8ce3c98f2663c0d6456ffe1e152acefea25ce7bb1bd5102b23",
-        "fa91ed1db7aa2ed3aa7d3672e441775825de2f448851c6104d2de7db0358f4ab",
-        "2babdfa1b0ad09ea5f9834202ff0b12658ad159eb6f4b13d14a6c49285bfb49f"
-      ],
-      "console_inputs": {
-        "mouse": 8,
-        "keyboard": 5
-      }
+        "690c8c5c0648408cc64c2841ab083a8661093749923f08667f69dd812685cb8c",
+        "449a09e5a19a6b6b0e3f1e9b27b1a813ccf9663ca1d3a7b61aba472bbd80a848",
+        "581dba4c0e1b7487d13d48f813733c80f0c8f9c27fa831487b0c4b21fe19803e",
+        "24f77569cbbaca18f1e812e1445ccab18e86e46cbe374ad228e5c7c44b200157"
+      ]
     }
   ]
 }

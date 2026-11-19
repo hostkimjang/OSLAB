@@ -209,6 +209,12 @@ class ConsoleConnection:
             struct.pack(">BBHH", 5, mask, x, y) for mask in (0, _BUTTONS[button], 0)
         ))
 
+    async def move(self, x: int, y: int) -> None:
+        """Move the guest's pointer to native framebuffer coordinates without clicking."""
+        if not (0 <= x < self.width and 0 <= y < self.height):
+            raise OslabError(f"Pointer coordinates must be inside the {self.width}×{self.height} VM screen")
+        await self._send_input(struct.pack(">BBHH", 5, 0, x, y))
+
     async def press_key(self, keys: list[str]) -> None:
         """Press a printable ASCII key, named key, or modifier chord in the VM."""
         if not 1 <= len(keys) <= 8:

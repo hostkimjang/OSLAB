@@ -10,11 +10,11 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-![OSLab으로 실제 Windows 프로그램 32개에서 릴리스 QA를 실행하는 영상](docs/media/oslab-windows-product-qa.gif)
+https://github.com/user-attachments/assets/52e5a594-a439-44a6-b461-f3e94d1c1c04
 
-> **실제 Windows 11 프로그램으로 검증한 작업 32개.** OSLab MCP로 일회용 Proxmox VM에서 7-Zip, LibreOffice, OBS Studio 등을 조작했습니다. 압축 복원, 릴리스 판정 수정, 녹화 파일 검증, SQLite 마이그레이션을 확대해 보여 줍니다. 첫 장면은 같은 시간축에 콘솔 4개를 배치했고, 촬영은 최대 3대에서 겹쳤습니다. 전체 시나리오에서 검사 140개를 통과했습니다.
+> **Windows VM 32대, 실제 프로그램 32개.** 일회용 Windows 11 VM마다 테스트 에이전트 하나가 OSLab MCP 서버로 7-Zip, LibreOffice, OBS Studio, VS Code, Sysinternals 도구 등을 조작합니다. 화면은 모두 해당 VM의 콘솔 녹화본이며, 최대 8대씩 나눠 녹화한 뒤 작업 시작 시점에 맞춰 배치했습니다. OSLab이 모든 결과를 게스트 안에서 확인했고 검사 140개를 모두 통과했습니다.
 
-[1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Windows QA 재현 방법](docs/windows-product-qa.ko.md) · [검증 결과](docs/media/oslab-windows-product-qa-attestation.json)
+[영상 소개](docs/intro-video.ko.md) · [1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Windows QA 재현 방법](docs/windows-product-qa.ko.md) · [검증 결과](docs/media/oslab-windows-product-qa-attestation.json)
 
 [이전 Windows 앱 매트릭스 데모](docs/windows-app-matrix.ko.md) · [Dispatch Board MSI 설치·업그레이드 예제](docs/release-qa-demo.ko.md) · [Dispatch Board 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
@@ -168,7 +168,7 @@ uv run oslab run `
 <a id="codex-mcp"></a>
 ## Codex 또는 Claude로 테스트 VM 조작하기
 
-그래픽 콘솔이 있는 테스트 VM을 켜고 VMID를 확인합니다. Windows 앱을 조작하려면 데스크톱에 로그인합니다. VM에 Computer Use 프로그램을 별도로 설치할 필요는 없습니다. 위 예제로 테스트 VM을 복제·부팅하고 나서 연결하려면 `oslab run`에 `--keep-vm`을 추가합니다. OSLab의 Proxmox 토큰에는 해당 VM을 조회할 권한과 `VM.Console` 권한이 필요합니다. 저장소 루트에서 실행합니다.
+그래픽 콘솔이 있는 테스트 VM을 켜고 VMID를 확인합니다. Windows 앱을 조작하려면 데스크톱에 로그인합니다. VM에 Computer Use 프로그램을 별도로 설치할 필요는 없습니다. 위 예제로 만든 복제 VM에 나중에 연결하려면 `oslab run`에 `--keep-vm`을 추가합니다. OSLab의 Proxmox 토큰에는 해당 VM의 `VM.Audit`와 `VM.Console` 권한이 필요합니다. 저장소 루트에서 다음 명령을 실행합니다.
 
 ```powershell
 $vmId = Read-Host '테스트 VM의 VMID'
@@ -180,6 +180,8 @@ codex mcp get oslab
 `codex mcp get oslab`에서 등록한 VMID를 확인합니다. 여러 VM을 조작할 때는 등록 명령에 VM마다 `--vm-id`를 추가합니다. Codex에 `oslab` 도구가 보이면 VM 콘솔 창을 닫고 다음과 같이 요청합니다.
 
 > OSLab MCP의 `list_vms`로 내 테스트 VM을 확인하고 화면을 캡처해 줘. `Win+r`을 누른 뒤 `notepad`를 한 글자씩 입력하고 Enter를 눌러 메모장을 열어 줘. 새 캡처를 보고 메모장 편집 영역을 클릭해 `oslab mcp ok`를 입력한 다음, 문구가 보이는 최종 화면을 PNG로 캡처해 보여 줘.
+
+새 테스트 복제 VM을 자동으로 찾으려면 시나리오의 `provider.vmIdRange`를 `--vm-id-range START END`에 지정합니다. 이미 `oslab`을 등록했다면 기존 `--vm-id` 옵션과 값을 범위 지정으로 바꾼 뒤 클라이언트를 재시작합니다. 자동 검색은 범위 안에서 이름이 `oslab-`로 시작하고 토큰에 두 권한이 모두 있는 실행 중 QEMU VM을 찾습니다. 템플릿은 제외합니다. [MCP 접근 범위와 등록 방법](docs/computer-use-mcp.ko.md#vm-scope)
 
 Claude Code에서도 같은 서버를 모든 프로젝트에서 사용할 수 있습니다. [Claude Code 사용자 범위 등록](docs/computer-use-mcp.ko.md#claude-code) 또는 [Claude Desktop 설정](docs/computer-use-mcp.ko.md#claude-desktop)을 따릅니다.
 

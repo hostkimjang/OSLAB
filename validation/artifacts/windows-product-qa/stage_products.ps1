@@ -13,7 +13,7 @@ $entries = @(
     @('notepadpp','zip','https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.9.9.1/npp.8.9.9.1.portable.x64.zip','cbcefa34677e10fe6dd19802f7d6b3b9860cd6de62afeaae7680e09c51b47779'),
     @('git','7z','https://github.com/git-for-windows/git/releases/download/v2.56.1.windows.1/PortableGit-2.56.1-64-bit.7z.exe','9dd04a608ceb5f6ab32a73709e0ecb159d211da71b697c45ff81f6dd0c6b49c7'),
     @('sqlitebrowser','zip','https://github.com/sqlitebrowser/sqlitebrowser/releases/download/v3.13.1/DB.Browser.for.SQLite-v3.13.1-win64.zip','22375e275ec42d96de1d3b8e9ea4ed86d2a3505c4d0ffcbd1af67aa4003e5e4d'),
-    @('winmerge','zip','https://github.com/WinMerge/winmerge/releases/download/v2.16.60/winmerge-2.16.60-x64-exe.zip','be3f850ed2e450c474928cb67d2998e812da90dea1240a46352714553342522'),
+    @('winmerge','zip','https://github.com/WinMerge/winmerge/releases/download/v2.16.60/winmerge-2.16.60-x64-exe.zip','be3f850ed2e450c474928ccb67d2998e812da90dea1240a46352714553342522'),
     @('vlc','7z','https://download.videolan.org/pub/videolan/vlc/3.0.23/win64/vlc-3.0.23-win64.7z','eb4fd8a28291da73608c733786a09610fea865fbe94113bcb60b91c1ebb8404a'),
     @('audacity','msi','https://github.com/audacity/audacity/releases/download/Audacity-4.0.2/audacity-win-4.0.2-x86_64.msi','ff6cad670befee96fee563056965fa5e17bfa8c7ea3aba10c461c18799409e22'),
     @('shotcut','zip','https://github.com/mltframework/shotcut/releases/download/v26.11.15/shotcut-win64-26.11.15.zip','d704c12a8ce6d1fbe1a13155578ee5cf36b749a26503500cce38d8e68f900b0d'),

@@ -10,11 +10,11 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-![OSLab drives real Windows release QA in 32 installed and built-in programs](docs/media/oslab-windows-product-qa.gif)
+https://github.com/user-attachments/assets/52e5a594-a439-44a6-b461-f3e94d1c1c04
 
-> **32 real Windows 11 workflows.** OSLab MCP drives 7-Zip, LibreOffice, OBS Studio, and other desktop tools in disposable Proxmox VMs. See a release archive restored, a blocked release gate corrected, a recording verified, and a SQLite migration applied. The opening aligns 4 consoles on a shared capture clock with 3 active at peak. The catalog brings together the workflows that passed 140 checks.
+> **32 Windows VMs, 32 real programs.** On each disposable Windows 11 VM, a test agent drives one real program, such as 7-Zip, LibreOffice, OBS Studio, VS Code or a Sysinternals tool, through the OSLab MCP server. Every screen is a console recording of its own VM, recorded in waves of up to 8 and lined up at each run's start. OSLab checked every result inside the guest, and all 140 checks passed.
 
-[Download the 1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Reproduce the Windows QA runs](docs/windows-product-qa.md) · [Read the verification results](docs/media/oslab-windows-product-qa-attestation.json)
+[About this video](docs/intro-video.md) · [Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Reproduce the Windows QA runs](docs/windows-product-qa.md) · [Read the verification results](docs/media/oslab-windows-product-qa-attestation.json)
 
 [Earlier Windows app matrix demo](docs/windows-app-matrix.md) · [Dispatch Board MSI and upgrade demo](docs/release-qa-demo.md) · [Watch the Dispatch Board recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
@@ -168,7 +168,7 @@ Do not run an example scenario unchanged against a shared cluster. Review the te
 <a id="codex-mcp"></a>
 ## Control a Test VM with Codex or Claude
 
-Start a test VM with a graphical console and note its VMID. Sign in to the Windows desktop to control apps. The VM needs no separate computer-use software. To keep the clone from the example above running, add `--keep-vm` to `oslab run`. Your OSLab Proxmox token needs permission to see the VM and the `VM.Console` privilege. Run these commands from the repository root.
+Start a test VM with a graphical console and note its VMID. Sign in to the Windows desktop to control apps. The VM needs no separate computer-use software. To keep the clone from the example above running, add `--keep-vm` to `oslab run`. Your OSLab Proxmox token needs `VM.Audit` and `VM.Console` on the VM. Run these commands from the repository root.
 
 ```powershell
 $vmId = Read-Host 'Test VMID'
@@ -180,6 +180,8 @@ codex mcp get oslab
 Check the registered VMID in `codex mcp get oslab`. To control more than one VM, repeat `--vm-id` in the registration command. Once Codex shows the `oslab` tools, close the VM console window and try this prompt.
 
 > Use the OSLab MCP to list the test VM and capture its screen. Press `Win+r`, enter `notepad` one key at a time, and press Enter. Capture the new screen, click the Notepad editing area, and type `oslab mcp ok`. Show me the final PNG with the text visible.
+
+To include newly created test clones automatically, register with `--vm-id-range START END` using the scenario's `provider.vmIdRange`. In an existing `oslab` registration, replace the `--vm-id` options and their values with the range, then restart the client. Discovery includes running `oslab-` QEMU VMs in that range for which the token has both permissions, excluding templates. [MCP scope and setup](docs/computer-use-mcp.md#vm-scope)
 
 Claude Code can use the same server across projects. Register it in [Claude Code's user scope](docs/computer-use-mcp.md#claude-code), or use the [Claude Desktop setup](docs/computer-use-mcp.md#claude-desktop).
 
