@@ -4,7 +4,7 @@ English · [한국어](windows-product-qa.ko.md)
 
 Run 32 release QA workflows against real programs on disposable Windows 11 VMs. Each VM operates a separate program or LibreOffice application using synthetic release files. The OSLab MCP sends clicks and keystrokes through the Proxmox console. The runner collects separate evidence through QEMU Guest Agent (QGA), including file hashes, computed values and observed desktop state. [Scenario source](../validation/artifacts/windows-product-qa) · [Console MCP](computer-use-mcp.md)
 
-The README video recorded all 32 workflows on disposable Windows 11 VMs, and all 140 checks passed. [About the video](intro-video.md) · [1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Verification record](media/oslab-windows-product-qa-attestation.json)
+The 32-VM video recorded all 32 workflows on disposable Windows 11 VMs, and all 140 checks passed. Chapter 06 of the [introduction video](intro-video.md) reuses these recordings. [About the 32-VM video](intro-video.md#the-32-vm-windows-qa-video) · [1080p recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Verification record](media/oslab-windows-product-qa-attestation.json)
 
 ## Scenario catalog
 
@@ -82,7 +82,7 @@ uv run --locked --extra computer-use python "$demo/run.py" run @lab --wave-size 
 - `<ID>-stage-0.png` through `<ID>-stage-3.png` capture actual guest pixels at the workflow milestones. Extra captures use the same batch clock. For a video, align overlapping captures for the parallel segment and label a composite drawn from multiple batches.
 - The runner skips cases already recorded in the output directory. Use `cleanup-wave` with the same lab parameters to clear a retained batch before retrying. A run with any requested evidence still missing returns a nonzero exit code.
 
-## Record the README video
+## Record the 32-VM video
 
 `fleet.py` runs the same workflows in waves and records each VM console to its own video. Each wave creates linked clones from the sealed source and starts them a few at a time while it watches the node's available memory. It records every console at 30 fps, starts the wave's workflows at the same moment, and removes the wave's VMs before the next wave starts. A failed workflow runs once more in a later wave, and running the command again repeats only the workflows that have not passed yet.
 
@@ -90,7 +90,7 @@ The recorder needs a direct connection to the Proxmox node, so pass the node's L
 
 `edit_video.py` builds the video from those recordings. It lines up every recording at the start of its own workflow, shows all of them as one wall, and zooms into the featured workflows. Long waits play faster and the actions play close to real time. A workflow is marked as passed at the moment its guest checks passed. Each workflow's test agent appears as a colored cursor that follows the MCP click positions and times in `case-<ID>.json`, and the editor interpolates the paths between clicks. The editor uses the [Geist](https://github.com/vercel/geist-font) fonts and writes `oslab-intro-master.mp4` without an audio track.
 
-The README copy is a two-pass encode of the master that stays under the 10 MB video limit for GitHub's free plan. `--receipt` writes a JSON record of the programs, checks and that file's hash next to it. [Scene breakdown](intro-video.md)
+The published copy is a two-pass encode of the master that stays under the 10 MB video limit for GitHub's free plan. `--receipt` writes a JSON record of the programs, checks and that file's hash next to it. [Scene breakdown](intro-video.md#the-32-vm-windows-qa-video)
 
 ```powershell
 uv run --locked --extra computer-use python "$demo/fleet.py" run @lab --lan-address 192.168.0.10 --wave-size 8 --ffmpeg ffmpeg

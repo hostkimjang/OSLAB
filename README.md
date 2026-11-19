@@ -10,11 +10,11 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-https://github.com/user-attachments/assets/52e5a594-a439-44a6-b461-f3e94d1c1c04
+[![OSLab introduction video, 2 minutes 45 seconds](docs/media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
 
-> **32 Windows VMs, 32 real programs.** On each disposable Windows 11 VM, a test agent drives one real program, such as 7-Zip, LibreOffice, OBS Studio, VS Code or a Sysinternals tool, through the OSLab MCP server. Every screen is a console recording of its own VM, recorded in waves of up to 8 and lined up at each run's start. OSLab checked every result inside the guest, and all 140 checks passed.
+> **From one scenario to evidence on a fresh Windows VM.** OSLab clones a disposable Windows 11 VM on Proxmox, runs the build through QEMU Guest Agent, checks the result, keeps the reports and removes the VM. The video follows a CLI run, a run launched from the web dashboard, and a Codex session that operates the Windows desktop through the OSLab MCP server. It ends on 32 real programs tested on 32 VMs, with all 140 guest checks passed. VM, report and dashboard screens are real recordings with waits sped up, and the 32-VM wall lines up runs recorded in waves of up to 8.
 
-[About this video](docs/intro-video.md) · [Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Reproduce the Windows QA runs](docs/windows-product-qa.md) · [Read the verification results](docs/media/oslab-windows-product-qa-attestation.json)
+[About this video](docs/intro-video.md) · [Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4) · [Verification record](docs/media/oslab-intro-film-attestation.json) · [32-VM Windows QA video](docs/intro-video.md#the-32-vm-windows-qa-video) · [Reproduce the Windows QA runs](docs/windows-product-qa.md)
 
 [Earlier Windows app matrix demo](docs/windows-app-matrix.md) · [Dispatch Board MSI and upgrade demo](docs/release-qa-demo.md) · [Watch the Dispatch Board recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 

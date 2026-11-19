@@ -10,11 +10,11 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-https://github.com/user-attachments/assets/52e5a594-a439-44a6-b461-f3e94d1c1c04
+[![OSLab 소개 영상, 2분 45초](docs/media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
 
-> **Windows VM 32대, 실제 프로그램 32개.** 일회용 Windows 11 VM마다 테스트 에이전트 하나가 OSLab MCP 서버로 7-Zip, LibreOffice, OBS Studio, VS Code, Sysinternals 도구 등을 조작합니다. 화면은 모두 해당 VM의 콘솔 녹화본이며, 최대 8대씩 나눠 녹화한 뒤 작업 시작 시점에 맞춰 배치했습니다. OSLab이 모든 결과를 게스트 안에서 확인했고 검사 140개를 모두 통과했습니다.
+> **시나리오 하나로 새 Windows VM에서 테스트하고 증거까지 남깁니다.** OSLab은 Proxmox에서 일회용 Windows 11 VM을 복제하고, QEMU Guest Agent로 빌드를 실행해 결과를 검사한 뒤 보고서를 남기고 VM을 삭제합니다. 영상은 CLI 실행, 웹 대시보드에서 시작한 실행, OSLab MCP 서버로 Windows 화면을 조작하는 Codex 세션을 차례로 보여 줍니다. 마지막에는 VM 32대에서 실제 프로그램 32개를 검사해 게스트 검사 140개를 모두 통과합니다. VM, 보고서, 대시보드 화면은 실제 녹화이고 대기 구간은 빠르게 재생했습니다. 32대 화면은 최대 8대씩 녹화한 실행을 시작 시점에 맞춰 배치했습니다.
 
-[영상 소개](docs/intro-video.ko.md) · [1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-windows-product-qa.mp4) · [Windows QA 재현 방법](docs/windows-product-qa.ko.md) · [검증 결과](docs/media/oslab-windows-product-qa-attestation.json)
+[영상 소개](docs/intro-video.ko.md) · [1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4) · [검증 기록](docs/media/oslab-intro-film-attestation.json) · [32대 Windows QA 영상](docs/intro-video.ko.md#32대-windows-qa-영상) · [Windows QA 재현 방법](docs/windows-product-qa.ko.md)
 
 [이전 Windows 앱 매트릭스 데모](docs/windows-app-matrix.ko.md) · [Dispatch Board MSI 설치·업그레이드 예제](docs/release-qa-demo.ko.md) · [Dispatch Board 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
