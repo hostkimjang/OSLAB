@@ -143,6 +143,22 @@ class ProxmoxClient:
             raise ProviderError("Proxmox cluster resources response must be a list")
         return [item for item in data if isinstance(item, dict)]
 
+    def has_vm_console_permission(self, vmid: int) -> bool:
+        """Check the calling token's effective console privilege on this VM."""
+        path = f"/vms/{vmid}"
+        data = self.request("GET", "/access/permissions", {"path": path})
+        if not isinstance(data, dict):
+            raise ProviderError("Proxmox effective permissions response must be a mapping")
+        permissions = data.get(path, {})
+        if not isinstance(permissions, dict):
+            raise ProviderError("Proxmox VM permissions must be a mapping")
+        if "VM.Console" not in permissions:
+            return False
+        if permissions["VM.Console"] not in (0, 1):
+            raise ProviderError("Proxmox VM console permission has an invalid propagation flag")
+        # Both propagation flag values represent a granted privilege at this path.
+        return True
+
     def list_nodes(self) -> list[dict[str, Any]]:
         data = self.request("GET", "/nodes")
         if not isinstance(data, list):

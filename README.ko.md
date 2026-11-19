@@ -168,7 +168,7 @@ uv run oslab run `
 <a id="codex-mcp"></a>
 ## Codex 또는 Claude로 테스트 VM 조작하기
 
-그래픽 콘솔이 있는 테스트 VM을 켜고 VMID를 확인합니다. Windows 앱을 조작하려면 데스크톱에 로그인합니다. VM에 Computer Use 프로그램을 별도로 설치할 필요는 없습니다. 위 예제로 테스트 VM을 복제·부팅하고 나서 연결하려면 `oslab run`에 `--keep-vm`을 추가합니다. OSLab의 Proxmox 토큰에는 해당 VM을 조회할 권한과 `VM.Console` 권한이 필요합니다. 저장소 루트에서 실행합니다.
+그래픽 콘솔이 있는 테스트 VM을 켜고 VMID를 확인합니다. Windows 앱을 조작하려면 데스크톱에 로그인합니다. VM에 Computer Use 프로그램을 별도로 설치할 필요는 없습니다. 위 예제로 만든 복제 VM에 나중에 연결하려면 `oslab run`에 `--keep-vm`을 추가합니다. OSLab의 Proxmox 토큰에는 해당 VM의 `VM.Audit`와 `VM.Console` 권한이 필요합니다. 저장소 루트에서 다음 명령을 실행합니다.
 
 ```powershell
 $vmId = Read-Host '테스트 VM의 VMID'
@@ -180,6 +180,8 @@ codex mcp get oslab
 `codex mcp get oslab`에서 등록한 VMID를 확인합니다. 여러 VM을 조작할 때는 등록 명령에 VM마다 `--vm-id`를 추가합니다. Codex에 `oslab` 도구가 보이면 VM 콘솔 창을 닫고 다음과 같이 요청합니다.
 
 > OSLab MCP의 `list_vms`로 내 테스트 VM을 확인하고 화면을 캡처해 줘. `Win+r`을 누른 뒤 `notepad`를 한 글자씩 입력하고 Enter를 눌러 메모장을 열어 줘. 새 캡처를 보고 메모장 편집 영역을 클릭해 `oslab mcp ok`를 입력한 다음, 문구가 보이는 최종 화면을 PNG로 캡처해 보여 줘.
+
+새 테스트 복제 VM을 자동으로 찾으려면 시나리오의 `provider.vmIdRange`를 `--vm-id-range START END`에 지정합니다. 이미 `oslab`을 등록했다면 기존 `--vm-id` 옵션과 값을 범위 지정으로 바꾼 뒤 클라이언트를 재시작합니다. 자동 검색은 범위 안에서 이름이 `oslab-`로 시작하고 토큰에 두 권한이 모두 있는 실행 중 QEMU VM을 찾습니다. 템플릿은 제외합니다. [MCP 접근 범위와 등록 방법](docs/computer-use-mcp.ko.md#vm-scope)
 
 Claude Code에서도 같은 서버를 모든 프로젝트에서 사용할 수 있습니다. [Claude Code 사용자 범위 등록](docs/computer-use-mcp.ko.md#claude-code) 또는 [Claude Desktop 설정](docs/computer-use-mcp.ko.md#claude-desktop)을 따릅니다.
 

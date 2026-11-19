@@ -112,6 +112,33 @@ def test_get_version_calls_remote_api() -> None:
     assert transport.requests[0][0].full_url == "https://proxmox.example.local:8006/api2/json/version"
 
 
+@pytest.mark.parametrize(
+    ("permissions", "expected"),
+    [
+        ({"/vms/9101": {"VM.Console": 1}}, True),
+        ({"/vms/9101": {"VM.Console": 0}}, True),
+        ({"/vms/9101": {"VM.Audit": 1}}, False),
+        ({"/vms": {"VM.Console": 1}}, False),
+    ],
+)
+def test_vm_console_permission_uses_effective_privileges_at_the_exact_vm_path(permissions, expected) -> None:
+    client, transport = make_client([permissions])
+
+    assert client.has_vm_console_permission(9101) is expected
+    request, _ = transport.requests[0]
+    url = urllib.parse.urlsplit(request.full_url)
+    assert request.get_method() == "GET"
+    assert url.path == "/api2/json/access/permissions"
+    assert urllib.parse.parse_qs(url.query) == {"path": ["/vms/9101"]}
+
+
+def test_vm_console_permission_rejects_malformed_privileges() -> None:
+    client, _ = make_client([{"/vms/9101": {"VM.Console": None}}])
+
+    with pytest.raises(ProviderError, match="invalid propagation flag"):
+        client.has_vm_console_permission(9101)
+
+
 def test_guest_exec_sends_command_as_repeated_proxmox_parameters() -> None:
     client, transport = make_client([{"result": {"pid": 1234}}])
 

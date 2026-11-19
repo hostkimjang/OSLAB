@@ -2,7 +2,7 @@
 
 > 내부 작업 로그입니다. 공개 온보딩은 `README.md`와 `docs/index.md`에서 시작하고, 이 파일은 구현 진행 상황과 lab 검증 기록을 추적하기 위한 개발자용 문서입니다.
 
-최종 업데이트: 2026-08-31
+최종 업데이트: 2026-11-19
 
 ## 현재 상태 요약
 
@@ -11,6 +11,11 @@
 Web dashboard v1은 NestJS API + Next.js UI 기반으로 추가되어 있으며, local account login, English/Korean language switch, logout, scenario/suite/fixture catalog, file editor, validation, run launcher, Artifact Manager, live log stream, result explorer를 제공합니다.
 
 브라우저 기반 회귀 검증은 [Browser Debug Checklist](browser-debug-checklist.md)에 누적합니다.
+
+### 2026-11-19 MCP에서 시험 VM 검색
+
+- [x] `--vm-id-range START END`로 범위 안의 실행 중인 OSLab QEMU VM을 검색한다. 화면 캡처와 입력 전에 Proxmox 접근 권한을 다시 확인한다. [MCP 접근 범위와 등록 방법](../computer-use-mcp.ko.md#vm-scope)
+- [x] 같은 MCP 연결에서 새 복제본이 목록에 추가되는 동작, 권한 상실 시 입력 차단과 콘솔 종료, 최신 키 입력 프레임 확인을 모의 환경에서 검증했다. MCP·Proxmox·콘솔 관련 테스트 40건이 통과했다.
 
 ### 2026-08-31 공개 문서 영문·한국어 대응 감사
 
