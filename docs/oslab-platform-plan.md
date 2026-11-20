@@ -313,7 +313,7 @@ Command result shape:
 
 | Channel | OS | Role |
 | --- | --- | --- |
-| QEMU Guest Agent | Windows, Linux | Current Windows execution path |
+| QEMU Guest Agent | Windows, Linux | Current execution path for Windows and Linux |
 | WinRM | Windows | Future/fallback Windows channel |
 | SSH | Linux | Future primary Linux channel |
 
@@ -354,6 +354,8 @@ Windows MVP checks:
 | `oslab.directory` | `C:\Oslab` can be created | `preflight_failure` |
 | `oslab.file_roundtrip` | Guest upload/download works | `preflight_failure` |
 | `oslab.cleanup_test_file` | Temporary files can be removed | `preflight_failure` |
+
+With `guest.screen.signIn: true`, the `desktop.sign_in` check comes first. It passes when the desktop test account is signed in and the automatic logon password is removed again, and fails with `preflight_failure` otherwise.
 
 Linux design checks:
 
@@ -942,7 +944,7 @@ Use fake provider and fake guest channel.
 | Product non-zero exit | `product_execution_failure` |
 | Assertion mismatch | `assertion_failure` with reports written |
 | Cleanup failure | Stale VM metadata recorded |
-| Linux scenario validation | Schema pass, real execution skipped until SSH implementation |
+| Linux scenario validation | Schema pass, real execution through QEMU Guest Agent |
 
 ### Real Lab Smoke Tests
 

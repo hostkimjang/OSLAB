@@ -50,6 +50,15 @@
             "start": { "type": "integer" },
             "end": { "type": "integer" }
           }
+        },
+        "clone": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Changes applied to the disposable clone right after it is created.",
+          "properties": {
+            "display": { "type": "string", "enum": ["std", "virtio"] },
+            "network": { "type": "string", "enum": ["disconnected"] }
+          }
         }
       }
     },
@@ -60,6 +69,14 @@
         "mode": {
           "type": "string",
           "enum": ["auto", "qemuAgent", "winrm", "ssh"]
+        },
+        "screen": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "signIn": { "type": "boolean", "description": "Windows only." },
+            "showCommands": { "type": "boolean" }
+          }
         }
       }
     },

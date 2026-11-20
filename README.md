@@ -10,17 +10,17 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-[![OSLab introduction video, 2 minutes 45 seconds](docs/media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
+https://github.com/user-attachments/assets/3c727531-1799-4566-a377-2103e6270c26
 
-> **From one scenario to evidence on a fresh Windows VM.** OSLab clones a disposable Windows 11 VM on Proxmox, runs the build through QEMU Guest Agent, checks the result, keeps the reports and removes the VM. The video follows a CLI run, a run launched from the web dashboard, and a Codex session that operates the Windows desktop through the OSLab MCP server. It ends on 32 real programs tested on 32 VMs, with all 140 guest checks passed. VM, report and dashboard screens are real recordings with waits sped up, and the 32-VM wall lines up runs recorded in waves of up to 8.
+> **Test one build across Windows and Linux.** The film follows Demo Agent 2.4 through fresh installs and upgrades on Windows 11 and Ubuntu 24.04. It shows the signed-in Windows desktop, the Ubuntu upgrade report, a dashboard run and a Codex session using OSLab MCP. The finale brings together 32 Windows programs across 32 VMs and 140 passing guest checks.
 
-[About this video](docs/intro-video.md) · [Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4) · [Verification record](docs/media/oslab-intro-film-attestation.json) · [32-VM Windows QA video](docs/intro-video.md#the-32-vm-windows-qa-video) · [Reproduce the Windows QA runs](docs/windows-product-qa.md)
+[About this video](docs/intro-video.md) · [Reproduce the Windows and Ubuntu tests](docs/user-scenario.md) · [Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4) · [Verification record](docs/media/oslab-intro-film-attestation.json) · [32-VM Windows QA video](docs/intro-video.md#the-32-vm-windows-qa-video)
 
 [Earlier Windows app matrix demo](docs/windows-app-matrix.md) · [Dispatch Board MSI and upgrade demo](docs/release-qa-demo.md) · [Watch the Dispatch Board recording](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
 OSLAB is an OS integration test platform for software that must be verified in a real operating system—not only in a unit test, container, or mocked environment. It clones a disposable VM, prepares the guest, transfers an artifact, executes it, evaluates assertions, writes reports, and cleans up the VM.
 
-The complete path available today is **Windows on Proxmox through QEMU Guest Agent (QGA)**. Linux scenarios and SSH/WinRM concepts exist in the model, but those execution paths are not complete. Additional VM providers are also future work.
+The complete paths available today run on **Proxmox through QEMU Guest Agent (QGA)** for **Windows and Linux guests**. SSH and WinRM channels exist in the scenario model, but those execution paths are not complete. Additional VM providers are also future work.
 
 ## Why OSLAB
 
@@ -99,11 +99,13 @@ Cleanup is part of the run contract. A scenario can retain a failed VM for debug
 | --- | --- |
 | Proxmox VM lifecycle | Implemented |
 | Windows + QEMU Guest Agent | Complete end-to-end path |
+| Linux + QEMU Guest Agent | Complete end-to-end path |
 | Folder and installer artifacts | Implemented |
-| PowerShell fixtures | Implemented |
+| PowerShell fixtures (Windows) and shell fixtures (Linux) | Implemented |
+| Clone display and network overrides (`provider.clone`) | Implemented |
 | JSON, JUnit XML, HTML, structured progress | Implemented |
 | Local web dashboard | Implemented |
-| Linux + SSH execution | Incomplete |
+| SSH execution | Incomplete; Linux runs use QGA |
 | WinRM execution | Incomplete; not required by the QGA path |
 | Providers other than Proxmox | Incomplete |
 
@@ -217,7 +219,7 @@ See [Reports and Evidence](docs/reports.md) for the complete contract.
 
 The repository includes Windows examples for PowerShell system inspection, Python and C programs, fixture state, step-based commands, unit-test output, an HTTP service, and intentional assertion failure. Start with [Demo Catalog](docs/demos.md); use [Adoption Guide](docs/adoption-guide.md) when replacing a demo artifact with your own software.
 
-The Linux example documents the intended scenario shape. It is not an end-to-end supported Linux run yet.
+The Linux example, `scenarios/linux/generic-smoke.example.yaml` with the `validation/artifacts/linux-system` artifact, runs end to end through QGA. It applies a shell fixture, uploads a tar.gz artifact, collects a `commandResult` JSON file, and shows each command on the VM console. See [Linux Guests](docs/scenarios.md#linux-guests).
 
 ## Documentation
 
@@ -226,6 +228,7 @@ The Linux example documents the intended scenario shape. It is not an end-to-end
 | Install and run the first demo | [Getting Started](docs/getting-started.md) |
 | Understand the model | [Concepts](docs/concepts.md) |
 | Choose an example | [Demo Catalog](docs/demos.md) |
+| Retest a build on Windows and Ubuntu | [Demo Agent environment matrix](docs/user-scenario.md) |
 | Connect a Proxmox lab | [Proxmox Connection](docs/proxmox-connection.md) |
 | Control a VM screen with Codex or Claude | [Codex setup and Notepad demo](#codex-mcp), [MCP guide](docs/computer-use-mcp.md) |
 | Write scenario YAML | [Scenarios](docs/scenarios.md) |

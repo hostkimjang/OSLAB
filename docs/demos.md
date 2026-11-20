@@ -17,6 +17,7 @@ The demos are small product-neutral examples. They teach one `oslab` concept at 
 | Python HTTP service | `scenarios/windows/demo-python-http-service.example.yaml` | `validation/artifacts/python-http-service` | Python runtime bootstrap | In-VM service lifecycle and HTTP smoke validation |
 | C unit test | `scenarios/windows/demo-c-unit.example.yaml` | `validation/artifacts/c-unit` | C compiler bootstrap | Multi-file compile/link/run unit test |
 | Intentional assertion failure | `scenarios/windows/demo-intentional-assertion-failure.example.yaml` | `validation/artifacts/hello-python` | Python runtime bootstrap | How assertion failures appear in reports/JUnit |
+| Linux system | `scenarios/linux/generic-smoke.example.yaml` | `validation/artifacts/linux-system` | Shell snapshot fixture | Linux guest over QEMU Guest Agent, tar.gz upload, commands shown on the VM console |
 
 Recommended order:
 
@@ -83,6 +84,28 @@ Expected stdout marker:
 ```text
 oslab powershell system demo
 ```
+
+### Linux System
+
+This demo runs on a Linux template through QEMU Guest Agent. The shell fixture copies `/etc/os-release` to `/tmp/oslab/os-release.snapshot`, and the POSIX `sh` artifact writes `/opt/oslab/command-result.json` with the kernel, the OS name, and the file state it checked. With `guest.screen.showCommands: true` and `provider.clone.display: virtio`, the VM console shows each command as it runs.
+
+Copy `scenarios/linux/generic-smoke.example.yaml` to `scenarios/linux/generic-smoke.local.yaml`, edit its provider block for your Linux template, then run:
+
+```powershell
+uv run oslab run `
+  --scenario scenarios/linux/generic-smoke.local.yaml `
+  --config config/oslab.local.yaml `
+  --env-file config/oslab.local.env `
+  --artifact-path validation/artifacts/linux-system
+```
+
+Expected stdout marker:
+
+```text
+oslab linux system demo
+```
+
+See [Linux Guests](scenarios.md#linux-guests) for template requirements.
 
 ### Fixture State Handoff
 

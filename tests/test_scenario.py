@@ -22,7 +22,10 @@ def test_linux_example_scenario_is_valid() -> None:
 
     assert scenario.scenario_id == "generic.linux.smoke"
     assert scenario.os_family == "linux"
-    assert scenario.guest_mode == "auto"
+    assert scenario.guest_mode == "qemuAgent"
+    assert scenario.clone_display == "virtio"
+    assert scenario.clone_network == "disconnected"
+    assert scenario.show_commands is True
 
 
 def test_fake_artifact_smoke_scenario_is_valid() -> None:

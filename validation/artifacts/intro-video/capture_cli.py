@@ -95,17 +95,19 @@ class BootConsole:
         try:
             return self.client.get_vm_status(self.vm_id).get("status") == "running"
         except ProviderError:
-            return False  # The clone does not exist yet, or no longer.
+            return None  # A failed status request alone does not establish power-off.
 
     async def follow(self):
         while True:
-            if await asyncio.to_thread(self.running):
+            running = await asyncio.to_thread(self.running)
+            if running:
+                self.powered_off = None
                 try:
                     await self.session()
                 except (OSError, WebSocketException, ProviderError, zlib.error, asyncio.TimeoutError) as exc:
                     # The VM is still starting or has just stopped; check its state again.
                     self.last_error = type(exc).__name__
-            elif self.image is not None and self.powered_off is None:
+            elif running is False and self.image is not None and self.powered_off is None:
                 self.image = Image.new("RGB", self.image.size)
                 self.powered_off = time.time()
             await asyncio.sleep(.25)
@@ -414,8 +416,9 @@ def build_aliases(config_path, run_dir, terminal, markers):
     profile = Path.home()
     aliases += [{"find": str(profile), "replace": USER_FOLDER},
                 {"find": profile.as_posix(), "replace": USER_FOLDER.replace("\\", "/")}]
-    output = json.loads((run_dir / "raw" / "actual-output.json").read_text(encoding="utf-8-sig"))
-    computer = output.get("metadata", {}).get("computerName")
+    output_path = run_dir / "raw" / "actual-output.json"
+    output = json.loads(output_path.read_text(encoding="utf-8-sig")) if output_path.is_file() else {}
+    computer = output.get("metadata", {}).get("computerName") if isinstance(output, dict) else None
     if computer:
         aliases.append({"find": computer, "replace": COMPUTER})
     # oslab lists the names of the variables it loaded from the env file. Drop the private ones.

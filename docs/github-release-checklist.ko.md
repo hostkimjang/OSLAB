@@ -59,7 +59,7 @@
 
 ## 첫 공개 배포의 알려진 제한
 
-- Windows/Proxmox/QEMU Guest Agent 경로가 현재 구현된 경로다.
-- Linux 지원은 목표로 문서화되어 있지만 첫 번째 완성 구현 경로는 아니다.
+- Proxmox와 QEMU Guest Agent 경로가 Windows와 Linux 게스트에 구현되어 있다.
+- Linux 게스트는 QEMU Guest Agent로 실행된다. SSH guest channel은 아직 구현되지 않았다.
 - Config의 WinRM/SSH credential은 향후 guest channel을 위해 예약되어 있다.
 - Production cluster에 사용하기 전에 Proxmox least-privilege role 지침을 더 엄격하게 다듬어야 한다.

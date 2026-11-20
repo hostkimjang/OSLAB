@@ -16,11 +16,18 @@ class TemplateRef:
 
 @dataclass(frozen=True)
 class VmSpec:
-    """Requested clone shape."""
+    """Requested clone shape.
+
+    `display` replaces the clone's display adapter (`std` or `virtio`), and
+    `network` set to `disconnected` disables every network link on the clone.
+    `None` keeps the template value.
+    """
 
     vm_id: int
     name: str
     full_clone: bool = False
+    display: str | None = None
+    network: str | None = None
 
 
 @dataclass(frozen=True)

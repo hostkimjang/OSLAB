@@ -17,6 +17,8 @@ ALLOWED_ARTIFACT_TRANSFERS = {"files", "archive"}
 ALLOWED_FIXTURE_TYPES = {"powershell", "shell"}
 ALLOWED_REPORT_FORMATS = {"junit", "json", "html"}
 ALLOWED_SHELLS = {"powershell", "cmd", "sh", "bash"}
+ALLOWED_CLONE_SETTINGS = {"display": {"std", "virtio"}, "network": {"disconnected"}}
+ALLOWED_GUEST_SCREEN_SETTINGS = {"signIn", "showCommands"}
 SUPPORTED_SCHEMA_VERSION = 1
 
 
@@ -73,8 +75,28 @@ class Scenario:
         return None
 
     @property
+    def clone_display(self) -> str | None:
+        clone = self.raw["provider"].get("clone")
+        return clone.get("display") if isinstance(clone, dict) else None
+
+    @property
+    def clone_network(self) -> str | None:
+        clone = self.raw["provider"].get("clone")
+        return clone.get("network") if isinstance(clone, dict) else None
+
+    @property
     def guest_mode(self) -> str:
         return str(self.raw["guest"]["mode"])
+
+    @property
+    def show_commands(self) -> bool:
+        screen = self.raw["guest"].get("screen")
+        return isinstance(screen, dict) and screen.get("showCommands") is True
+
+    @property
+    def sign_in(self) -> bool:
+        screen = self.raw["guest"].get("screen")
+        return isinstance(screen, dict) and screen.get("signIn") is True
 
     @property
     def report_formats(self) -> list[str]:
@@ -96,6 +118,17 @@ class Scenario:
                 if isinstance(adapter, str) and adapter.strip():
                     return adapter
         return "canonical.inventory"
+
+    @property
+    def output_path(self) -> str | None:
+        outputs = self.raw.get("outputs")
+        if isinstance(outputs, dict):
+            actual = outputs.get("actual")
+            if isinstance(actual, dict):
+                path = actual.get("path")
+                if isinstance(path, str) and path.strip():
+                    return path
+        return None
 
 
 def load_scenario(path: Path) -> Scenario:
@@ -133,6 +166,8 @@ def validate_scenario_mapping(raw: dict[str, Any], *, path: Path | None = None) 
     provider = _require_mapping(raw, "provider", where=where)
     _require_non_empty_string(provider, "type", where=where)
     _validate_vmid_range(provider, where=where)
+    if "clone" in provider:
+        _validate_provider_clone(_require_mapping(provider, "clone", where=where), where=where)
 
     guest = _require_mapping(raw, "guest", where=where)
     guest_mode = _require_non_empty_string(guest, "mode", where=where)
@@ -142,6 +177,8 @@ def validate_scenario_mapping(raw: dict[str, Any], *, path: Path | None = None) 
         )
     _validate_guest_order(guest, "windowsOrder", where=where)
     _validate_guest_order(guest, "linuxOrder", where=where)
+    if "screen" in guest:
+        _validate_guest_screen(_require_mapping(guest, "screen", where=where), os_family=os_family, where=where)
 
     if "isolation" in raw:
         isolation = _require_mapping(raw, "isolation", where=where)
@@ -309,6 +346,33 @@ def _validate_vmid_range(provider: dict[str, Any], *, where: str) -> None:
         raise ScenarioValidationError(f"`provider.vmIdRange.start` and `end` must be integers{where}")
     if start > end:
         raise ScenarioValidationError(f"`provider.vmIdRange.start` must be <= `end`{where}")
+
+
+def _validate_provider_clone(clone: dict[str, Any], *, where: str) -> None:
+    for key, value in clone.items():
+        allowed_values = ALLOWED_CLONE_SETTINGS.get(key)
+        if allowed_values is None:
+            raise ScenarioValidationError(
+                f"Unsupported provider.clone field `{key}`{where}; expected one of {sorted(ALLOWED_CLONE_SETTINGS)}"
+            )
+        if not isinstance(value, str) or value not in allowed_values:
+            raise ScenarioValidationError(
+                f"Unsupported provider.clone.{key} `{value}`{where}; expected one of {sorted(allowed_values)}"
+            )
+
+
+def _validate_guest_screen(screen: dict[str, Any], *, os_family: str, where: str) -> None:
+    for key, value in screen.items():
+        if key not in ALLOWED_GUEST_SCREEN_SETTINGS:
+            raise ScenarioValidationError(
+                f"Unsupported guest.screen field `{key}`{where}; expected one of {sorted(ALLOWED_GUEST_SCREEN_SETTINGS)}"
+            )
+        if not isinstance(value, bool):
+            raise ScenarioValidationError(f"`guest.screen.{key}` must be a boolean{where}")
+    if "signIn" in screen and os_family != "windows":
+        raise ScenarioValidationError(f"`guest.screen.signIn` is supported only for Windows scenarios{where}")
+    if os_family == "windows" and screen.get("showCommands") is True and screen.get("signIn") is not True:
+        raise ScenarioValidationError(f"`guest.screen.showCommands` requires `guest.screen.signIn: true` on Windows{where}")
 
 
 def _require_mapping(raw: dict[str, Any], field: str, *, where: str) -> dict[str, Any]:

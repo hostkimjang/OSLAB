@@ -7,6 +7,7 @@ Tests use fake transports, so the core behavior can harden without a real lab.
 from __future__ import annotations
 
 import json
+import re
 import ssl
 import time
 import urllib.error
@@ -185,6 +186,11 @@ class ProxmoxClient:
             raise ProviderError("Proxmox VM config response must be a mapping", details={"data": data})
         return data
 
+    def update_vm_config(self, vmid: int, settings: dict[str, str]) -> None:
+        """Apply VM config changes synchronously."""
+
+        self.request("PUT", f"/nodes/{self.config.node}/qemu/{vmid}/config", settings)
+
     def clone_vm(self, *, template_vmid: int, new_vmid: int, name: str, full_clone: bool) -> str:
         data = self.request(
             "POST",
@@ -310,7 +316,14 @@ class ProxmoxProvider:
     def __init__(self, client: ProxmoxClient) -> None:
         self.client = client
 
-    def create_clone(self, template: TemplateRef, vm_spec: VmSpec) -> VmRef:
+    def create_clone(
+        self,
+        template: TemplateRef,
+        vm_spec: VmSpec,
+        *,
+        on_created: Callable[[VmRef], None] | None = None,
+    ) -> VmRef:
+        """Create and configure a clone. Report ownership after the clone task succeeds and before configuration."""
         if template.vm_id is None:
             raise VmCloneError("Proxmox MVP requires template.vm_id")
 
@@ -321,7 +334,24 @@ class ProxmoxProvider:
             full_clone=vm_spec.full_clone,
         )
         self.client.wait_for_task(task_id, failure_class="vm_clone_failure")
-        return VmRef(vm_id=vm_spec.vm_id, name=vm_spec.name, node=self.client.config.node)
+        vm = VmRef(vm_id=vm_spec.vm_id, name=vm_spec.name, node=self.client.config.node)
+        if on_created is not None:
+            on_created(vm)
+        clone_settings = self._clone_settings(vm_spec)
+        if clone_settings:
+            self.client.update_vm_config(vm_spec.vm_id, clone_settings)
+        return vm
+
+    def _clone_settings(self, vm_spec: VmSpec) -> dict[str, str]:
+        settings: dict[str, str] = {}
+        if vm_spec.display is not None:
+            settings["vga"] = vm_spec.display
+        if vm_spec.network == "disconnected":
+            for key, value in self.client.get_vm_config(vm_spec.vm_id).items():
+                if re.fullmatch(r"net\d+", key):
+                    options = [option for option in str(value).split(",") if not option.startswith("link_down=")]
+                    settings[key] = ",".join([*options, "link_down=1"])
+        return settings
 
     def start_vm(self, vm: VmRef) -> None:
         task_id = self.client.start_vm(vm.vm_id)

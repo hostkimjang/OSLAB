@@ -78,6 +78,7 @@ Current implementation:
 - clone/start/stop/destroy
 - VM status
 - guest info through Proxmox/QGA
+- clone display and network overrides (`provider.clone`)
 
 Future providers can implement the same lifecycle surface without changing scenario semantics.
 
@@ -87,7 +88,7 @@ The guest channel executes commands and transfers files inside the VM.
 
 Current implementation:
 
-- QEMU Guest Agent for Windows
+- QEMU Guest Agent for Windows and Linux guests
 
 Designed:
 

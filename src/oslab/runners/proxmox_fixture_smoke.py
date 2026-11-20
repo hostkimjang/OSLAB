@@ -112,7 +112,13 @@ def run_proxmox_fixture_smoke(
     try:
         vm = provider.create_clone(
             TemplateRef(vm_id=scenario.template_vm_id, name=scenario.template_name),
-            VmSpec(vm_id=selected_vm_id, name=clone_name, full_clone=full_clone),
+            VmSpec(
+                vm_id=selected_vm_id,
+                name=clone_name,
+                full_clone=full_clone,
+                display=scenario.clone_display,
+                network=scenario.clone_network,
+            ),
         )
         provider.start_vm(vm)
         started = True

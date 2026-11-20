@@ -94,7 +94,13 @@ def run_proxmox_guest_preflight(
     try:
         vm = provider.create_clone(
             TemplateRef(vm_id=scenario.template_vm_id, name=scenario.template_name),
-            VmSpec(vm_id=selected_vm_id, name=clone_name, full_clone=full_clone),
+            VmSpec(
+                vm_id=selected_vm_id,
+                name=clone_name,
+                full_clone=full_clone,
+                display=scenario.clone_display,
+                network=scenario.clone_network,
+            ),
         )
         provider.start_vm(vm)
         started = True
@@ -270,8 +276,12 @@ def _run_command_check(
     return GuestPreflightCheck(check_id, True, "Command check passed", details=details)
 
 
-def _run_file_roundtrip_check(channel: QemuAgentChannel, vm: VmRef) -> GuestPreflightCheck:
-    guest_path = "C:\\Oslab\\oslab-preflight.txt"
+def _run_file_roundtrip_check(
+    channel: QemuAgentChannel,
+    vm: VmRef,
+    *,
+    guest_path: str = "C:\\Oslab\\oslab-preflight.txt",
+) -> GuestPreflightCheck:
     content = "oslab guest preflight\n"
     try:
         upload = channel.upload_text(vm, guest_path, content)

@@ -17,6 +17,7 @@
 | Python HTTP service | `scenarios/windows/demo-python-http-service.example.yaml` | `validation/artifacts/python-http-service` | Python runtime bootstrap | VM 내부 service lifecycle과 HTTP smoke 검증 |
 | C unit test | `scenarios/windows/demo-c-unit.example.yaml` | `validation/artifacts/c-unit` | C compiler bootstrap | Multi-file compile/link/run unit test |
 | Intentional assertion failure | `scenarios/windows/demo-intentional-assertion-failure.example.yaml` | `validation/artifacts/hello-python` | Python runtime bootstrap | Assertion failure가 report/JUnit에 표시되는 방식 |
+| Linux system | `scenarios/linux/generic-smoke.example.yaml` | `validation/artifacts/linux-system` | Shell snapshot fixture | QEMU Guest Agent로 실행하는 Linux 게스트, tar.gz 업로드, VM 콘솔 명령 표시 |
 
 추천 순서:
 
@@ -83,6 +84,28 @@ Invoke-Item runs\<run-id>\reports\result.html
 ```text
 oslab powershell system demo
 ```
+
+### Linux System
+
+Linux 템플릿에서 QEMU Guest Agent로 실행하는 데모입니다. shell fixture가 `/etc/os-release`를 `/tmp/oslab/os-release.snapshot`으로 복사하고, POSIX `sh` artifact가 커널, OS 이름, 확인한 파일 상태를 `/opt/oslab/command-result.json`에 씁니다. `guest.screen.showCommands: true`와 `provider.clone.display: virtio`를 쓰므로 VM 콘솔에 실행 중인 명령이 그대로 표시됩니다.
+
+`scenarios/linux/generic-smoke.example.yaml`을 `scenarios/linux/generic-smoke.local.yaml`로 복사하고 provider block을 자신의 Linux 템플릿에 맞게 고친 뒤 실행합니다.
+
+```powershell
+uv run oslab run `
+  --scenario scenarios/linux/generic-smoke.local.yaml `
+  --config config/oslab.local.yaml `
+  --env-file config/oslab.local.env `
+  --artifact-path validation/artifacts/linux-system
+```
+
+예상 stdout marker:
+
+```text
+oslab linux system demo
+```
+
+템플릿 요구 사항은 [Linux 게스트](scenarios.ko.md#linux-guests)를 참고하세요.
 
 ### Fixture State Handoff
 

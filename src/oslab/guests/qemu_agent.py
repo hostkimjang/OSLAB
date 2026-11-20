@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import time
 from collections.abc import Callable, Sequence
-from pathlib import PureWindowsPath
+from dataclasses import replace
+from pathlib import PurePath, PurePosixPath, PureWindowsPath
 from typing import Any
+from uuid import uuid4
 
 from oslab.errors import OslabError, ProviderError
 from oslab.guests.base import GuestCommandResult, GuestFileReadResult, GuestFileWriteResult
@@ -57,7 +60,12 @@ _ALL_MOJIBAKE_MARKERS = _UTF8_MOJIBAKE_MARKERS + _CP949_MOJIBAKE_MARKERS
 
 
 class QemuAgentChannel:
-    """Execute guest commands through Proxmox QEMU Guest Agent endpoints."""
+    """Execute guest commands through Proxmox QEMU Guest Agent endpoints.
+
+    The base class drives Windows guests with PowerShell helpers.
+    """
+
+    path_type: type[PurePath] = PureWindowsPath
 
     def __init__(
         self,
@@ -178,27 +186,15 @@ class QemuAgentChannel:
         *,
         progress: UploadProgressCallback | None,
     ) -> GuestFileWriteResult:
-        target = PureWindowsPath(guest_path)
-        parent = str(target.parent)
+        target = self.path_type(guest_path)
         safe_name = _safe_chunk_name(target.name)
-        parts_dir = str(PureWindowsPath(parent) / f".{safe_name}.chunks")
+        parts_dir = str(target.parent / f".{safe_name}.chunks")
         encoded = base64.b64encode(content).decode("ascii")
         chunks = [encoded[index : index + MAX_CHUNK_RAW_BYTES] for index in range(0, len(encoded), MAX_CHUNK_RAW_BYTES)]
 
         prep = self.execute(
             vm,
-            [
-                "powershell.exe",
-                "-NoProfile",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-Command",
-                (
-                    "$ErrorActionPreference = 'Stop'; "
-                    f"Remove-Item -LiteralPath {_ps_single_quote(parts_dir)} -Recurse -Force -ErrorAction SilentlyContinue; "
-                    f"New-Item -ItemType Directory -Force -Path {_ps_single_quote(parts_dir)} | Out-Null"
-                ),
-            ],
+            self._reset_directory_command(parts_dir),
             timeout_seconds=60,
             poll_interval_seconds=1.0,
         )
@@ -211,7 +207,7 @@ class QemuAgentChannel:
         encoded_written = 0
         encoded_total = len(encoded)
         for index, chunk in enumerate(chunks):
-            part_path = str(PureWindowsPath(parts_dir) / f"part-{index:06d}.b64")
+            part_path = str(self.path_type(parts_dir) / f"part-{index:06d}.b64")
             self._upload_small_bytes(vm, part_path, chunk.encode("ascii"))
             encoded_written += len(chunk)
             if progress is not None:
@@ -220,14 +216,7 @@ class QemuAgentChannel:
 
         decode = self.execute(
             vm,
-            [
-                "powershell.exe",
-                "-NoProfile",
-                "-ExecutionPolicy",
-                "Bypass",
-                "-Command",
-                _decode_chunks_command(parts_dir, guest_path),
-            ],
+            self._decode_chunks_command(parts_dir, guest_path),
             timeout_seconds=120,
             poll_interval_seconds=1.0,
         )
@@ -245,6 +234,30 @@ class QemuAgentChannel:
             )
         return GuestFileWriteResult(guest_path=guest_path, bytes_written=len(content))
 
+    def _reset_directory_command(self, path: str) -> list[str]:
+        return [
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            (
+                "$ErrorActionPreference = 'Stop'; "
+                f"Remove-Item -LiteralPath {_ps_single_quote(path)} -Recurse -Force -ErrorAction SilentlyContinue; "
+                f"New-Item -ItemType Directory -Force -Path {_ps_single_quote(path)} | Out-Null"
+            ),
+        ]
+
+    def _decode_chunks_command(self, parts_dir: str, guest_path: str) -> list[str]:
+        return [
+            "powershell.exe",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            _decode_chunks_script(parts_dir, guest_path),
+        ]
+
     def upload_text(self, vm: VmRef, guest_path: str, content: str, *, encoding: str = "utf-8") -> GuestFileWriteResult:
         return self.upload_bytes(vm, guest_path, content.encode(encoding))
 
@@ -254,7 +267,7 @@ class QemuAgentChannel:
         try:
             raw = self.client.guest_file_read(vm.vm_id, guest_path)
         except ProviderError as exc:
-            return self._download_text_via_powershell(vm, guest_path, cause=exc)
+            return self._download_text_fallback(vm, guest_path, cause=exc)
         content = _file_content_to_text(raw.get("content"))
         truncated = bool(raw.get("truncated"))
         if truncated:
@@ -264,7 +277,7 @@ class QemuAgentChannel:
             )
         return GuestFileReadResult(guest_path=guest_path, content=content, truncated=truncated, raw=raw)
 
-    def _download_text_via_powershell(self, vm: VmRef, guest_path: str, *, cause: ProviderError) -> GuestFileReadResult:
+    def _download_text_fallback(self, vm: VmRef, guest_path: str, *, cause: ProviderError) -> GuestFileReadResult:
         command = [
             "powershell.exe",
             "-NoProfile",
@@ -302,6 +315,135 @@ class QemuAgentChannel:
             content=raw_bytes.decode("utf-8-sig", errors="replace"),
             raw={"fallback": "powershell-base64", "fileReadCause": cause.details},
         )
+
+
+class LinuxQemuAgentChannel(QemuAgentChannel):
+    """QEMU Guest Agent channel for Linux guests, using POSIX paths and `sh` helpers."""
+
+    path_type = PurePosixPath
+
+    def execute_with_diagnostics(
+        self,
+        vm: VmRef,
+        command: Sequence[str],
+        *,
+        diagnostic_command: tuple[str, ...],
+        timeout_seconds: int,
+    ) -> GuestCommandResult:
+        """Run sensitive argv while keeping provider response bodies out of diagnostics."""
+
+        try:
+            result = self.execute(vm, command, timeout_seconds=timeout_seconds)
+        except ProviderError as exc:
+            timed_out = exc.details.get("failureClass") == "guest_execution_timeout"
+            message = "Timed out waiting for QEMU Guest Agent command" if timed_out else "QEMU Guest Agent command failed"
+            raise ProviderError(
+                f"{message} on VM {vm.vm_id}",
+                details={
+                    "failureClass": "guest_execution_timeout" if timed_out else "provider_failure",
+                    "vmId": vm.vm_id,
+                    "command": list(diagnostic_command),
+                },
+            ) from None
+        return replace(result, command=diagnostic_command, raw={})
+
+    def _upload_large_bytes(
+        self,
+        vm: VmRef,
+        guest_path: str,
+        content: bytes,
+        *,
+        progress: UploadProgressCallback | None,
+    ) -> GuestFileWriteResult:
+        target = PurePosixPath(guest_path)
+        parts_dir = target.parent / f".oslab-chunks-{uuid4().hex}"
+        prep = self.execute(vm, ["mkdir", "-m", "700", "--", str(parts_dir)])
+        if not prep.passed:
+            raise ProviderError("Failed to prepare guest chunk upload directory", details={"partsDir": str(parts_dir)})
+
+        chunk_count = (len(content) + MAX_CHUNK_RAW_BYTES - 1) // MAX_CHUNK_RAW_BYTES
+        active_error: BaseException | None = None
+        try:
+            for index, start in enumerate(range(0, len(content), MAX_CHUNK_RAW_BYTES)):
+                chunk = content[start : start + MAX_CHUNK_RAW_BYTES]
+                self._upload_small_bytes(vm, str(parts_dir / f"part-{index:06d}"), chunk)
+                if progress is not None:
+                    progress(start + len(chunk), len(content))
+
+            assembled = self.execute(
+                vm,
+                [
+                    "sh",
+                    "-c",
+                    _ASSEMBLE_LINUX_UPLOAD,
+                    "oslab",
+                    str(parts_dir),
+                    guest_path,
+                    str(chunk_count),
+                    hashlib.sha256(content).hexdigest(),
+                ],
+                timeout_seconds=120,
+            )
+            if not assembled.passed:
+                raise ProviderError(
+                    "Failed to assemble or verify guest chunk upload",
+                    details={"guestPath": guest_path, "chunks": chunk_count, "exitCode": assembled.exit_code},
+                )
+        except BaseException as exc:
+            active_error = exc
+            raise
+        finally:
+            try:
+                removed = self.execute(vm, ["rm", "-rf", "--", str(parts_dir)])
+                if not removed.passed:
+                    raise ProviderError("Failed to clean up guest chunk upload", details={"partsDir": str(parts_dir)})
+            except ProviderError as exc:
+                if active_error is None:
+                    raise
+                active_error.add_note(f"Chunk cleanup failed for {parts_dir}: {exc}")
+        return GuestFileWriteResult(guest_path=guest_path, bytes_written=len(content))
+
+    def _download_text_fallback(self, vm: VmRef, guest_path: str, *, cause: ProviderError) -> GuestFileReadResult:
+        result = self.execute(vm, ["base64", guest_path], timeout_seconds=60, poll_interval_seconds=1.0)
+        if not result.passed:
+            raise ProviderError(
+                "QEMU Guest Agent file-read failed and base64 fallback failed",
+                details={
+                    "guestPath": guest_path,
+                    "fileReadCause": cause.details,
+                    "exitCode": result.exit_code,
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                },
+            ) from cause
+        try:
+            raw_bytes = base64.b64decode(result.stdout)
+        except ValueError as exc:
+            raise ProviderError(
+                "base64 file-read fallback returned invalid base64",
+                details={"guestPath": guest_path, "stdout": result.stdout},
+            ) from exc
+        return GuestFileReadResult(
+            guest_path=guest_path,
+            content=raw_bytes.decode("utf-8-sig", errors="replace"),
+            raw={"fallback": "base64", "fileReadCause": cause.details},
+        )
+
+
+_ASSEMBLE_LINUX_UPLOAD = r"""
+set -eu
+file=$1/assembled
+: >"$file"
+i=0
+while [ "$i" -lt "$3" ]; do
+  part=$(printf '%s/part-%06d' "$1" "$i")
+  cat -- "$part" >>"$file"
+  i=$((i + 1))
+done
+sum=$(sha256sum <"$file")
+[ "${sum%% *}" = "$4" ]
+mv -fT -- "$file" "$2"
+"""
 
 
 def _coerce_pid(value: Any) -> int:
@@ -409,7 +551,7 @@ def _safe_chunk_name(value: str) -> str:
     return "".join(char if char.isalnum() or char in "._-" else "_" for char in value)
 
 
-def _decode_chunks_command(parts_dir: str, guest_path: str) -> str:
+def _decode_chunks_script(parts_dir: str, guest_path: str) -> str:
     return (
         "$ErrorActionPreference = 'Stop'; "
         f"$partsDir = {_ps_single_quote(parts_dir)}; "

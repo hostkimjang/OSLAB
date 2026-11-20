@@ -86,6 +86,7 @@ Provider는 VM lifecycle을 관리합니다.
 - clone/start/stop/destroy
 - VM status
 - Proxmox/QGA를 통한 guest info
+- 복제본 화면·네트워크 설정(`provider.clone`)
 
 향후 provider는 같은 lifecycle surface를 구현하면 scenario semantics를 바꾸지 않고 추가할 수 있습니다.
 
@@ -97,7 +98,7 @@ Guest channel은 VM 내부에서 command를 실행하고 file을 전송하는 in
 
 현재 구현:
 
-- Windows용 QEMU Guest Agent
+- Windows와 Linux 게스트용 QEMU Guest Agent
 
 설계된 경로:
 

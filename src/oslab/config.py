@@ -17,11 +17,16 @@ class OslabConfig:
 
     path: Path | None
     raw: dict[str, Any]
+    vmid_lock_dir_override: Path | None = None
 
     @property
     def output_root(self) -> Path:
         run_defaults = self.raw.get("runDefaults") or {}
         return Path(run_defaults.get("outputRoot") or "runs")
+
+    @property
+    def vmid_lock_dir(self) -> Path:
+        return self.vmid_lock_dir_override or self.output_root / ".locks"
 
     @property
     def timeout_minutes(self) -> int:

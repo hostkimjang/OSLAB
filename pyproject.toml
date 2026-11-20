@@ -28,6 +28,10 @@ oslab-mcp = "oslab.mcp_server:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+# The desktop console helper that OSLab compiles inside Windows guests.
+"oslab.runners" = ["*.cs"]
+
 [dependency-groups]
 dev = [
   "pytest>=8.0",

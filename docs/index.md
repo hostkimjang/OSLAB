@@ -15,6 +15,7 @@ README:
 | --- | --- |
 | [Getting Started](getting-started.md) | Run the generic demos in a Proxmox Windows VM |
 | [Demo Catalog](demos.md) | Public demo scenarios and what each one teaches |
+| [Demo Agent Environment Matrix](user-scenario.md) | Retest a candidate build with fresh installs and upgrades on Windows and Ubuntu |
 | [Introduction Video](intro-video.md) | What the README video shows, which parts are recorded or edited, and how it is made |
 | [Adoption Guide](adoption-guide.md) | Adapt the demos to your own product artifact |
 | [Concepts](concepts.md) | Scenario, provider, guest channel, fixture, artifact, adapter, assertion, report |

@@ -203,6 +203,6 @@ uv run oslab analyze-inventory `
 | Product-specific login/register flow | Scenario `product.steps`, artifact scripts, product-owned docs |
 | Product-specific inventory semantics | 해당 product가 소유한 adapter/assertion |
 | CI runner provisioning | 문서 패턴은 제공. Runner/network/secret 구성은 lab마다 다름 |
-| Linux SSH execution | Scenario model은 있음. 구현은 아직 완료 전 |
+| SSH guest channel | Scenario model은 있음. Linux scenario는 대신 QEMU Guest Agent로 실행 |
 
 Generic core는 VM lifecycle, guest execution, fixture execution, artifact transfer, output collection, normalization hook, assertion, report를 담당합니다.

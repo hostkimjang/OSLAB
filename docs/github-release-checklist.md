@@ -59,7 +59,7 @@ Use this checklist before publishing `oslab` on GitHub for the first time.
 
 ## Known Limits For First Release
 
-- The Windows/Proxmox/QEMU Guest Agent path is the implemented path.
-- Linux support is documented as a target, but not the first complete implementation path.
+- The Proxmox and QEMU Guest Agent path is implemented for Windows and Linux guests.
+- The SSH guest channel is not implemented. Linux guests run through QEMU Guest Agent.
 - WinRM/SSH credentials in config are reserved for future guest channels.
 - Proxmox least-privilege role guidance should be tightened before production cluster use.

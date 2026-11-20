@@ -2,77 +2,76 @@
 
 English · [한국어](intro-video.ko.md)
 
-[![OSLab introduction video, 2 minutes 45 seconds](media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
+[![OSLab introduction video](media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
 
 [Download the 1080p MP4](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4) · [Verification record](media/oslab-intro-film-attestation.json) · [How the video is made](#how-the-video-is-made)
 
 ## Synopsis
 
-The video follows OSLab from a test definition to the evidence it keeps, in 2 minutes 45 seconds. It opens on 32 disposable Windows 11 VMs, each running release QA in a different real program, and then follows a single test from start to finish.
+The video opens on 32 Windows 11 VM consoles, then follows one candidate build through fresh installs and upgrades on Windows 11 and Ubuntu 24.04. The tests use Demo Agent, a sample endpoint inventory agent. [Run the same environment matrix](user-scenario.md)
 
-A scenario file names the Windows template, the build and its command, the result file to collect and the checks to pass. One `oslab run` clones a VM on Proxmox, reaches the guest through QEMU Guest Agent, uploads and runs the build, checks its output, and destroys the VM. The terminal output plays next to the console of the VM that the run created, and a lifecycle rail shows how long each step took. The run folder keeps the logs, the raw and normalized output, and the JSON, JUnit and HTML reports.
+One `oslab suite-run` starts four disposable VMs. The Windows fresh-install console shows the agent commands on the signed-in desktop. The Ubuntu upgrade shows the migration from 2.3.1 to 2.4.0 and the checks that the original asset ID and settings survive. OSLab keeps the logs, inventory and reports after removing the VMs.
 
 The local web dashboard launches another run, streams its log and opens the result with its evidence and report. Codex then operates a Windows desktop through the OSLab MCP server and the Proxmox console. It opens Notepad, types a line, saves the file to the Desktop and shows it in File Explorer while the host mouse and keyboard stay free, and QEMU Guest Agent confirms the saved file.
 
-The last chapter returns to the 32 programs. LibreOffice Calc and Visual Studio Code each show a finding, the fix and the guest check that proves it, a diagram traces how a test agent reaches each VM, eight more programs follow, and the wall ends with 32 of 32 programs passed and 140 checks verified inside the guests.
+The last chapter returns to the 32 Windows programs. It shows the fixes in LibreOffice Calc and Visual Studio Code and how the agents reach the VMs, then brings the consoles together with the final tally of 32 programs passed and 140 guest checks verified.
 
 ## Chapters
 
-| Time | Chapter | On screen |
-| --- | --- | --- |
-| 0:00–0:07 | Opening | 32 Windows VMs fill the wall, then the title |
-| 0:07–0:19 | 01 Scenario | The scenario YAML, first as a whole file and then one section at a time |
-| 0:19–0:44 | 02 Run | `oslab run` output next to the console of the VM it created, with the real duration of each step |
-| 0:44–0:57 | 03 Evidence | The run folder, the HTML report and the assertion results |
-| 0:57–1:23 | 04 Dashboard | A run launched from the web dashboard, its live log, the evidence checklist and the report |
-| 1:23–1:54 | 05 AI agents | Codex works in Notepad and File Explorer through the OSLab MCP server, then the guest checks pass |
-| 1:54–2:38 | 06 Scale | The 32-VM wall, the Calc and VS Code fixes, how it works, eight more programs and 32 of 32 passed |
-| 2:38–2:45 | End card | What OSLab covers and the repository address |
+| Chapter | On screen |
+| --- | --- |
+| Opening | 32 Windows VMs and the OSLab title |
+| 01 Scenario | The Windows fresh-install scenario for Demo Agent |
+| 02 Run | `oslab suite-run` and the signed-in Windows desktop, then the Windows and Ubuntu consoles for all four test cases |
+| 03 Evidence | Files, HTML report and assertions from the Ubuntu upgrade |
+| 04 Dashboard | A separate run launched from the web dashboard, its live log and its results |
+| 05 AI agents | Codex operates Notepad and File Explorer through MCP and the guest checks confirm the saved file |
+| 06 Scale | The Calc and VS Code fixes, the MCP control path and the final tally across 32 Windows VMs |
+| End card | OSLab and the repository address |
 
 ## Recorded and edited parts
 
-- **Separate recordings:** chapters 02 and 03 come from one CLI run, chapter 04 from a separate dashboard run, and chapter 05 from a separate Codex session on its own VM. The opening and chapter 06 reuse the recordings of the [32-VM Windows QA video](#the-32-vm-windows-qa-video).
-- **Screens:** the VM consoles are 30 fps recordings taken through the Proxmox console while each run or session happened. The HTML report and the dashboard are headless Chromium recordings, and a Playwright script drove the dashboard.
-- **Rendered panels:** the YAML panel is typeset from the scenario file in this repository. The terminal panel replays the recorded CLI output at its recorded times, and the typing of the command is animated.
-- **Speed:** waits play faster, and every recorded chapter shows its current playback speed. The lifecycle rail in chapter 02 shows the real step durations.
-- **Names:** local host names, user folders and private variable names are replaced in the terminal text, the HTML report and the dashboard. VM IDs and run IDs stay as recorded.
-- **Cursors:** the editor draws the cursors at recorded pointer positions and interpolates the movement between them. In chapter 05 the cursor follows Codex's MCP `move_mouse` and `click` calls, and the guest's own pointer also appears in the recording.
-- **Verdicts:** the PASS badges come from `run.json`, the assertion results and the guest checks. A failed run or check shows FAIL.
-- **32-VM wall:** the VMs ran in waves of up to 8, and the wall lines up each recording at the start of its own workflow. The cursor flights into the empty slots at the start are a title animation. The finished wall is held for 2 seconds.
-- **Sound:** the MP4 has no audio track.
+- Chapters 02 and 03 use a single four-entry suite recording. The first close-up follows the `windows-fresh` child run, and the evidence chapter shows the `ubuntu-upgrade` child. Chapters 04 and 05 reuse the original dashboard run and the Codex session on its own VM.
+- The VM footage came from the Proxmox consoles during the runs. The report and dashboard footage came from headless Chromium. Playwright drove the dashboard.
+- The editor typesets the YAML and replays the captured terminal text. It animates command typing, speeds up wait periods and uses recorded event times for the lifecycle rail. Private names in the terminal, report and dashboard text use public aliases.
+- The editor draws cursors at recorded input positions and interpolates the movement between them. The cursor in chapter 05 follows Codex's MCP `move_mouse` and `click` calls. The guest's own pointer also appears in the recording.
+- The outcome badges use the run results and guest checks. The opening and finale reuse the original [32-VM Windows QA recordings](#the-32-vm-windows-qa-video), made in groups of up to eight VMs and aligned by the start of each workflow. The title and final verification tally are animated. The MP4 is silent.
 
 ## How the video is made
 
-The video is assembled from four kinds of recordings. Each capture script writes a folder that `edit_intro.py` reads, and each removes the VMs, servers and temporary files it created.
+Prepare the local suite and four scenario copies first. The capture commands also need FFmpeg, Node.js with the repository's Playwright dependencies installed, and access to the Proxmox node's LAN API. [Prepare the suite](user-scenario.md#run-the-matrix)
 
-1. `capture_cli.py` runs one scenario with `uv run --locked oslab run` and records the terminal output with arrival times. It records the console of the VM that the run creates from boot to removal, copies the run folder, and records the HTML report with `record_page.mjs`. `aliases.json` lists the public names that replace private ones.
-2. `capture_dashboard.mjs` starts a separate dashboard from this checkout, with its own API port, SQLite database and web build, so a running dashboard is not affected. It drives headless Chromium through the Run Launcher, the live console and the Results Explorer, and writes the recording, every pointer action and the times of the main steps. The dashboard does not run scenarios whose path contains `.local.`, so the scenario is another gitignored copy, such as `scenarios/windows/qa-*.example.yaml` or a file under `scenarios/<os>/private/`.
-3. `capture_agent.py run` creates a linked clone of a Windows template, signs in its desktop and records its console until a stop file appears. Meanwhile an MCP client such as Codex operates the VM with the OSLab MCP tools and keeps a log of its calls in `calls.json`. `capture_agent.py check` reads the saved file through QEMU Guest Agent and writes `checks.json`.
-4. `edit_intro.py` reads the three capture folders and the output folder of the 32-VM QA runs, and writes `oslab-intro-film.mp4` at 1920×1080 and 30 fps. `--preview` renders chosen seconds to PNG files first. The final render fails if a capture is missing, and `--receipt` writes the verification record for an encoded copy.
+1. `capture_suite.py` runs `uv run --locked oslab suite-run` with timestamped terminal output and records the four consoles. It saves `suite.json` and the child run evidence. `--report-entry ubuntu-upgrade` records the HTML report used in chapter 03. `--chromium` selects an installed Chromium executable for report recording. Use `--evidence-only --run-id <same-run-id>` to retry the report without rerunning the VMs.
+2. `capture_dashboard.mjs` starts an isolated dashboard with its own API port, SQLite database and web build. It records Run Launcher, the live console and Results Explorer together with the pointer inputs and their times. Copy the [ordered Windows steps scenario](../scenarios/windows/demo-agent-steps.example.yaml) to `scenarios/windows/qa-demo-agent-steps.example.yaml` and set the Windows template and VMID range for your lab.
+3. `capture_agent.py run` records a signed-in Windows clone while an MCP client uses the console and writes its call log to `calls.json`. In a second terminal, run `capture_agent.py check` after the client has saved the file, then write the stop file to end the recording.
+4. `edit_intro.py` reads the `suite`, `dashboard` and `agent` capture folders and the 32-VM footage. It renders a 1920×1080, 30 fps MP4. Use `--preview` to inspect selected frames and `--receipt` to write the verification record for the encoded copy. [Reproduce the 32-VM footage](windows-product-qa.md#record-the-32-vm-video)
 
 ```powershell
 $demo = 'validation/artifacts/intro-video'
 $capture = "$env:TEMP/oslab-intro"
-uv run --locked --extra computer-use python "$demo/capture_cli.py" --output "$capture/cli" `
-    --scenario scenarios/windows/demo-powershell-system.local.yaml --artifact-path validation/artifacts/powershell-system `
-    --config config/oslab.local.yaml --env-file config/oslab.local.env --lan-address 192.168.0.10 --ffmpeg ffmpeg
+$lan = Read-Host 'Proxmox API LAN address'
+uv run --locked --extra computer-use python "$demo/capture_suite.py" --output "$capture/suite" `
+    --suite validation/suites/qa-demo-agent-matrix.example.yaml --artifact-path validation/artifacts/demo-agent-cli `
+    --config config/oslab.local.yaml --env-file config/oslab.local.env --lan-address $lan `
+    --max-parallel 4 --report-entry ubuntu-upgrade --ffmpeg ffmpeg
 node "$demo/capture_dashboard.mjs" --out "$capture/dashboard" --scenario scenarios/windows/qa-demo-agent-steps.example.yaml `
     --artifact validation/artifacts/demo-agent-cli --ffmpeg ffmpeg
 $agent = @('--config', 'config/oslab.local.yaml', '--env-file', 'config/oslab.local.env', '--work', "$env:TEMP/oslab-agent-capture",
-    '--output', "$capture/agent", '--template-vmid', '9200', '--vmid-start', '9185', '--vmid-end', '9189', '--lan-address', '192.168.0.10')
+    '--output', "$capture/agent", '--template-vmid', '9200', '--vmid-start', '9185', '--vmid-end', '9189', '--lan-address', $lan)
 uv run --locked --extra computer-use python "$demo/capture_agent.py" run @agent
-# After the MCP client has finished and written calls.json:
+# In a second terminal with the same variables, after the MCP client writes calls.json.
 uv run --locked --extra computer-use python "$demo/capture_agent.py" check @agent
 New-Item -ItemType File "$env:TEMP/oslab-agent-capture/stop.flag"
 $edit = @('--captures', $capture, '--fleet', 'runs/windows-product-qa-demo', '--fonts', 'fonts/geist', '--out', "$capture/edit", '--ffmpeg', 'ffmpeg')
 uv run --locked --extra computer-use python "$demo/edit_intro.py" @edit
 ```
 
-The published copy is a two-pass H.264 encode of the master that stays under the 10 MB video limit for GitHub's free plan, so the same file also works as a README video attachment. `--receipt` writes the verification record next to it. An attachment that is only added to an unsubmitted comment box returns 404 to signed-out visitors, so post the README attachment in a pull request description before linking it.
+Adjust the example template and VMID values for your lab before recording the MCP session. For a smaller H.264 copy, set the target bitrate to fit the required file size at the rendered duration. This example locates FFmpeg's pass logs in the capture folder.
 
 ```powershell
-$encode = @('-y', '-i', "$capture/edit/oslab-intro-film.mp4", '-an', '-c:v', 'libx264', '-preset', 'slower',
-    '-b:v', '450k', '-maxrate', '1100k', '-bufsize', '2200k', '-pix_fmt', 'yuv420p', '-x264-params', 'aq-mode=3')
+$encode = @('-y', '-i', "$capture/edit/oslab-intro-film.mp4", '-an', '-c:v', 'libx264', '-preset', 'medium',
+    '-b:v', '404k', '-maxrate', '1100k', '-bufsize', '2200k', '-pix_fmt', 'yuv420p', '-x264-params', 'aq-mode=3',
+    '-passlogfile', "$capture/edit/intro-encode")
 ffmpeg @encode -pass 1 -f mp4 NUL
 ffmpeg @encode -pass 2 -movflags +faststart docs/media/oslab-intro-film.mp4
 uv run --locked --extra computer-use python "$demo/edit_intro.py" @edit --receipt docs/media/oslab-intro-film.mp4
@@ -80,7 +79,7 @@ uv run --locked --extra computer-use python "$demo/edit_intro.py" @edit --receip
 
 ## Verification record
 
-[`oslab-intro-film-attestation.json`](media/oslab-intro-film-attestation.json) records the CLI run with its step durations, the dashboard run, the Codex session with its MCP calls and guest checks, the length and frame count of each recording, the counts from the 32-VM QA runs, the edits listed above, and the SHA-256 of the published MP4. VM IDs and lab host names are left out.
+The verification record ties the published MP4's SHA-256 to the lab runs, capture timings, Codex MCP activity, and 32-VM guest checks shown in the video. [Verification record](media/oslab-intro-film-attestation.json)
 
 ## The 32-VM Windows QA video
 

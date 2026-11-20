@@ -1,14 +1,14 @@
 # README 데모 미디어 제작
 
-README 상단의 소개 영상과 32대 릴리스 QA 영상은 실제 Proxmox Windows 게스트에서 녹화한 화면을 사용합니다.
+README 상단의 소개 영상은 Proxmox의 Windows 11과 Ubuntu 24.04 게스트를, 32대 릴리스 QA 영상은 Windows 11 게스트를 녹화한 화면을 사용합니다.
 
 ## 구성
 
 ### OSLab 소개 영상
 
-README 상단 영상은 OSLab의 전체 흐름을 2분 45초 동안 보여 줍니다. [소개 영상 문서](../intro-video.ko.md)의 제작 방법에 따라 세 가지를 따로 녹화한 뒤 `edit_intro.py`로 한 편으로 편집합니다.
+README 상단 영상은 OSLab의 전체 흐름을 3분 5초 동안 보여 줍니다. [소개 영상 문서](../intro-video.ko.md)의 제작 방법에 따라 테스트 실행, 대시보드, MCP 세션을 녹화한 뒤 `edit_intro.py`로 편집합니다.
 
-1. `capture_cli.py`가 `oslab run` 한 번의 터미널 출력, 그 실행이 만든 VM의 콘솔, 실행 폴더, HTML 보고서를 녹화합니다. 02장과 03장에 씁니다.
+1. `capture_suite.py`가 `oslab suite-run` 한 번의 터미널 출력과 VM 네 대의 콘솔을 녹화합니다. 02장에서는 로그인한 Windows 데스크톱과 네 환경의 실행을 보여 주고, 03장에서는 같은 실행 묶음의 Ubuntu 업그레이드 보고서를 보여 줍니다.
 2. `capture_dashboard.mjs`가 별도 포트로 띄운 대시보드에서 실행 하나를 시작하고, 실시간 로그와 결과 화면을 headless Chromium으로 녹화합니다. 04장에 씁니다.
 3. `capture_agent.py`가 VM 하나의 콘솔을 녹화하는 동안 Codex가 OSLab MCP로 메모장과 파일 탐색기를 조작하고, 끝난 뒤 QGA로 저장된 파일을 확인합니다. 05장에 씁니다.
 4. 첫 장면과 06장은 아래 32대 릴리스 QA 녹화본을 다시 씁니다.

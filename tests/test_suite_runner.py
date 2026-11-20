@@ -1,11 +1,14 @@
 from pathlib import Path
 import time
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 
 from oslab.config import OslabConfig
 from oslab.models.result import RunResult
 from oslab.models.suite import load_suite
 from oslab.providers.proxmox import ProxmoxConfig
+from oslab.providers.vmid import LocalVmidLock, VmidRange
 from oslab.runners.proxmox_artifact_smoke import ProgressEvent
 from oslab.runners import suite_runner
 from oslab.runners.suite_runner import run_suite_validation
@@ -23,6 +26,48 @@ def make_proxmox_config() -> ProxmoxConfig:
         token_secret="secret",
         verify_tls=False,
     )
+
+
+def test_concurrent_suites_share_parent_vmid_reservations(tmp_path: Path, monkeypatch) -> None:
+    suite_path = tmp_path / "suite.yaml"
+    suite_path.write_text(
+        """schemaVersion: 1
+id: reservation.suite
+runs:
+  - id: linux
+    scenario: scenarios/linux/generic-smoke.example.yaml
+""",
+        encoding="utf-8",
+    )
+    config = make_config(tmp_path)
+    both_reserved = Barrier(2)
+    reserve_by_run: dict[str, Path] = {}
+
+    def fake_run_artifact_validation(scenario, child_config, *, run_id, **kwargs):
+        reservation = LocalVmidLock(child_config.vmid_lock_dir).reserve(VmidRange(9170, 9171), used_vmids=set())
+        try:
+            reserve_by_run[run_id] = reservation.lock_path
+            both_reserved.wait(timeout=5)
+        finally:
+            reservation.release()
+        result = RunResult(run_id=run_id, scenario_id=scenario.scenario_id, status="running")
+        result.complete("passed")
+        return result
+
+    monkeypatch.setattr(suite_runner, "run_artifact_validation", fake_run_artifact_validation)
+    suite = load_suite(suite_path)
+    proxmox_config = make_proxmox_config()
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        runs = [
+            executor.submit(
+                run_suite_validation, suite, config, proxmox_config=proxmox_config, artifact_path=tmp_path, run_id=run_id
+            )
+            for run_id in ("reservation-a", "reservation-b")
+        ]
+        assert [run.result().status for run in runs] == ["passed", "passed"]
+
+    assert set(reserve_by_run.values()) == {config.vmid_lock_dir / "vmid-9170.lock", config.vmid_lock_dir / "vmid-9171.lock"}
+    assert not list(config.vmid_lock_dir.glob("*.lock"))
 
 
 def test_run_suite_validation_writes_aggregate_result(tmp_path: Path, monkeypatch) -> None:
