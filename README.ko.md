@@ -10,7 +10,7 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-[![OSLab 소개 영상, 3분 5초](docs/media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
+https://github.com/user-attachments/assets/3c727531-1799-4566-a377-2103e6270c26
 
 > **같은 빌드를 Windows와 Linux에서 검증합니다.** Demo Agent 2.4를 Windows 11과 Ubuntu 24.04에 새로 설치하고, 이전 버전에서도 올려 봅니다. 로그인한 Windows 데스크톱과 Ubuntu 업그레이드 보고서, 웹 대시보드 실행, Codex의 OSLab MCP 조작을 보여 줍니다. 마지막에는 Windows VM 32대에서 프로그램 32개와 게스트 검사 140개가 모두 통과한 결과를 모아 보여 줍니다.
 

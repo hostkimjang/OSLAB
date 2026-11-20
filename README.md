@@ -10,7 +10,7 @@
   English · <a href="README.ko.md">한국어</a>
 </p>
 
-[![OSLab introduction video, 3 minutes 5 seconds](docs/media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
+https://github.com/user-attachments/assets/3c727531-1799-4566-a377-2103e6270c26
 
 > **Test one build across Windows and Linux.** The film follows Demo Agent 2.4 through fresh installs and upgrades on Windows 11 and Ubuntu 24.04. It shows the signed-in Windows desktop, the Ubuntu upgrade report, a dashboard run and a Codex session using OSLab MCP. The finale brings together 32 Windows programs across 32 VMs and 140 passing guest checks.
 
