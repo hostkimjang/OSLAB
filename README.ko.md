@@ -10,17 +10,17 @@
   <a href="README.md">English</a> · 한국어
 </p>
 
-[![OSLab 소개 영상, 2분 45초](docs/media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
+[![OSLab 소개 영상, 3분 5초](docs/media/oslab-intro-film-poster.jpg)](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4)
 
-> **시나리오 하나로 새 Windows VM에서 테스트하고 증거까지 남깁니다.** OSLab은 Proxmox에서 일회용 Windows 11 VM을 복제하고, QEMU Guest Agent로 빌드를 실행해 결과를 검사한 뒤 보고서를 남기고 VM을 삭제합니다. 영상은 CLI 실행, 웹 대시보드에서 시작한 실행, OSLab MCP 서버로 Windows 화면을 조작하는 Codex 세션을 차례로 보여 줍니다. 마지막에는 VM 32대에서 실제 프로그램 32개를 검사해 게스트 검사 140개를 모두 통과합니다. VM, 보고서, 대시보드 화면은 실제 녹화이고 대기 구간은 빠르게 재생했습니다. 32대 화면은 최대 8대씩 녹화한 실행을 시작 시점에 맞춰 배치했습니다.
+> **같은 빌드를 Windows와 Linux에서 검증합니다.** Demo Agent 2.4를 Windows 11과 Ubuntu 24.04에 새로 설치하고, 이전 버전에서도 올려 봅니다. 로그인한 Windows 데스크톱과 Ubuntu 업그레이드 보고서, 웹 대시보드 실행, Codex의 OSLab MCP 조작을 보여 줍니다. 마지막에는 Windows VM 32대에서 프로그램 32개와 게스트 검사 140개가 모두 통과한 결과를 모아 보여 줍니다.
 
-[영상 소개](docs/intro-video.ko.md) · [1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4) · [검증 기록](docs/media/oslab-intro-film-attestation.json) · [32대 Windows QA 영상](docs/intro-video.ko.md#32대-windows-qa-영상) · [Windows QA 재현 방법](docs/windows-product-qa.ko.md)
+[영상 소개](docs/intro-video.ko.md) · [Windows·Ubuntu 테스트 재현](docs/user-scenario.ko.md) · [1080p MP4 다운로드](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-intro-film.mp4) · [검증 기록](docs/media/oslab-intro-film-attestation.json) · [32대 Windows QA 영상](docs/intro-video.ko.md#32대-windows-qa-영상)
 
 [이전 Windows 앱 매트릭스 데모](docs/windows-app-matrix.ko.md) · [Dispatch Board MSI 설치·업그레이드 예제](docs/release-qa-demo.ko.md) · [Dispatch Board 영상](https://raw.githubusercontent.com/hostkimjang/OSLAB/master/docs/media/oslab-release-qa.mp4)
 
 OSLAB은 단위 테스트나 컨테이너, 모의 환경만으로 확인하기 어려운 소프트웨어를 **실제 운영체제에서 검증하는 OS 통합 테스트 플랫폼**입니다. 일회용 VM을 복제하고, 게스트 환경을 준비한 뒤, 테스트할 파일을 전송해 실행합니다. 이어서 결과 판정과 보고서 생성을 마치고 VM을 정리합니다.
 
-현재 처음부터 끝까지 연결된 경로는 **Proxmox 위의 Windows와 QEMU Guest Agent(QGA)** 조합입니다. Linux 시나리오와 SSH/WinRM 개념은 모델에 포함되어 있지만 해당 실행 경로는 아직 완성되지 않았습니다. Proxmox 이외의 VM 공급자도 향후 작업 범위입니다.
+현재 처음부터 끝까지 연결된 경로는 **Proxmox 위에서 QEMU Guest Agent(QGA)로 실행하는 Windows와 Linux 게스트**입니다. SSH와 WinRM 채널은 시나리오 모델에는 있지만 실행 경로는 아직 완성되지 않았습니다. Proxmox 이외의 VM 공급자도 향후 작업 범위입니다.
 
 ## OSLAB이 필요한 이유
 
@@ -99,11 +99,13 @@ VM 정리도 실행 계약의 일부입니다. 실패한 VM을 디버깅 목적�
 | --- | --- |
 | Proxmox VM 수명 주기 | 구현됨 |
 | Windows + QEMU Guest Agent | 전체 실행 경로 구현됨 |
+| Linux + QEMU Guest Agent | 전체 실행 경로 구현됨 |
 | 폴더 및 설치 파일 artifact | 구현됨 |
-| PowerShell fixture | 구현됨 |
+| PowerShell fixture(Windows), shell fixture(Linux) | 구현됨 |
+| 복제본 화면·네트워크 설정(`provider.clone`) | 구현됨 |
 | JSON, JUnit XML, HTML, 구조화 진행 로그 | 구현됨 |
 | 로컬 웹 대시보드 | 구현됨 |
-| Linux + SSH 실행 | 미완성 |
+| SSH 실행 | 미완성, Linux 실행은 QGA 사용 |
 | WinRM 실행 | 미완성, 현재 QGA 경로에는 필요 없음 |
 | Proxmox 이외의 provider | 미완성 |
 
@@ -217,7 +219,7 @@ runs/<run-id>/
 
 Windows 예제에는 PowerShell 시스템 정보, Python과 C 프로그램, fixture 상태, 단계별 명령, 단위 테스트 출력, HTTP 서비스, 의도적인 assertion 실패가 포함되어 있습니다. [데모 목록](docs/demos.ko.md)에서 시작한 뒤, 자신의 소프트웨어로 바꿀 때는 [도입 가이드](docs/adoption-guide.ko.md)를 참고하세요.
 
-Linux 예제는 앞으로 지원할 시나리오 형식을 보여 주기 위한 것입니다. 아직 처음부터 끝까지 실행되는 Linux 경로는 아닙니다.
+Linux 예제(`scenarios/linux/generic-smoke.example.yaml`, artifact는 `validation/artifacts/linux-system`)는 QGA로 처음부터 끝까지 실행됩니다. shell fixture를 적용하고 tar.gz artifact를 올린 뒤 `commandResult` JSON을 수집하며, 실행하는 명령을 VM 콘솔에도 보여 줍니다. 자세한 내용은 [Linux 게스트](docs/scenarios.ko.md#linux-guests)를 참고하세요.
 
 ## 문서 안내
 
@@ -226,6 +228,7 @@ Linux 예제는 앞으로 지원할 시나리오 형식을 보여 주기 위한 
 | 설치하고 첫 데모 실행 | [시작하기](docs/getting-started.ko.md) |
 | 핵심 모델 이해 | [핵심 개념](docs/concepts.ko.md) |
 | 예제 선택 | [데모 목록](docs/demos.ko.md) |
+| Windows와 Ubuntu에서 후보 빌드 재검증 | [Demo Agent 환경 매트릭스](docs/user-scenario.ko.md) |
 | Proxmox 랩 연결 | [Proxmox 연결](docs/proxmox-connection.ko.md) |
 | Codex·Claude로 VM 화면 캡처·조작 | [Codex 등록과 메모장 데모](#codex-mcp), [MCP 가이드](docs/computer-use-mcp.ko.md) |
 | 시나리오 YAML 작성 | [시나리오](docs/scenarios.ko.md) |

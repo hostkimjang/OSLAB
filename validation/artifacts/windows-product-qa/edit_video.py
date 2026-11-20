@@ -79,7 +79,7 @@ class Fonts:
 
 
 def text(canvas, xy, value, font, fill=INK, alpha=1.0, anchor="la"):
-    if alpha <= 0.01 or not value:
+    if alpha <= 0.01 or not value or value.isspace():
         return
     if alpha >= .99:
         ImageDraw.Draw(canvas).text(xy, value, font=font, fill=fill, anchor=anchor)
@@ -569,6 +569,9 @@ class Film:
         self.tracks = {case.id: Track(case) for case in cases}
         self.labels = {case.id: fit(case.title, self.fonts("medium", 15), TILE_W - 30) for case in cases}
         self.pointers = {}
+        # The footnotes under the counters and the recording and speed labels. Editors that disclose the edit
+        # elsewhere can turn them off.
+        self.disclosures = True
         for case in cases:
             color = self.colors[case.id]
             for size, height, font in (("wall", 19, self.fonts("mono-bold", 12)), ("screen", 34, self.fonts("mono-bold", 20))):
@@ -613,7 +616,7 @@ class Film:
                 box(canvas, (x + 6, y + h - 30, min(w - 12, width + 18), 24), 6, fill=(6, 9, 16), alpha=.82 * labels)
                 text(canvas, (x + 15, y + h - 18), self.labels[case.id], label, INK, labels, "lm")
                 if passed:
-                    age = (tau - case.duration) / rate
+                    age = (tau - case.duration) / rate if rate > 0 else math.inf
                     pop = 1 + .35 * (1 - ease_out(age / .3))
                     bw, bh = 62 * pop, 22 * pop
                     box(canvas, (x + w - 8 - bw, y + 8, bw, bh), 6, fill=MINT, alpha=labels)
@@ -666,6 +669,11 @@ class Film:
         x, y, w, h = rect
         track = self.tracks[case.id]
         epoch = case.start + clamp(tau, 0, case.duration)
+        if rate <= 0:
+            px, py = track.position(epoch, 0)
+            self.cursor(canvas, case.id, (x + px * w / VM_W, y + py * h / VM_H), "wall",
+                        alpha * (.35 if tau >= case.duration else 1.0))
+            return
         px, py = track.position(epoch, .45 * rate)
         point = (x + px * w / VM_W, y + py * h / VM_H)
         clicked = track.last_click(epoch)
@@ -711,6 +719,8 @@ class Film:
             x += 300
         minutes, seconds = divmod(int(max(tau, 0)), 60)
         text(canvas, (W - 48, y), f"T+{minutes:02d}:{seconds:02d}", fonts("mono-bold", 40), INK, alpha, "ra")
+        if not self.disclosures:
+            return
         text(canvas, (W - 48, y + 50), f"{round(rate)}× TIME-LAPSE", fonts("mono", 18), MUTED, alpha, "ra")
         note = fonts("regular", 17)
         text(canvas, (48, H - 46), "Each tile is a continuous console recording of its own Windows 11 VM, recorded in "
@@ -806,6 +816,8 @@ class Film:
 
     def feature_header(self, canvas, feature, t, alpha=1.0):
         brand(canvas, self.fonts, 48, 42, 26, alpha)
+        if not self.disclosures:
+            return
         speed = feature.remap.speed(t)
         text(canvas, (CARD[0] + CARD[2], 52), f"REAL CONSOLE RECORDING  ·  {speed_label(speed)}",
              self.fonts("mono", 20), MUTED, alpha, "rm")
@@ -1071,7 +1083,8 @@ class Story:
         film = self.film
         canvas = film.background.copy()
         brand(canvas, film.fonts, 48, 42, 26)
-        text(canvas, (W - 48, 52), "MORE PROGRAMS  ·  REAL CONSOLE RECORDINGS", film.fonts("mono", 20), MUTED, 1, "rm")
+        header = "MORE PROGRAMS  ·  REAL CONSOLE RECORDINGS" if film.disclosures else "MORE PROGRAMS"
+        text(canvas, (W - 48, 52), header, film.fonts("mono", 20), MUTED, 1, "rm")
         width, height, gap = 776, 485, 20
         left, top = (W - 2 * width - gap) / 2, 88
         for index, clip in enumerate(group):
@@ -1102,16 +1115,18 @@ class Story:
                      film.fonts("mono-bold", round(20 * pop)), (6, 30, 28), appear, "mm")
         return canvas
 
-    def finale(self, t, length=5.5):
+    def finale(self, t, length=5.5, tau=None, rate=None):
+        """The finished wall. Callers that pace the end themselves pass the wall time tau and its time-lapse rate."""
         film = self.film
         canvas = film.background.copy()
-        tau = self.final_tau + t * self.final_rate
+        if tau is None:
+            tau, rate = self.final_tau + t * self.final_rate, self.final_rate
         appear = ease_out(t / .4)
         zoom = mix(1.06, 1.0, ease(t / length))
-        film.wall(canvas, tau, (zoom, W / 2, H / 2), rate=self.final_rate)
+        film.wall(canvas, tau, (zoom, W / 2, H / 2), rate=rate)
         text(canvas, (48, 104), "Every run checked inside its own guest.", film.fonts("semibold", 64), INK, appear)
         brand(canvas, film.fonts, 48, 40, 30, appear)
-        film.counters(canvas, tau, appear, rate=self.final_rate)
+        film.counters(canvas, tau, appear, rate=rate)
         return canvas
 
     def ending(self, t):

@@ -1,61 +1,6 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "title": "OSLab introduction film",
-  "cli_run": {
-    "run_id": "intro-cli-20261119-213335",
-    "scenario": "demo.powershell-system.windows",
-    "status": "passed",
-    "assertions": {
-      "failed": 0,
-      "total": 2
-    },
-    "vm_destroyed": true,
-    "run_seconds": 67.2,
-    "steps": [
-      {
-        "name": "Clone",
-        "seconds": 4.0
-      },
-      {
-        "name": "Boot",
-        "seconds": 4.5
-      },
-      {
-        "name": "Guest agent",
-        "seconds": 17.8
-      },
-      {
-        "name": "Preflight",
-        "seconds": 16.0
-      },
-      {
-        "name": "Upload",
-        "seconds": 9.0
-      },
-      {
-        "name": "Run",
-        "seconds": 2.9
-      },
-      {
-        "name": "Assert",
-        "seconds": 0.6
-      },
-      {
-        "name": "Destroy",
-        "seconds": 10.7
-      }
-    ],
-    "console_recording": {
-      "fps": 30,
-      "frames": 1786,
-      "seconds": 59.533
-    },
-    "report_recording": {
-      "fps": 30,
-      "frames": 332,
-      "seconds": 11.067
-    }
-  },
   "dashboard_run": {
     "run_id": "20261119-223531-demo-agent-steps-windows",
     "scenario": "demo.agent-steps.windows",
@@ -110,19 +55,428 @@
     "record": "oslab-windows-product-qa-attestation.json"
   },
   "edits": [
-    "Chapters 02 and 03 show one CLI run, chapter 04 a separate run that a Playwright script launched from the dashboard, and chapter 05 a separate Codex session. The opening and chapter 06 reuse the 32-VM Windows QA recordings.",
-    "Waits play faster, and each recorded chapter shows its playback speed.",
+    "Chapter 02 follows the Windows fresh install from the recorded suite. The environment interlude uses one source clock for all four consoles and holds the last product frames under a VM removed label. Chapter 03 shows the same Ubuntu upgrade's report.",
+    "Chapter 04 uses a separate dashboard run launched by Playwright. Chapter 05 uses a separate Codex session. The opening and chapter 06 reuse the 32-VM Windows QA recordings.",
+    "The edit changes playback speed between events and holds on selected results.",
     "The YAML and terminal panels are typeset from the scenario file and the recorded CLI output. Command typing is animated.",
     "Local host names, user folders and private variable names are replaced in the terminal text, the HTML report and the dashboard.",
     "The editor draws the cursors at the recorded pointer positions and interpolates the movement between them.",
-    "The 32-VM wall aligns recordings made in waves of up to 8 at each run's start, and the finished wall is held for 2 seconds."
+    "The 32-VM wall aligns recordings made in waves of up to eight at each run's start. The final cursor movement toward the logo is animated."
   ],
   "video": {
     "file": "oslab-intro-film.mp4",
-    "bytes": 9340985,
-    "sha256": "b25ffd3ddb37963d9cdc1c6546c6b1485d2cdbd386e586f95e61c9db072fb26d",
+    "bytes": 9519512,
+    "sha256": "6d67e33822ad532f42c83edc4cbca058ece167aae68fcd5760034d50981271a4",
     "width": 1920,
     "height": 1080,
     "fps": 30
+  },
+  "suite_run": {
+    "run_id": "intro-suite-v2-20261120",
+    "suite_id": "demo-agent-matrix",
+    "status": "passed",
+    "summary": {
+      "allowedFailed": 0,
+      "failed": 0,
+      "passed": 4,
+      "requiredFailed": 0,
+      "total": 4
+    },
+    "run_chapter_entry": "windows-fresh",
+    "evidence_chapter_entry": "ubuntu-upgrade",
+    "all_product_checks_overlapped": true,
+    "children": [
+      {
+        "entry_id": "windows-fresh",
+        "scenario_file": "scenarios/windows/demo-agent-fresh-install.example.yaml",
+        "scenario_sha256": "90172132402ddd55f1bdf106b1151777ccf2a85bba6bce6b1878a2d5daaa2708",
+        "run_id": "intro-suite-v2-20261120-windows-fresh",
+        "scenario": "demo.agent-matrix.windows-fresh",
+        "status": "passed",
+        "assertions": {
+          "failed": 0,
+          "total": 4
+        },
+        "vm_destroyed": true,
+        "run_seconds": 266.6,
+        "lifecycle": [
+          {
+            "name": "Clone",
+            "start_phase": "vm.clone.start",
+            "finish_phase": "vm.clone.done",
+            "seconds": 11.0
+          },
+          {
+            "name": "Boot",
+            "start_phase": "vm.start.start",
+            "finish_phase": "vm.boot.done",
+            "seconds": 4.8
+          },
+          {
+            "name": "Guest agent",
+            "start_phase": "guest.ready.wait",
+            "finish_phase": "guest.ready.done",
+            "seconds": 36.2
+          },
+          {
+            "name": "Sign in",
+            "start_phase": "desktop.signin.start",
+            "finish_phase": "desktop.signin.done",
+            "seconds": 66.1
+          },
+          {
+            "name": "Preflight",
+            "start_phase": "preflight.start",
+            "finish_phase": "preflight.done",
+            "seconds": 18.3
+          },
+          {
+            "name": "Upload",
+            "start_phase": "artifact.prepare.start",
+            "finish_phase": "artifact.upload.done",
+            "seconds": 9.8
+          },
+          {
+            "name": "Run",
+            "start_phase": "product.step.start",
+            "finish_phase": "product.steps.write.done",
+            "seconds": 98.3
+          },
+          {
+            "name": "Assert",
+            "start_phase": "output.collect.start",
+            "finish_phase": "assertions.done",
+            "seconds": 1.0
+          },
+          {
+            "name": "Destroy",
+            "start_phase": "vm.stop.start",
+            "finish_phase": "vm.destroy.done",
+            "seconds": 11.8
+          }
+        ],
+        "product_steps": [
+          {
+            "id": "version",
+            "status": "passed",
+            "seconds": 19.91
+          },
+          {
+            "id": "install",
+            "status": "passed",
+            "seconds": 13.791
+          },
+          {
+            "id": "register",
+            "status": "passed",
+            "seconds": 34.906
+          },
+          {
+            "id": "status",
+            "status": "passed",
+            "seconds": 13.841
+          },
+          {
+            "id": "scan",
+            "status": "passed",
+            "seconds": 15.884
+          }
+        ],
+        "console_recording": {
+          "fps": 24,
+          "frames": 5997,
+          "seconds": 249.875
+        }
+      },
+      {
+        "entry_id": "windows-upgrade",
+        "scenario_file": "scenarios/windows/demo-agent-upgrade.example.yaml",
+        "scenario_sha256": "60e499ddcec0e537a3618015124e80f98967e25653ec1273d4ee73b4d880f204",
+        "run_id": "intro-suite-v2-20261120-windows-upgrade",
+        "scenario": "demo.agent-matrix.windows-upgrade",
+        "status": "passed",
+        "assertions": {
+          "failed": 0,
+          "total": 4
+        },
+        "vm_destroyed": true,
+        "run_seconds": 209.4,
+        "lifecycle": [
+          {
+            "name": "Clone",
+            "start_phase": "vm.clone.start",
+            "finish_phase": "vm.clone.done",
+            "seconds": 8.4
+          },
+          {
+            "name": "Boot",
+            "start_phase": "vm.start.start",
+            "finish_phase": "vm.boot.done",
+            "seconds": 4.5
+          },
+          {
+            "name": "Guest agent",
+            "start_phase": "guest.ready.wait",
+            "finish_phase": "guest.ready.done",
+            "seconds": 18.0
+          },
+          {
+            "name": "Sign in",
+            "start_phase": "desktop.signin.start",
+            "finish_phase": "desktop.signin.done",
+            "seconds": 60.4
+          },
+          {
+            "name": "Preflight",
+            "start_phase": "preflight.start",
+            "finish_phase": "preflight.done",
+            "seconds": 17.2
+          },
+          {
+            "name": "Upload",
+            "start_phase": "artifact.prepare.start",
+            "finish_phase": "artifact.upload.done",
+            "seconds": 10.8
+          },
+          {
+            "name": "Run",
+            "start_phase": "product.step.start",
+            "finish_phase": "product.steps.write.done",
+            "seconds": 60.9
+          },
+          {
+            "name": "Assert",
+            "start_phase": "output.collect.start",
+            "finish_phase": "assertions.done",
+            "seconds": 0.6
+          },
+          {
+            "name": "Destroy",
+            "start_phase": "vm.stop.start",
+            "finish_phase": "vm.destroy.done",
+            "seconds": 11.6
+          }
+        ],
+        "product_steps": [
+          {
+            "id": "version",
+            "status": "passed",
+            "seconds": 18.611
+          },
+          {
+            "id": "install",
+            "status": "passed",
+            "seconds": 13.935
+          },
+          {
+            "id": "status",
+            "status": "passed",
+            "seconds": 14.955
+          },
+          {
+            "id": "scan",
+            "status": "passed",
+            "seconds": 13.347
+          }
+        ],
+        "console_recording": {
+          "fps": 24,
+          "frames": 4679,
+          "seconds": 194.958
+        }
+      },
+      {
+        "entry_id": "ubuntu-fresh",
+        "scenario_file": "scenarios/linux/demo-agent-fresh-install.example.yaml",
+        "scenario_sha256": "1740468d5caf369b1f7df5c757ce322dace26ec7c3a0c3b12c75022cb23afea7",
+        "run_id": "intro-suite-v2-20261120-ubuntu-fresh",
+        "scenario": "demo.agent-matrix.ubuntu-fresh",
+        "status": "passed",
+        "assertions": {
+          "failed": 0,
+          "total": 4
+        },
+        "vm_destroyed": true,
+        "run_seconds": 190.9,
+        "lifecycle": [
+          {
+            "name": "Clone",
+            "start_phase": "vm.clone.start",
+            "finish_phase": "vm.clone.done",
+            "seconds": 8.4
+          },
+          {
+            "name": "Boot",
+            "start_phase": "vm.start.start",
+            "finish_phase": "vm.boot.done",
+            "seconds": 4.4
+          },
+          {
+            "name": "Guest agent",
+            "start_phase": "guest.ready.wait",
+            "finish_phase": "guest.ready.done",
+            "seconds": 139.1
+          },
+          {
+            "name": "Preflight",
+            "start_phase": "preflight.start",
+            "finish_phase": "preflight.done",
+            "seconds": 7.4
+          },
+          {
+            "name": "Upload",
+            "start_phase": "artifact.prepare.start",
+            "finish_phase": "artifact.upload.done",
+            "seconds": 7.2
+          },
+          {
+            "name": "Run",
+            "start_phase": "product.step.start",
+            "finish_phase": "product.steps.write.done",
+            "seconds": 8.0
+          },
+          {
+            "name": "Assert",
+            "start_phase": "output.collect.start",
+            "finish_phase": "assertions.done",
+            "seconds": 3.2
+          },
+          {
+            "name": "Destroy",
+            "start_phase": "vm.stop.start",
+            "finish_phase": "vm.destroy.done",
+            "seconds": 8.1
+          }
+        ],
+        "product_steps": [
+          {
+            "id": "version",
+            "status": "passed",
+            "seconds": 1.634
+          },
+          {
+            "id": "install",
+            "status": "passed",
+            "seconds": 1.708
+          },
+          {
+            "id": "register",
+            "status": "passed",
+            "seconds": 1.599
+          },
+          {
+            "id": "status",
+            "status": "passed",
+            "seconds": 1.608
+          },
+          {
+            "id": "scan",
+            "status": "passed",
+            "seconds": 1.473
+          }
+        ],
+        "console_recording": {
+          "fps": 24,
+          "frames": 4237,
+          "seconds": 176.542
+        }
+      },
+      {
+        "entry_id": "ubuntu-upgrade",
+        "scenario_file": "scenarios/linux/demo-agent-upgrade.example.yaml",
+        "scenario_sha256": "fa1062e64d5d053f455c7c46ac376a9edd6fc1fa631c0f7f1d2e521c1f06199e",
+        "run_id": "intro-suite-v2-20261120-ubuntu-upgrade",
+        "scenario": "demo.agent-matrix.ubuntu-upgrade",
+        "status": "passed",
+        "assertions": {
+          "failed": 0,
+          "total": 4
+        },
+        "vm_destroyed": true,
+        "run_seconds": 191.8,
+        "lifecycle": [
+          {
+            "name": "Clone",
+            "start_phase": "vm.clone.start",
+            "finish_phase": "vm.clone.done",
+            "seconds": 8.9
+          },
+          {
+            "name": "Boot",
+            "start_phase": "vm.start.start",
+            "finish_phase": "vm.boot.done",
+            "seconds": 7.0
+          },
+          {
+            "name": "Guest agent",
+            "start_phase": "guest.ready.wait",
+            "finish_phase": "guest.ready.done",
+            "seconds": 131.2
+          },
+          {
+            "name": "Preflight",
+            "start_phase": "preflight.start",
+            "finish_phase": "preflight.done",
+            "seconds": 6.8
+          },
+          {
+            "name": "Upload",
+            "start_phase": "artifact.prepare.start",
+            "finish_phase": "artifact.upload.done",
+            "seconds": 7.4
+          },
+          {
+            "name": "Run",
+            "start_phase": "product.step.start",
+            "finish_phase": "product.steps.write.done",
+            "seconds": 6.1
+          },
+          {
+            "name": "Assert",
+            "start_phase": "output.collect.start",
+            "finish_phase": "assertions.done",
+            "seconds": 3.1
+          },
+          {
+            "name": "Destroy",
+            "start_phase": "vm.stop.start",
+            "finish_phase": "vm.destroy.done",
+            "seconds": 8.6
+          }
+        ],
+        "product_steps": [
+          {
+            "id": "version",
+            "status": "passed",
+            "seconds": 1.502
+          },
+          {
+            "id": "install",
+            "status": "passed",
+            "seconds": 1.499
+          },
+          {
+            "id": "status",
+            "status": "passed",
+            "seconds": 1.534
+          },
+          {
+            "id": "scan",
+            "status": "passed",
+            "seconds": 1.509
+          }
+        ],
+        "console_recording": {
+          "fps": 24,
+          "frames": 4218,
+          "seconds": 175.75
+        },
+        "report_recording": {
+          "fps": 30,
+          "frames": 332,
+          "seconds": 11.067
+        }
+      }
+    ]
   }
 }

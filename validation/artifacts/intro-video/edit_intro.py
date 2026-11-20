@@ -3,15 +3,15 @@
 The film walks through OSLab in six chapters between a cold open and an end card:
 
 1. Scenario: the YAML file of a public demo scenario.
-2. Run: the terminal output of a real `oslab run`, replayed with its recorded timing, next to
-   the console recording of the disposable VM that the run created.
-3. Evidence: the files that run wrote and its HTML report recorded in a browser.
+2. Run: the terminal output of a real `oslab suite-run`, replayed next to the Windows fresh-install VM.
+   The environment interlude shows all four consoles and follows the Ubuntu upgrade.
+3. Evidence: the files and browser-recorded HTML report from that same Ubuntu upgrade.
 4. Dashboard: a browser recording of the web dashboard launching a run on the lab.
 5. AI agents: the console recording of a VM that an AI agent operated through the OSLab MCP
    server, next to the agent's tool calls.
 6. Scale: the 32-VM Windows QA fleet edited by windows-product-qa/edit_video.py.
 
-capture_cli.py, capture_dashboard.mjs and capture_agent.py record chapters 2 to 5.
+capture_suite.py, capture_dashboard.mjs and capture_agent.py record chapters 2 to 5.
 """
 
 from __future__ import annotations
@@ -20,9 +20,11 @@ import argparse
 import hashlib
 import json
 import math
+import random
 import re
 import subprocess
 import sys
+import tempfile
 from bisect import bisect_right
 from datetime import datetime
 from pathlib import Path
@@ -31,6 +33,7 @@ from types import SimpleNamespace
 from PIL import Image, ImageDraw, ImageFilter
 
 HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[2]
 sys.path.insert(0, str(HERE.parent / "windows-product-qa"))
 
 import edit_video as ev  # noqa: E402  The fleet editor provides the drawing helpers and the 32-VM wall.
@@ -44,6 +47,8 @@ SKY = (125, 211, 252)
 VIOLET = (196, 181, 253)
 TERMINAL = (8, 12, 20)
 CHAPTERS = ["Scenario", "Run", "Evidence", "Dashboard", "AI agents", "Scale"]
+# Position and size of the OSLab logo on the end card, as brand() takes them. The 32 agents of chapter 6 land on it.
+LOGO = (W / 2 - 250, 250, 100)
 
 
 def load_json(path):
@@ -59,6 +64,51 @@ def fit_rect(size, rect):
 
 def dissolve(first, second, amount):
     return Image.blend(first, second, clamp(amount)) if amount > 0 else first
+
+
+def piecewise(keys, t):
+    """The value at t of the polyline through (t, value) keys and its slope there. Past the last key the value holds."""
+    for (start, value), (end, next_value) in zip(keys, keys[1:]):
+        if t <= end:
+            rate = (next_value - value) / (end - start)
+            return value + (t - start) * rate, rate
+    return keys[-1][1], 0.0
+
+
+def finale_timing(durations, opening, beats, finish):
+    # When several runs finish together, they light up on the same beat.
+    ends = sorted(set(durations))[-len(beats):]
+    start = min(opening, max(0, ends[0] - .5))
+    return [(0.0, start), *zip(beats[-len(ends):], ends), (finish, ends[-1] + 1.5)]
+
+
+def crossing(keys, value):
+    """First output second at which a nondecreasing source timeline reaches value."""
+    if value < keys[0][1]:
+        return -math.inf
+    for (start, first), (end, last) in zip(keys, keys[1:]):
+        if first <= value <= last:
+            return start if last == first else mix(start, end, (value - first) / (last - first))
+    return math.inf
+
+
+def logo_center():
+    x, y, size = LOGO
+    unit = size / 28
+    return x + 15 * unit, y + 10 * unit
+
+
+def mark_point(rank, count):
+    """A point inside one of the two slanted bars that brand() draws for the OSLab mark at LOGO."""
+    x, y, size = LOGO
+    unit = size / 28
+    jitter = random.Random(rank)
+    # The first bar is wider, so it takes a larger share of the agents.
+    offset, width = (0, 9) if rank < count * .56 else (13, 7)
+    along, across = jitter.uniform(.12, .88), jitter.uniform(.15, .85)
+    bottom = (x + (offset + across * width) * unit, y + 20 * unit)
+    top = (x + (offset + 10 + across * width) * unit, y)
+    return mix(bottom[0], top[0], along), mix(bottom[1], top[1], along)
 
 
 class Look:
@@ -115,9 +165,6 @@ class Look:
             text(canvas, (x + w - 20, y + 21), badge, self.fonts("mono", 17), DIM, alpha, "rm")
         return x + 1, y + 41, w - 2, h - 42
 
-    def footnote(self, canvas, value, alpha=1.0):
-        text(canvas, (48, H - 22), value, self.fonts("regular", 22), DIM, alpha, "ls")
-
     def stamp(self, canvas, center, label, detail, age, color=MINT):
         """A result badge that pops in when a run finishes."""
         if age < 0:
@@ -141,8 +188,9 @@ class ColdOpen:
     duration = 7.6
     nav = False
 
-    def __init__(self, look, fleet):
+    def __init__(self, look, fleet, suite=False):
         self.look, self.fleet = look, fleet
+        self.suite = suite
         self.title_at = 4.7
         self.still = None
 
@@ -161,13 +209,10 @@ class ColdOpen:
             canvas = self.wall(t)
             # The first frame doubles as the player's poster, so the brand and the title show from the start.
             brand(canvas, fonts, 48, 42, 26)
-            text(canvas, (48, 104), "Every test gets a fresh Windows VM.", fonts("semibold", 68), INK)
+            title = "Every test gets a fresh VM." if self.suite else "Every test gets a fresh Windows VM."
+            text(canvas, (48, 104), title, fonts("semibold", 68), INK)
             text(canvas, (50, 198), "OSLab clones a disposable VM, runs the test inside it, keeps the evidence "
                  "and removes the VM.", fonts("regular", 29), MUTED)
-            text(canvas, (48, H - 84), f"32 recorded Windows VMs  ·  up to 8 at once  ·  starts aligned  ·  "
-                 f"{ev.OPEN_RATE:g}× replay", fonts("mono", 24), MINT, ease_out((t - 1.2) / .5))
-            self.look.footnote(canvas, "Console recordings from chapter 6. The cursor flights are animated. Once a tile "
-                               "opens, its cursor follows the agent's recorded MCP clicks.")
             return canvas
         if self.still is None:
             frozen = self.wall(self.title_at)
@@ -182,8 +227,8 @@ class ColdOpen:
         b = ease_out((local - .5) / .5)
         text(canvas, (W / 2, 590), "Scenario-based OS integration testing on disposable VMs", fonts("regular", 44), INK, b, "mm")
         c = ease_out((local - .8) / .5)
-        text(canvas, (W / 2, 668), "Windows on Proxmox  ·  CLI and web dashboard  ·  MCP for Codex and Claude",
-             fonts("mono", 24), MINT, c, "mm")
+        guests = "Windows and Linux" if self.suite else "Windows"
+        text(canvas, (W / 2, 668), f"{guests} on Proxmox  ·  CLI, web dashboard and MCP", fonts("mono", 24), MINT, c, "mm")
         return canvas
 
 
@@ -192,7 +237,7 @@ def look_copy(look):
 
 
 class EndCard:
-    duration = 6.5
+    duration = 4.0
     nav = False
 
     def __init__(self, look, fleet):
@@ -204,18 +249,9 @@ class EndCard:
         if self.base is None:
             self.base = self.fleet.story.diagram_background()
         canvas = self.base.copy()
-        a = ease_out(t / .5)
-        brand(canvas, fonts, W / 2 - 250, 250, 100, a)
-        text(canvas, (W / 2, 432), "Disposable Windows VMs for real-world QA", fonts("regular", 46), INK, a, "mm")
-        rows = [("Scenario YAML", "a fresh VM, the build, the checks"), ("Evidence", "JSON, JUnit and HTML for every run"),
-                ("Dashboard", "launch runs and review results"), ("MCP", "Codex and Claude operate the VM screen")]
-        for index, (name, detail) in enumerate(rows):
-            b = ease_out((t - .35 - index * .12) / .4)
-            y = 540 + index * 62
-            text(canvas, (W / 2 - 40, y), name, fonts("mono-bold", 30), MINT, b, "rm")
-            text(canvas, (W / 2 - 10, y), detail, fonts("regular", 30), INK, b, "lm")
-        c = ease_out((t - 1.0) / .5)
-        text(canvas, (W / 2, 880), "github.com/hostkimjang/OSLAB", fonts("semibold", 46), INK, c, "mm")
+        # The agents of chapter 6 have already formed the logo, so it stays in place from the first frame.
+        brand(canvas, fonts, *LOGO)
+        text(canvas, (W / 2, 470), "github.com/hostkimjang/OSLAB", fonts("semibold", 46), INK, ease_out(t / .5), "mm")
         return canvas
 
 
@@ -224,7 +260,7 @@ class EndCard:
 SECTIONS = [
     (("provider", "isolation"), "Clone a fresh VM from a Windows template"),
     (("guest",), "Reach the guest through QEMU Guest Agent"),
-    (("artifact",), "Upload the build and run its command"),
+    (("artifact", "product"), "Upload the build and run the product checks"),
     (("outputs",), "Collect the result file"),
     (("assertions",), "Check the exit code and the output"),
     (("reports", "cleanup"), "Keep the reports and destroy the VM"),
@@ -265,8 +301,11 @@ class ScenarioChapter:
         self.lines = Path(path).read_text(encoding="utf-8").splitlines()
         tops = [(index, line.split(":")[0]) for index, line in enumerate(self.lines) if line and not line[0].isspace()]
         spans = {key: (start, end) for (start, key), (end, _) in zip(tops, tops[1:] + [(len(self.lines), "")])}
-        self.bands = [(min(spans[key][0] for key in keys), max(spans[key][1] for key in keys), label)
-                      for keys, label in SECTIONS]
+        self.bands = []
+        for keys, title in SECTIONS:
+            present = [spans[key] for key in keys if key in spans]
+            if present:
+                self.bands.append((min(start for start, _ in present), max(end for _, end in present), title))
         # The whole file shows first. Then the panel zooms in and steps through the sections.
         self.first_band, self.band_length, self.zoom_length = 1.8, 1.6, .5
         self.rect = (628, 104, 1244, 930)
@@ -342,8 +381,8 @@ class ScenarioChapter:
         look, fonts = self.look, self.look.fonts
         canvas = look_copy(look)
         y = look.heading(canvas, t, 1, "Describe the test once.",
-                         "A scenario file names the Windows template, the build and its command, the result "
-                         "to collect and the checks to pass.", width=520)
+                         "A scenario names the VM template, the build, the commands to run and the results to check.",
+                         width=520)
         highlighting = t >= self.first_band
         active = self.band_at(t)
         y += 30
@@ -363,22 +402,23 @@ class ScenarioChapter:
         a = ease_out((t - .2) / .5)
         content = look.window(canvas, self.rect, self.label, "YAML", a, fill=TERMINAL)
         place(canvas, self.panel(t), content, radius=13, alpha=a)
-        look.footnote(canvas, f"{self.label} from this repository. The runs in the next chapters use a local "
-                      "copy with the lab's template and VMID range.")
         return canvas
 
 
 # 2. Run ----------------------------------------------------------------------------------------
 
+# Lifecycle steps with the phases that may start and finish them. A run with product steps reports them where a run
+# with a single command reports the command, and only Windows runs that sign in to the desktop have a Sign in step.
 STEPS = [
-    ("Clone", "vm.clone.start", "vm.clone.done"),
-    ("Boot", "vm.start.start", "vm.boot.done"),
-    ("Guest agent", "guest.ready.wait", "guest.ready.done"),
-    ("Preflight", "preflight.start", "preflight.done"),
-    ("Upload", "artifact.prepare.start", "artifact.upload.done"),
-    ("Run", "product.command.start", "product.command.done"),
-    ("Assert", "output.collect.start", "assertions.done"),
-    ("Destroy", "vm.stop.start", "vm.destroy.done"),
+    ("Clone", ("vm.clone.start",), ("vm.clone.done",)),
+    ("Boot", ("vm.start.start",), ("vm.boot.done",)),
+    ("Guest agent", ("guest.ready.wait",), ("guest.ready.done",)),
+    ("Sign in", ("desktop.signin.start",), ("desktop.signin.done",)),
+    ("Preflight", ("preflight.start",), ("preflight.done",)),
+    ("Upload", ("artifact.prepare.start",), ("artifact.upload.done",)),
+    ("Run", ("product.command.start", "product.step.start"), ("product.command.done", "product.steps.write.done")),
+    ("Assert", ("output.collect.start",), ("assertions.done",)),
+    ("Destroy", ("vm.stop.start",), ("vm.destroy.done",)),
 ]
 STATUS_COLORS = {"[OK]": MINT, "[..]": AMBER, "[!!]": CORAL}
 
@@ -395,6 +435,50 @@ class Progress:
 
     def at(self, phase):
         return self.first[phase]["epoch"]
+
+    def moment(self, *phases, default=None):
+        return next((self.at(phase) for phase in phases if phase in self.first), default)
+
+    @property
+    def completed(self):
+        return self.moment("run.done", "run.failed", default=self.events[-1]["epoch"])
+
+    def vm_running(self, epoch):
+        started = self.moment("vm.start.done", "vm.boot.done", default=math.inf)
+        stopped = self.moment("vm.stop.done", "vm.destroy.done", default=math.inf)
+        return started <= epoch < stopped
+
+    def console_visible(self, clip, epoch):
+        # Use the runner's confirmed final state: VNC's first "powered off" reading may be a transient reboot.
+        stopped = self.moment("vm.stop.done", "vm.destroy.done", default=clip.end)
+        return clip.t0 <= epoch < stopped
+
+    def lifecycle(self):
+        """The lifecycle steps this run went through, as (name, start phase, finish phase)."""
+        steps = []
+        for name, starts, finishes in STEPS:
+            start = next((phase for phase in starts if phase in self.first), None)
+            finish = next((phase for phase in finishes if phase in self.first), None)
+            if start and finish:
+                steps.append((name, start, finish))
+        return steps
+
+    def product_steps(self):
+        """Product step timings and outcomes, including interrupted steps."""
+        steps, pending = [], {}
+        for event in self.events:
+            phase = event["phase"]
+            step_id = event.get("details", {}).get("stepId")
+            if not step_id:
+                continue
+            if phase == "product.step.start":
+                step = [step_id, event["epoch"], self.completed, "interrupted"]
+                steps.append(step)
+                pending[step_id] = step
+            elif phase in ("product.step.done", "product.step.failed") and step_id in pending:
+                step = pending.pop(step_id)
+                step[2:] = [event["epoch"], "passed" if phase.endswith(".done") else "failed"]
+        return steps
 
 
 def aliased(value, aliases):
@@ -464,15 +548,19 @@ class RunChapter:
     number = 2
     duration = 25.0
     nav = True
-    terminal_rect = (48, 206, 880, 830)
-    row_height = 27
+    terminal_rect = (48, 206, 800, 830)
+    console_rect = (872, 206, 1000, 650)
+    lifecycle_rect = (872, 876, 1000, 160)
+    row_height = 26
 
-    def __init__(self, look, folder, ffmpeg):
+    def __init__(self, look, folder, ffmpeg, suite=None):
         self.look = look
-        self.terminal = load_json(folder / "terminal.json")
-        self.aliases = load_json(folder / "aliases.json")
+        terminal_folder = suite.folder if suite else folder
+        self.terminal = load_json(terminal_folder / "terminal.json")
+        self.aliases = load_json(terminal_folder / "aliases.json")
+        self.suite = suite
         self.progress = Progress(folder / "progress.jsonl")
-        self.steps = [step for step in STEPS if step[1] in self.progress.first and step[2] in self.progress.first]
+        self.steps = self.progress.lifecycle()
         run = load_json(folder / "run.json")
         details = run.get("details", {})
         assertions = details.get("assertions", {})
@@ -485,13 +573,16 @@ class RunChapter:
         self.clips = [self.console]
         self.typing, self.hold = 2.2, 2.6
         lines = sorted(self.terminal["lines"], key=lambda row: row["t"])
-        done = self.progress.at("run.done")
-        events = [self.progress.at(done) for _, _, done in self.steps] + [self.progress.at("run.done")]
+        done = self.progress.completed
+        events = [self.progress.at(finish) for _, _, finish in self.steps] + [done]
+        # Console windows on the desktop play near real time, so the viewer can read each step.
+        events += [event["epoch"] for event in self.progress.events if event["phase"].startswith("desktop.console.")]
         # Play on until the last line the CLI printed, which can come after run.done.
-        self.remap = Remap(self.terminal["started"], max(done + .4, lines[-1]["t"] + .2), events,
+        end = max(done + .4, lines[-1]["t"] + .2) if lines and not suite else done + .4
+        self.remap = Remap(self.terminal["started"], end, events,
                            self.duration - self.typing - self.hold, before=.6, after=.9, cap=6.0)
         self.command = aliased(self.terminal["command"], self.aliases)
-        self.font = look.fonts("mono", 20)
+        self.font = look.fonts("mono", 19)
         self.limit = int((self.terminal_rect[2] - 42) / look.width("M", self.font))
         # Wrap the recorded output once. Each frame shows the rows printed by its source time.
         self.rows = []
@@ -499,13 +590,39 @@ class RunChapter:
             for piece_row in wrap_pieces(terminal_pieces(aliased(row["text"].rstrip(), self.aliases)), self.limit):
                 self.rows.append((row["t"], piece_row))
         self.row_times = [moment for moment, _ in self.rows]
+        # While the product steps run in console windows on the desktop, the console view closes in on those windows.
+        windows = [event for event in self.progress.events if event["phase"] == "desktop.console.start"]
+        self.push = None
+        if windows and all(key in windows[0]["details"] for key in ("width", "height", "top", "left")):
+            window = windows[0]["details"]
+            width, height = self.console.size
+            # The window and a margin, widened to the screen's aspect ratio so the view keeps its size.
+            crop_w = min(width, window["width"] + 40)
+            crop_h = crop_w * height / width
+            left = clamp(window["left"] - 20, 0, width - crop_w)
+            top = clamp(window["top"] + window["height"] / 2 - crop_h / 2, 0, height - crop_h)
+            first = windows[0]["epoch"]
+            last = max((event["epoch"] for event in self.progress.events if event["phase"] == "desktop.console.done"),
+                       default=self.progress.completed)
+            self.push = ((left, top, crop_w, crop_h), self.typing + self.remap.output(first),
+                         self.typing + self.remap.output(last))
+
+    def console_crop(self, t):
+        """The part of the VM screen the console view shows at film time t."""
+        width, height = self.console.size
+        if self.push is None:
+            return 0, 0, width, height
+        window, closer, back = self.push
+        amount = ease(clamp((t - closer + .7) / .7)) * (1 - ease(clamp((t - back - .5) / .7)))
+        return tuple(mix(whole, part, amount) for whole, part in zip((0, 0, width, height), window))
 
     def epoch(self, t):
         return self.remap.source(t - self.typing) if t >= self.typing else self.terminal["started"]
 
     def draw_terminal(self, canvas, t, a):
         look, font = self.look, self.font
-        content = look.window(canvas, self.terminal_rect, "Windows PowerShell", "oslab run", a, fill=TERMINAL)
+        title = "oslab suite-run" if self.suite else "oslab run"
+        content = look.window(canvas, self.terminal_rect, "Windows PowerShell", title, a, fill=TERMINAL)
         x, y, w, h = content
         visible = int((h - 30) / self.row_height)
         rows = []
@@ -521,46 +638,49 @@ class RunChapter:
                 text(canvas, (xx, y + 16 + index * self.row_height), value, font, color, a)
                 xx += look.width(value, font)
 
-    def draw_console(self, canvas, epoch, rect, a):
+    def draw_console(self, canvas, t, epoch, rect, a):
         look = self.look
-        content = look.window(canvas, rect, "Disposable VM  ·  Windows 11 console", "Proxmox console", a, fill=(0, 0, 0))
-        clone, destroyed = self.progress.at("vm.clone.done"), self.progress.at("vm.destroy.done")
-        # Show the recording until the VM powered off. A recording that ended earlier holds its last frame.
-        powered_off = self.console.meta.get("powered_off", destroyed)
-        if self.console.t0 <= epoch < min(powered_off, destroyed):
-            place(canvas, self.console.at(epoch), fit_rect(self.console.size, content), alpha=a)
+        title = "Windows 11  ·  Fresh install" if self.suite else "Disposable VM  ·  Windows 11 console"
+        content = look.window(canvas, rect, title, "Proxmox console", a, fill=(0, 0, 0))
+        clone = self.progress.moment("vm.clone.done", default=self.console.t0)
+        destroyed = self.progress.moment("vm.destroy.done")
+        if self.progress.console_visible(self.console, epoch):
+            crop = self.console_crop(t)
+            place(canvas, self.console.at(epoch), fit_rect(self.console.size, content), crop, alpha=a)
             return
         if epoch < clone:
             message = "Cloning a VM from the template…"
         elif epoch < self.console.t0:
             message = "Starting the VM…"
-        elif epoch < destroyed:
-            message = "VM stopped  ·  destroying the clone…"
         elif self.finished(epoch):
             return
-        else:
+        elif destroyed is not None and epoch >= destroyed:
             message = "VM destroyed"
+        elif self.progress.moment("vm.stop.done") is not None and epoch >= self.progress.at("vm.stop.done"):
+            message = "VM stopped"
+        else:
+            message = "Console recording ended"
         text(canvas, (content[0] + content[2] / 2, content[1] + content[3] / 2), message,
              look.fonts("mono", 24), MUTED, a, "mm")
 
     def finished(self, epoch):
-        return epoch >= self.progress.at("run.done")
+        return epoch >= self.progress.completed
 
     def draw_lifecycle(self, canvas, t, epoch, rect, a):
         fonts = self.look.fonts
         x, y, w, h = rect
         box(canvas, rect, 14, fill=PANEL, outline=EDGE, alpha=a)
         started = self.progress.at("run.created")
-        elapsed = max(0.0, min(epoch, self.progress.at("run.done")) - started) if t >= self.typing else 0.0
+        elapsed = max(0.0, min(epoch, self.progress.completed) - started) if t >= self.typing else 0.0
         text(canvas, (x + 22, y + 26), "LIFECYCLE  ·  REAL DURATIONS", fonts("mono", 17), DIM, a, "lm")
-        speed = self.remap.speed(t - self.typing) if self.typing <= t < self.duration - self.hold else 0.0
-        label = f"T+{int(elapsed) // 60:02d}:{int(elapsed) % 60:02d}   " + ev.speed_label(speed)
-        text(canvas, (x + w - 22, y + 26), label, fonts("mono", 17), MUTED, a, "rm")
+        text(canvas, (x + w - 22, y + 26), f"T+{int(elapsed) // 60:02d}:{int(elapsed) % 60:02d}", fonts("mono", 17),
+             MUTED, a, "rm")
         track_y = y + 84
-        gap = (w - 80) / (len(self.steps) - 1)
-        box(canvas, (x + 40, track_y - 2, w - 80, 4), 2, fill=EDGE, alpha=a)
+        gap = (w - 80) / max(len(self.steps) - 1, 1)
+        if len(self.steps) > 1:
+            box(canvas, (x + 40, track_y - 2, w - 80, 4), 2, fill=EDGE, alpha=a)
         for index, (name, begin, done) in enumerate(self.steps):
-            cx = x + 40 + index * gap
+            cx = x + w / 2 if len(self.steps) == 1 else x + 40 + index * gap
             first, last = self.progress.at(begin), self.progress.at(done)
             finished, running = epoch >= last, first <= epoch < last
             if finished and index:
@@ -581,19 +701,288 @@ class RunChapter:
         a = ease_out(t / .5)
         text(canvas, (48, 104), "02 · RUN", fonts("mono", 18), MINT, a)
         text(canvas, (48, 134), "Run it on a fresh VM.", fonts("semibold", 46), INK, a)
-        text(canvas, (640, 150), "One command clones the VM, runs the build, checks it and destroys the VM.",
-             fonts("regular", 26), MUTED, ease_out((t - .2) / .5), "lm")
+        caption = "A fresh Windows guest installs and checks the build on its desktop." if self.suite else (
+            "One command clones the VM, runs the build, checks it and destroys the VM.")
+        text(canvas, (640, 150), caption, fonts("regular", 26), MUTED, ease_out((t - .2) / .5), "lm")
         epoch = self.epoch(t)
         self.draw_terminal(canvas, t, a)
-        self.draw_console(canvas, epoch if t >= self.typing else 0.0, (960, 206, 912, 612), a)
-        self.draw_lifecycle(canvas, t, epoch, (960, 836, 912, 200), a)
-        done = self.progress.at("run.done")
+        self.draw_console(canvas, t, epoch if t >= self.typing else 0.0, self.console_rect, a)
+        self.draw_lifecycle(canvas, t, epoch, self.lifecycle_rect, a)
+        done = self.progress.completed
         if self.finished(epoch):
             age = t - self.typing - self.remap.output(done)
-            look.stamp(canvas, (1416, 512), "PASS" if self.passed else "FAIL", self.verdict, age,
+            x, y, w, h = self.console_rect
+            look.stamp(canvas, (x + w / 2, y + h / 2), "PASS" if self.passed else "FAIL", self.verdict, age,
                        MINT if self.passed else CORAL)
-        look.footnote(canvas, "Recorded CLI output and VM console of one run, aligned by timestamp. Command typing is "
-                      "animated, waits are shortened, and local names and paths are replaced.", a)
+        return canvas
+
+
+# Environments between chapters 2 and 3 ------------------------------------------------------------
+
+# The suite entries in tile order, left to right and top to bottom, with the system and the install path they test.
+ENVIRONMENTS = {
+    "windows-fresh": ("WINDOWS 11", "Fresh install", SKY),
+    "windows-upgrade": ("WINDOWS 11", "Upgrade from 2.3", SKY),
+    "ubuntu-fresh": ("UBUNTU 24.04", "Fresh install", AMBER),
+    "ubuntu-upgrade": ("UBUNTU 24.04", "Upgrade from 2.3", AMBER),
+}
+FOCUS = "ubuntu-upgrade"  # The entry the chapter zooms into and whose evidence chapter 3 shows.
+WINDOWS_RUN = "windows-fresh"
+# What a tile's header names from the moment each phase starts. A running product step names itself instead.
+STAGES = [
+    ("Cloning", "vm.clone.start"), ("Booting", "vm.start.start"), ("Guest agent", "guest.ready.wait"),
+    ("Signing in", "desktop.signin.start"), ("Preflight", "preflight.start"), ("Uploading", "artifact.prepare.start"),
+    ("Checking", "output.collect.start"), ("Destroying the VM", "vm.stop.start"),
+]
+
+
+class SuiteCapture:
+    """Match every recording and progress log to one child of the recorded suite."""
+
+    def __init__(self, folder):
+        self.folder = folder
+        self.result = load_json(folder / "suite.json")
+        self.run_id = self.result["runId"]
+        terminal = load_json(folder / "terminal.json")
+        if terminal.get("runId") != self.run_id:
+            raise ValueError("The terminal recording belongs to a different suite run")
+        self.entries = {row["id"]: row for row in load_json(folder / "entries.json")}
+        results = {row["id"]: row for row in self.result["entries"]}
+        if self.entries.keys() != ENVIRONMENTS.keys() or self.entries.keys() != results.keys():
+            raise ValueError("The recorded suite must contain the four expected Windows and Ubuntu entries")
+        self.progress = {}
+        for entry_id, row in self.entries.items():
+            if row["folder"] != entry_id:
+                raise ValueError(f"Unexpected capture folder for {entry_id}")
+            source = self.child(entry_id)
+            child = load_json(source / "run.json")
+            for field in ("runId", "scenarioId", "status"):
+                if row[field] != child[field] or row[field] != results[entry_id][field]:
+                    raise ValueError(f"The {field} for {entry_id} does not match its suite and child result")
+            progress = Progress(source / "progress.jsonl")
+            if progress.first["run.created"].get("details", {}).get("runId") != child["runId"]:
+                raise ValueError(f"The progress log for {entry_id} belongs to a different run")
+            self.progress[entry_id] = progress
+            self.media(entry_id, "console")
+
+    def child(self, entry_id):
+        return self.folder / self.entries[entry_id]["folder"]
+
+    def media(self, entry_id, kind):
+        meta = load_json(self.child(entry_id) / f"{kind}.json")
+        if meta.get("runId") != self.entries[entry_id]["runId"] or meta.get("suiteRunId", self.run_id) != self.run_id:
+            raise ValueError(f"The {kind} recording for {entry_id} belongs to a different run")
+        return meta
+
+    def scenario_path(self, override=None):
+        entry = self.entries[WINDOWS_RUN]
+        path = (REPO / entry["scenario"]).resolve()
+        if not path.is_relative_to(REPO):
+            raise ValueError("The recorded Windows fresh-install scenario must be inside the repository")
+        if override is not None and override.resolve() != path:
+            raise ValueError("--scenario must match the recorded suite's Windows fresh-install scenario")
+        if hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest() != entry["scenarioSha256"]:
+            raise ValueError("The Windows fresh-install scenario has changed since it was recorded")
+        return path
+
+
+class Environment:
+    """One suite entry: the console recording of its VM, its product steps and its result."""
+
+    def __init__(self, suite, entry_id, ffmpeg):
+        self.id = entry_id
+        self.system, self.path, self.color = ENVIRONMENTS[entry_id]
+        self.progress = suite.progress[entry_id]
+        folder = suite.child(entry_id)
+        run = load_json(folder / "run.json")
+        assertions = run.get("details", {}).get("assertions", {})
+        # The tile reports what the run recorded, so a failed run can never show PASS.
+        self.passed = run.get("status") == "passed" and assertions.get("failed") == 0
+        self.assertions = assertions.get("total", 0)
+        meta = suite.media(entry_id, "console")
+        self.console = Clip(ffmpeg, folder / "console.mkv", folder / "console.json") if meta.get("status") == "complete" else None
+        if self.passed and self.console is None:
+            raise ValueError(f"The passed {entry_id} run needs a complete console recording")
+        self.stages = [(name, self.progress.at(phase)) for name, phase in STAGES if phase in self.progress.first]
+        self.start = self.progress.at("run.created")
+        self.done = self.progress.completed
+        self.destroyed = self.progress.moment("vm.destroy.done", default=math.inf)
+        self.steps = self.progress.product_steps()
+
+    def stage(self, epoch):
+        current = "Starting"
+        for name, moment in self.stages:
+            if epoch >= moment:
+                current = name
+        for step, begin, end, _ in self.steps:
+            if begin <= epoch < end:
+                current = step
+        return current
+
+def concurrent_testing(steps_by_entry):
+    """A common instant must fall inside a real product step of every entry."""
+    starts = {begin for steps in steps_by_entry for _, begin, _, _ in steps}
+    return any(all(any(begin <= moment < end for _, begin, end, _ in steps) for steps in steps_by_entry)
+               for moment in starts)
+
+
+class EnvironmentsChapter:
+    """The same agent checks as four entries of one `oslab suite-run`: Windows 11 and Ubuntu 24.04, each as a fresh
+    install and as an upgrade from 2.3. The four consoles play side by side, the Ubuntu upgrade fills the screen
+    while its steps run, and every tile shows its run's result."""
+
+    duration = 24.0
+    nav = False
+    grid = (72, 196, 876, 410, 24)  # Left, top, tile width, tile height and gap of the 2x2 grid.
+    zoom_in, zoom_out, settle, zoom_scale = 9.4, 15.6, 21.0, 1.45
+
+    def __init__(self, look, suite, ffmpeg):
+        self.look = look
+        self.envs = [Environment(suite, key, ffmpeg) for key in ENVIRONMENTS]
+        self.clips = [env.console for env in self.envs if env.console is not None]
+        self.focus = next(env for env in self.envs if env.id == FOCUS)
+        self.parallel = concurrent_testing([env.steps for env in self.envs])
+        start, end = min(env.start for env in self.envs), max(env.done for env in self.envs)
+        # Source time runs fast up to the zoom, near real time while the focused upgrade runs its steps, fast again
+        # until the last run finishes, and holds on the results.
+        self.keys = [(0.0, start), (self.settle, end), (self.duration, end)]
+        if self.focus.steps and self.focus.console is not None:
+            first, last = self.focus.steps[0][1], self.focus.steps[-1][2]
+            self.keys[1:1] = [(self.zoom_in + .7, max(start, first - 1.0)), (self.zoom_out, min(end, last + 1.0))]
+        else:
+            self.zoom_in = self.zoom_out = self.duration
+        self.outcome_times = {env.id: crossing(self.keys, env.done) for env in self.envs}
+
+    def tile_rect(self, index):
+        left, top, width, height, gap = self.grid
+        return left + index % 2 * (width + gap), top + index // 2 * (height + gap), width, height
+
+    def zoom_rect(self):
+        left, top, width, height, gap = self.grid
+        return left, top, 2 * width + gap, 2 * height + gap
+
+    def draw_tile(self, canvas, env, rect, epoch, t, scale=1.0, alpha=1.0, highlight=0.0):
+        """A console with the entry's name, its current stage, its product steps and, once finished, its result."""
+        look, fonts = self.look, self.look.fonts
+        x, y, w, h = rect
+        finished = epoch >= env.done
+        edge = MINT if finished and env.passed else CORAL if finished else EDGE
+        box(canvas, rect, 14, fill=PANEL, outline=edge, width=2 if finished else 1, alpha=alpha)
+        if highlight > .01:
+            box(canvas, (x - 5, y - 5, w + 10, h + 10), 18, outline=MINT, width=3, alpha=alpha * highlight)
+        header = 44 * scale
+        system = fonts("mono-bold", round(16 * scale))
+        text(canvas, (x + 18 * scale, y + header / 2), env.system, system, env.color, alpha, "lm")
+        text(canvas, (x + 30 * scale + look.width(env.system, system), y + header / 2), env.path,
+             fonts("medium", round(20 * scale)), INK, alpha, "lm")
+        if not finished:
+            stage = env.stage(epoch)
+            font = fonts("mono", round(16 * scale))
+            right = x + w - 18 * scale
+            text(canvas, (right, y + header / 2), stage, font, MUTED, alpha, "rm")
+            dot = 4 * scale
+            pulse = .55 + .45 * math.sin(t * 6)
+            box(canvas, (right - look.width(stage, font) - 14 * scale, y + header / 2 - dot, 2 * dot, 2 * dot), dot,
+                fill=AMBER, alpha=alpha * pulse)
+        box(canvas, (x + 1, y + header, w - 2, 1), 0, fill=EDGE, alpha=alpha)
+        # The console on the left, the steps and the result on the right.
+        pad = 12 * scale
+        height = h - header - 2 * pad
+        size = env.console.size if env.console else (1280, 800)
+        width = min(height * size[0] / size[1], w - 245 * scale)
+        screen = (x + pad, y + header + pad, width, height)
+        box(canvas, screen, 8 * scale, fill=(0, 0, 0), alpha=alpha)
+        if env.console and env.progress.console_visible(env.console, epoch):
+            place(canvas, env.console.at(epoch), fit_rect(size, screen), radius=round(8 * scale), alpha=alpha)
+        else:
+            if epoch >= env.destroyed:
+                message = "VM removed"
+                if env.console and env.steps:
+                    frame = env.console.at(env.steps[-1][2])
+                    place(canvas, frame, fit_rect(size, screen), radius=round(8 * scale), alpha=.30 * alpha)
+            elif env.console and epoch < env.console.t0:
+                message = env.stage(epoch)
+            elif env.progress.vm_running(epoch):
+                message = "Console unavailable"
+            elif finished:
+                message = "No console recording"
+            else:
+                message = env.stage(epoch)
+            if epoch >= env.destroyed:
+                middle = screen[0] + screen[2] / 2, screen[1] + screen[3] / 2
+                box(canvas, (middle[0] - 82 * scale, middle[1] - 18 * scale, 164 * scale, 36 * scale), 7 * scale,
+                    fill=TERMINAL, outline=EDGE, alpha=alpha)
+            text(canvas, (screen[0] + screen[2] / 2, screen[1] + screen[3] / 2), message,
+                 fonts("mono", round(18 * scale)), MUTED, alpha, "mm")
+        column = screen[0] + screen[2] + 20 * scale
+        yy = screen[1] + 4 * scale
+        text(canvas, (column, yy), "STEPS", fonts("mono", round(14 * scale)), DIM, alpha)
+        yy += 34 * scale
+        for step, begin, end, status in env.steps:
+            done, running = epoch >= end, begin <= epoch < end
+            color = MINT if done and status == "passed" else CORAL if done else AMBER if running else DIM
+            radius = 9 * scale
+            box(canvas, (column, yy - radius, 2 * radius, 2 * radius), radius,
+                fill=color if done or running else None, outline=color, width=max(1, round(2 * scale)), alpha=alpha)
+            if done:
+                if status == "passed":
+                    points = ((column + 5 * scale, yy), (column + 8 * scale, yy + 3.5 * scale),
+                              (column + 13.5 * scale, yy - 3.5 * scale))
+                    ImageDraw.Draw(canvas).line(points, fill=(6, 30, 28), width=max(2, round(2.4 * scale)))
+                else:
+                    text(canvas, (column + radius, yy), "×", fonts("medium", round(14 * scale)), (6, 30, 28), alpha, "mm")
+            text(canvas, (column + 30 * scale, yy), step, fonts("mono", round(19 * scale)),
+                 INK if done or running else DIM, alpha, "lm")
+            yy += 38 * scale
+        bottom = screen[1] + screen[3]
+        if finished:
+            age = t - self.outcome_times[env.id]
+            pop = 1 + .3 * (1 - ease_out(clamp(age / .3)))
+            label = "PASS" if env.passed else "FAIL"
+            pill = (column, bottom - 74 * scale, 92 * scale * pop, 34 * scale * pop)
+            box(canvas, pill, 8 * scale, fill=MINT if env.passed else CORAL, alpha=alpha)
+            text(canvas, (pill[0] + pill[2] / 2, pill[1] + pill[3] / 2), label, fonts("mono-bold", round(19 * scale * pop)),
+                 (6, 30, 28), alpha, "mm")
+            text(canvas, (column, bottom - 18 * scale), f"{env.assertions} assertions", fonts("regular", round(19 * scale)),
+                 MUTED, alpha, "ls")
+        else:
+            elapsed = max(0.0, epoch - env.start)
+            text(canvas, (column, bottom - 18 * scale), f"T+{int(elapsed) // 60:02d}:{int(elapsed) % 60:02d}",
+                 fonts("mono", round(18 * scale)), MUTED, alpha, "ls")
+
+    def frame(self, t):
+        look, fonts = self.look, self.look.fonts
+        canvas = look_copy(look)
+        epoch, _ = piecewise(self.keys, t)
+        brand(canvas, fonts, 48, 42, 26)
+        a = ease_out(t / .5)
+        label = "SUITE  ·  4 ENVIRONMENTS IN PARALLEL" if self.parallel else "SUITE  ·  4 ENVIRONMENTS"
+        text(canvas, (48, 100), label, fonts("mono", 18), MINT, a)
+        text(canvas, (48, 128 + 10 * (1 - a)), "When the OS or the build changes, run every path again.",
+             fonts("semibold", 44), INK, a)
+        running = sum(env.progress.vm_running(epoch) for env in self.envs)
+        passed = sum(epoch >= env.done and env.passed for env in self.envs)
+        x = W - 48
+        for title, value, color in (("PASSED", f"{passed}/{len(self.envs)}", MINT), ("VMS RUNNING", str(running), INK)):
+            text(canvas, (x, 92), title, fonts("mono", 16), MUTED, a, "ra")
+            text(canvas, (x, 116), value, fonts("mono-bold", 36), color, a, "ra")
+            x -= 200
+        zoom = ease(clamp((t - self.zoom_in) / .7)) * (1 - ease(clamp((t - self.zoom_out) / .7)))
+        ending = ease(clamp((t - self.settle) / .6))
+        for index, env in enumerate(self.envs):
+            if env is self.focus and zoom > 0:
+                continue
+            appear = ease_out(clamp((t - .15 - index * .12) / .45))
+            dim = 1 - .25 * ending if env is not self.focus else 1.0
+            x, y, w, h = self.tile_rect(index)
+            grow = mix(.94, 1.0, appear)
+            rect = (x + w * (1 - grow) / 2, y + h * (1 - grow) / 2, w * grow, h * grow)
+            self.draw_tile(canvas, env, rect, epoch, t, alpha=appear * dim,
+                           highlight=ending if env is self.focus else 0.0)
+        if zoom > 0:
+            small = self.tile_rect(self.envs.index(self.focus))
+            rect = tuple(mix(start, end, zoom) for start, end in zip(small, self.zoom_rect()))
+            self.draw_tile(canvas, self.focus, rect, epoch, t, mix(1.0, self.zoom_scale, zoom))
         return canvas
 
 
@@ -604,6 +993,7 @@ FILE_NOTES = {
     "logs/progress.jsonl": "every lifecycle step",
     "raw/actual-output.json": "what the build wrote",
     "normalized/command-result.json": "what the assertions read",
+    "normalized/inventory.json": "what the assertions read",
     "reports/result.json": "for tools",
     "reports/result.junit.xml": "for CI",
     "reports/result.html": "for people",
@@ -615,7 +1005,7 @@ class EvidenceChapter:
     duration = 13.5
     nav = True
 
-    def __init__(self, look, folder, ffmpeg):
+    def __init__(self, look, folder, ffmpeg, suite=None):
         self.look = look
         # One row per file, with a row for each folder before its first file.
         self.rows = []
@@ -625,6 +1015,8 @@ class EvidenceChapter:
             if len(parts) != 2 or not parts[1].isdigit():
                 continue
             path = parts[0].replace("\\", "/").lstrip("/")
+            if suite and path not in FILE_NOTES:
+                continue
             names = path.split("/")
             for depth in range(1, len(names)):
                 parent = "/".join(names[:depth])
@@ -638,17 +1030,21 @@ class EvidenceChapter:
         self.crop = (width * .15, 0, width * .7, width * .7 / 1.6)
         self.clips = [self.report]
         self.assertions = load_json(folder / "reports" / "result.json")["assertions"]["results"]
-        self.run_id = load_json(folder / "run.json")["runId"]
+        run_id = load_json(folder / "run.json")["runId"]
+        self.run_path = f"scenarios/{run_id}/" if suite else f"runs/{run_id}/"
+        self.caption = "The Ubuntu upgrade leaves logs, inventory output, and JSON, JUnit and HTML reports." if suite else (
+            "Logs, raw and normalized output, and JSON, JUnit and HTML reports land in one folder.")
 
     def frame(self, t):
         look, fonts = self.look, self.look.fonts
         canvas = look_copy(look)
-        y = look.heading(canvas, t, 3, "Every run leaves evidence.",
-                         "Logs, raw and normalized output, and JSON, JUnit and HTML reports land in one folder.")
+        y = look.heading(canvas, t, 3, "Every run leaves evidence.", self.caption)
         y += 26
-        text(canvas, (48, y), f"runs/{self.run_id}/", fonts("mono-bold", 20), INK, ease_out((t - .5) / .4))
+        text(canvas, (48, y), self.run_path, fonts("mono-bold", 18), INK, ease_out((t - .5) / .4))
         y += 40
         for index, (path, name, depth) in enumerate(self.rows):
+            if y + 33 > H - 44:
+                break
             a = ease_out((t - .7 - index * .1) / .35)
             color = INK if path in FILE_NOTES else DIM if name.endswith("/") else MUTED
             text(canvas, (68 + depth * 28, y), name, fonts("mono", 21), color, a)
@@ -671,7 +1067,6 @@ class EvidenceChapter:
             text(canvas, (724, yy), "PASS" if passed else "FAIL", fonts("mono-bold", 20), MINT if passed else CORAL, b, "lm")
             text(canvas, (800, yy), str(row.get("id", row.get("name", ""))), fonts("mono", 20), INK, b, "lm")
             text(canvas, (1848, yy), row.get("message", ""), fonts("regular", 20), MUTED, b, "rm")
-        look.footnote(canvas, "Files written by the run in chapter 2. The HTML report was recorded in a browser.", a)
         return canvas
 
 
@@ -786,10 +1181,6 @@ class DashboardChapter:
                 text(canvas, (1506, y + 2), line, fonts("medium", 24), INK if done else MUTED, b)
                 y += 32
             y += 14
-        speed = self.remap.speed(t)
-        text(canvas, (1424, 84), "REAL BROWSER RECORDING  ·  " + ev.speed_label(speed), fonts("mono", 16), MUTED, a, "rs")
-        look.footnote(canvas, "Browser recording of the dashboard, driven by a Playwright script while it ran a scenario "
-                      "on the lab. Lab names are replaced, and waits play faster.", a)
         return canvas
 
 
@@ -947,10 +1338,6 @@ class AgentChapter:
             passed = row.get("passed") is True
             mark(canvas, (1220, 945 + index * 30), MINT if passed else CORAL, passed, b)
             text(canvas, (1250, 954 + index * 30), row["name"], fonts("regular", 21), INK, b, "lm")
-        speed = self.remap.speed(local) if local >= 0 else 0.0
-        text(canvas, (1872, 84), "REAL CONSOLE RECORDING  ·  " + ev.speed_label(speed), fonts("mono", 17), MUTED, a, "rs")
-        look.footnote(canvas, f"Console recording of a VM that {self.agent} operated through the OSLab MCP server, with "
-                      "waits shortened. The host mouse and keyboard stay free.", a)
         return canvas
 
 
@@ -962,23 +1349,35 @@ def load_fleet(fleet_dir, fonts, ffmpeg, work):
     cases = ev.load_cases(fleet_dir)
     ev.make_proxies(cases, ffmpeg, work / "proxies")
     film = ev.Film(args, cases)
+    # The intro film keeps the screen clean. docs/intro-video.md explains how the wall was recorded.
+    film.disclosures = False
     story = ev.Story(film, ev.build_features(film, ev.FEATURES, ffmpeg), ev.build_montage(film, ev.MONTAGE, ffmpeg), args)
     return SimpleNamespace(film=film, story=story)
 
 
 class ScaleChapter:
     """The 32-VM Windows QA wall, two zoomed fixes, how the agents reach the VMs, eight more programs and the
-    finished wall."""
+    finished wall. A wave of light runs over the passed tiles, the result comes up, and the agents leave their VMs
+    to form the OSLab logo of the end card."""
 
     number = 6
     nav = False
-    finale_length, result_hold = 5.5, 2.0
+    finale_length, victory_length, swarm_length = 5.5, 3.0, 2.8
+    score_from = 3.4  # Seconds before the end of the finale when the running score takes the middle of the screen.
+    # Seconds into the finale at which the fourth-to-last program has just passed and the last three programs pass.
+    # The score comes up on 29/32 and counts to 32/32 one program at a time, in the order the runs really finished.
+    last_passes = (2.0, 2.75, 3.45, 4.25)
 
     def __init__(self, look, fleet):
         self.look = look
         story, film = fleet.story, fleet.film
-        self.story = story
-        self.final = None
+        self.story, self.film = story, film
+        self.finished = None
+        self.background = None
+        # A soft shadow behind the result so the numbers stay legible over the wall.
+        shade = Image.new("L", (W, H), 0)
+        ImageDraw.Draw(shade).ellipse((W / 2 - 800, 230, W / 2 + 800, 910), fill=245)
+        self.shade = shade.filter(ImageFilter.GaussianBlur(80))
         # Calc and VS Code both show a finding, the fix and the guest check that proves it.
         calc, vscode = story.features[0], story.features[2]
         wall_from = ev.INTRO + .6
@@ -991,24 +1390,133 @@ class ScaleChapter:
             (.7, lambda t: story.pull_out(t, last=vscode), True),
             (6.6, story.how, True),
             (4.2, lambda t: story.quad(story.montage[0], t), False),
-            (4.2, lambda t: story.quad(story.montage[1], t), False),
-            (self.finale_length + self.result_hold, self.final_wall, True),
+            (self.finale_length, self.finale, True),
+            (self.victory_length, self.victory, True),
+            (self.swarm_length, self.swarm, False),
         ]
-        self.dissolves = {7, 9}  # Into the first montage and into the finale, which share no camera move.
+        self.dissolves = {7, 8}  # Into the montage and into the finale, which share no camera move.
         self.duration = sum(length for length, _, _ in self.shots)
+        # The finale plays the end of the wall at an uneven pace. Between these keys the wall time runs linearly.
+        self.finale_keys = finale_timing((case.duration for case in film.cases), story.final_tau, self.last_passes,
+                                         self.finale_length)
+        self.pass_moments = {case.id: crossing(self.finale_keys, case.duration) for case in film.cases}
+        # Where each agent rests on the finished wall and where it lands in the logo. The agents farthest from the
+        # logo leave first, so the whole swarm arrives within about a second.
+        self.rests, self.targets = {}, {}
+        for index, case in enumerate(film.cases):
+            x, y, w, h = film.tile_rect(index)
+            px, py = film.tracks[case.id].position(case.start + case.duration, .45 * story.final_rate)
+            self.rests[case.id] = (x + px * w / ev.VM_W, y + py * h / ev.VM_H)
+        self.order = sorted(film.cases, key=lambda case: -math.dist(self.rests[case.id], logo_center()))
+        for rank, case in enumerate(self.order):
+            self.targets[case.id] = mark_point(rank, len(film.cases))
 
-    def final_wall(self, t):
-        """The wall finishing its time-lapse. The last frame holds so the final counts can be read."""
-        if t < self.finale_length:
-            return self.story.finale(t)
-        if self.final is None:
-            final = self.story.finale(self.finale_length)
-            # Time stops here, so the time-lapse label under the clock gives way to a hold label.
+    def finished_wall(self):
+        """The last frame of the finale without its cursors, which the ending draws itself."""
+        if self.finished is None:
+            story, film = self.story, self.film
+            canvas = film.background.copy()
+            tau = self.final_tau()
+            film.wall(canvas, tau, rate=story.final_rate, cursors=0)
+            text(canvas, (48, 104), "Every run checked inside its own guest.", film.fonts("semibold", 64), INK)
+            brand(canvas, film.fonts, 48, 40, 30)
+            film.counters(canvas, tau, rate=story.final_rate)
+            # Time stops from here, so the time-lapse label under the clock goes away.
             label = (W - 300, 964, W - 40, 998)
-            final.paste(self.story.film.background.crop(label), label[:2])
-            text(final, (W - 48, 970), "RESULT HELD", self.look.fonts("mono", 18), MINT, 1.0, "ra")
-            self.final = final
-        return self.final.copy()
+            canvas.paste(film.background.crop(label), label[:2])
+            self.finished = canvas
+        return self.finished
+
+    def end_background(self):
+        if self.background is None:
+            self.background = self.story.diagram_background()
+        return self.background
+
+    def arrow(self, canvas, case_id, point, alpha=1.0):
+        """An agent's arrow without its name tag."""
+        sprite, tip, _, _ = self.film.pointers[case_id, "wall"]
+        sprite = ev.faded(sprite, alpha)
+        canvas.paste(sprite, (round(point[0]) - tip, round(point[1]) - tip), sprite)
+
+    def score(self, canvas, tau, alpha=1.0, size=1.0, t=None):
+        """The programs and their checks that have passed by this point in the recording."""
+        if alpha <= .01:
+            return
+        fonts, film = self.look.fonts, self.film
+        passed = [case for case in film.cases if tau >= case.duration]
+        checks = sum(len(case.checks) for case in passed)
+        if t is not None and passed:
+            age = t - max(self.pass_moments[case.id] for case in passed)
+            size *= 1 + .1 * (1 - ease_out(clamp(age / .35)))
+        canvas.paste((4, 7, 12), (0, 0), self.shade.point(lambda value: round(value * alpha)))
+        text(canvas, (W / 2, 420), f"{len(passed)}/{len(film.cases)}", fonts("mono-bold", round(170 * size)), MINT, alpha,
+             "mm")
+        text(canvas, (W / 2, 548), "Windows programs passed", fonts("medium", 36), INK, alpha, "mm")
+        text(canvas, (W / 2, 668), str(checks), fonts("mono-bold", 64), INK, alpha, "mm")
+        text(canvas, (W / 2, 728), "guest checks passed", fonts("regular", 28), MUTED, alpha, "mm")
+
+    def finale(self, t):
+        story, film = self.story, self.film
+        tau, rate = piecewise(self.finale_keys, t)
+        canvas = story.finale(t, tau=tau, rate=rate)
+        # Each program that finishes now lights its tile, in the order the runs really finished.
+        for index, case in enumerate(film.cases):
+            age = t - self.pass_moments[case.id]
+            if 0 <= age < .6:
+                x, y, w, h = film.tile_rect(index, (mix(1.06, 1.0, ease(t / self.finale_length)), W / 2, H / 2))
+                glow = 1 - age / .6
+                box(canvas, (x - 4, y - 4, w + 8, h + 8), 8, fill=MINT, alpha=.18 * glow)
+                box(canvas, (x - 4, y - 4, w + 8, h + 8), 8, outline=MINT, width=3, alpha=glow)
+        self.score(canvas, tau, ease_out((t - self.finale_length + self.score_from) / .4), t=t)
+        return canvas
+
+    def victory(self, t):
+        film = self.film
+        # The wall settles into the end card's background while the result comes up.
+        canvas = Image.blend(self.finished_wall(), self.end_background(), .86 * ease((t - .3) / .8))
+        resting = mix(.35, .18, ease((t - .3) / .8))
+        for case in film.cases:
+            self.arrow(canvas, case.id, self.rests[case.id], resting)
+        # The final count stays as it is and only grows a little, so it reads as the result.
+        self.score(canvas, self.final_tau(), size=mix(1.0, 1.12, ease_out(t / .4)))
+        return canvas
+
+    def final_tau(self):
+        return self.finale_keys[-1][1]
+
+    def swarm(self, t):
+        film, fonts = self.film, self.look.fonts
+        canvas = self.end_background().copy()
+        self.score(canvas, self.final_tau(), 1 - ease(t / .35), 1.12)
+        trails = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        trail = ImageDraw.Draw(trails)
+        flying, arrived = [], 0
+        for rank, case in enumerate(self.order):
+            launch = .15 + rank * .028
+            landing = launch + .85
+            start, target = self.rests[case.id], self.targets[case.id]
+            if t < launch:
+                self.arrow(canvas, case.id, start, mix(.18, 1.0, ease((t - launch + .3) / .3)))
+                continue
+            if t >= landing:
+                arrived += 1
+                film.ripple(canvas, target, film.colors[case.id], t - landing, .35, 14)
+                continue
+            swing = 1 if rank % 2 else -1
+            path = (start, (start[0] + 90 * swing, start[1] - 170), (target[0] - 220 * swing, target[1] + 260), target)
+            progress = ease((t - launch) / (landing - launch))
+            color = film.colors[case.id]
+            for step in range(1, 9):
+                tx, ty = ev.bezier(path, max(0.0, progress - step * .025))
+                radius = 3.2 * (1 - step / 9)
+                trail.ellipse((tx - radius, ty - radius, tx + radius, ty + radius), fill=(*color, round(160 * (1 - step / 9))))
+            flying.append((case.id, ev.bezier(path, progress)))
+        canvas.paste(trails, (0, 0), trails)
+        # The logo fills in as the agents land on it.
+        brand(canvas, fonts, *LOGO, clamp((arrived / len(self.order) - .3) / .7))
+        for case_id, point in flying:
+            self.arrow(canvas, case_id, point)
+        return canvas
 
     def frame(self, t):
         start = 0.0
@@ -1105,11 +1613,44 @@ def run_record(folder):
             "run_seconds": round(completed - started, 1)}
 
 
-def write_receipt(captures, fleet_dir, video, path):
+def lifecycle_record(progress):
+    return [{"name": name, "start_phase": begin, "finish_phase": done,
+             "seconds": round(progress.at(done) - progress.at(begin), 1)}
+            for name, begin, done in progress.lifecycle()]
+
+
+def suite_record(suite):
+    children = []
+    steps_by_entry = []
+    for entry_id in ENVIRONMENTS:
+        entry = suite.entries[entry_id]
+        child = suite.child(entry_id)
+        progress = suite.progress[entry_id]
+        steps = progress.product_steps()
+        steps_by_entry.append(steps)
+        console = suite.media(entry_id, "console")
+        record = {
+            "entry_id": entry_id,
+            "scenario_file": entry["scenario"],
+            "scenario_sha256": entry["scenarioSha256"],
+            **run_record(child),
+            "lifecycle": lifecycle_record(progress),
+            "product_steps": [{"id": step, "status": status, "seconds": round(end - begin, 3)}
+                              for step, begin, end, status in steps],
+            "console_recording": recording(console) if console.get("status") == "complete" else None,
+        }
+        if entry_id == FOCUS:
+            record["report_recording"] = recording(suite.media(entry_id, "report"))
+        children.append(record)
+    return {"run_id": suite.run_id, "suite_id": suite.result["suiteId"], "status": suite.result["status"],
+            "summary": suite.result["summary"], "run_chapter_entry": WINDOWS_RUN, "evidence_chapter_entry": FOCUS,
+            "all_product_checks_overlapped": concurrent_testing(steps_by_entry), "children": children}
+
+
+def write_receipt(captures, fleet_dir, video, path, suite=None):
     """Record the runs, the agent session and the recordings that the film shows, without VM IDs or lab host
     names."""
     cli, dashboard, agent = captures / "cli", captures / "dashboard", captures / "agent"
-    progress = Progress(cli / "progress.jsonl")
     session = load_json(agent / "calls.json")
     calls_by_tool = {}
     for call in session["calls"]:
@@ -1117,15 +1658,8 @@ def write_receipt(captures, fleet_dir, video, path):
     cases = ev.load_cases(fleet_dir)
     data = Path(video).read_bytes()
     receipt = {
-        "schema_version": 1,
+        "schema_version": 2 if suite else 1,
         "title": "OSLab introduction film",
-        "cli_run": {
-            **run_record(cli),
-            "steps": [{"name": name, "seconds": round(progress.at(done) - progress.at(begin), 1)}
-                      for name, begin, done in STEPS],
-            "console_recording": recording(load_json(cli / "console.json")),
-            "report_recording": recording(load_json(cli / "report.json")),
-        },
         "dashboard_run": {**run_record(dashboard), "browser_recording": recording(load_json(dashboard / "dashboard.json"))},
         "agent_session": {
             "client": session.get("agent"),
@@ -1141,58 +1675,81 @@ def write_receipt(captures, fleet_dir, video, path):
             "record": "oslab-windows-product-qa-attestation.json",
         },
         "edits": [
-            "Chapters 02 and 03 show one CLI run, chapter 04 a separate run that a Playwright script launched from the "
-            "dashboard, and chapter 05 a separate Codex session. The opening and chapter 06 reuse the 32-VM Windows QA "
-            "recordings.",
-            "Waits play faster, and each recorded chapter shows its playback speed.",
+            "Chapter 04 uses a separate dashboard run launched by Playwright. Chapter 05 uses a separate Codex session. "
+            "The opening and chapter 06 reuse the 32-VM Windows QA recordings.",
+            "The edit changes playback speed between events and holds on selected results.",
             "The YAML and terminal panels are typeset from the scenario file and the recorded CLI output. Command "
             "typing is animated.",
             "Local host names, user folders and private variable names are replaced in the terminal text, the HTML "
             "report and the dashboard.",
             "The editor draws the cursors at the recorded pointer positions and interpolates the movement between them.",
-            "The 32-VM wall aligns recordings made in waves of up to 8 at each run's start, and the finished wall "
-            "is held for 2 seconds.",
+            "The 32-VM wall aligns recordings made in waves of up to eight at each run's start. The final cursor "
+            "movement toward the logo is animated.",
         ],
         "video": {"file": Path(video).name, "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest(),
                   "width": W, "height": H, "fps": FPS},
     }
+    if suite:
+        receipt["suite_run"] = suite_record(suite)
+        receipt["edits"].insert(0, "Chapter 02 follows the Windows fresh install from the recorded suite. The environment "
+                                "interlude uses one source clock for all four consoles and holds the last product frames "
+                                "under a VM removed label. Chapter 03 shows the same Ubuntu upgrade's report.")
+    else:
+        receipt["cli_run"] = {
+            **run_record(cli),
+            "steps": lifecycle_record(Progress(cli / "progress.jsonl")),
+            "console_recording": recording(load_json(cli / "console.json")),
+            "report_recording": recording(load_json(cli / "report.json")),
+        }
+        receipt["edits"].insert(0, "Chapters 02 and 03 show one CLI run.")
     Path(path).write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--captures", type=Path, required=True, help="Folder with the cli, dashboard and agent captures")
+    parser.add_argument("--captures", type=Path, required=True, help="Folder with suite, dashboard and agent captures")
     parser.add_argument("--fleet", type=Path, required=True, help="Output folder of windows-product-qa/fleet.py")
     parser.add_argument("--fonts", type=Path, required=True, help="Folder with the Geist and Geist Mono fonts")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--ffmpeg", default="ffmpeg")
-    parser.add_argument("--scenario", type=Path, default=HERE.parents[2] / "scenarios/windows/demo-powershell-system.example.yaml")
+    parser.add_argument("--scenario", type=Path, help="Scenario to show (default: the recorded Windows fresh-install scenario)")
+    parser.add_argument("--legacy-cli", action="store_true", help="Use the single-run cli capture instead of the environment suite")
     parser.add_argument("--preview", nargs="*", type=float, help="Render these seconds to PNG files and a contact sheet")
     parser.add_argument("--crf", type=int, default=16)
     parser.add_argument("--receipt", type=Path,
                         help="Write the JSON record of the runs and recordings in this encoded film next to it, then exit")
     args = parser.parse_args()
+    suite = None if args.legacy_cli else SuiteCapture(args.captures / "suite")
     if args.receipt:
-        write_receipt(args.captures, args.fleet, args.receipt, args.receipt.with_name(f"{args.receipt.stem}-attestation.json"))
+        write_receipt(args.captures, args.fleet, args.receipt,
+                      args.receipt.with_name(f"{args.receipt.stem}-attestation.json"), suite)
         return 0
+    scenario = suite.scenario_path(args.scenario) if suite else (
+        args.scenario or REPO / "scenarios/windows/demo-powershell-system.example.yaml")
+    label = scenario.resolve().relative_to(REPO).as_posix()
     args.out.mkdir(parents=True, exist_ok=True)
     look = Look(ev.Fonts(args.fonts))
     fleet = load_fleet(args.fleet, args.fonts, args.ffmpeg, args.out)
-    label = args.scenario.resolve().relative_to(HERE.parents[2]).as_posix()
     chapters = []
     try:
-        captured = []
-        for chapter, folder, needed in ((RunChapter, "cli", "terminal.json"), (EvidenceChapter, "cli", "report.json"),
-                                        (DashboardChapter, "dashboard", "dashboard.json"),
-                                        (AgentChapter, "agent", "calls.json")):
+        chapters.extend((ColdOpen(look, fleet, suite is not None), ScenarioChapter(look, scenario, label)))
+        if suite:
+            suite.media(FOCUS, "report")
+            chapters.append(RunChapter(look, suite.child(WINDOWS_RUN), args.ffmpeg, suite))
+            chapters.append(EnvironmentsChapter(look, suite, args.ffmpeg))
+            chapters.append(EvidenceChapter(look, suite.child(FOCUS), args.ffmpeg, suite))
+            sources = []
+        else:
+            sources = [(RunChapter, "cli", "terminal.json"), (EvidenceChapter, "cli", "report.json")]
+        sources.extend([(DashboardChapter, "dashboard", "dashboard.json"), (AgentChapter, "agent", "calls.json")])
+        for chapter, folder, needed in sources:
             if (args.captures / folder / needed).exists():
-                captured.append(chapter(look, args.captures / folder, args.ffmpeg))
+                chapters.append(chapter(look, args.captures / folder, args.ffmpeg))
             elif args.preview is None:
                 raise FileNotFoundError(f"The film needs {folder}/{needed} under {args.captures}")
             else:
                 print(f"Preview without {chapter.__name__}: {folder}/{needed} is missing", flush=True)
-        chapters = [ColdOpen(look, fleet), ScenarioChapter(look, args.scenario, label), *captured,
-                    ScaleChapter(look, fleet), EndCard(look, fleet)]
+        chapters.extend((ScaleChapter(look, fleet), EndCard(look, fleet)))
         film = Intro(look, chapters)
         print(f"{film.duration:.1f} s: " + ", ".join(f"{type(c).__name__} {c.duration:.1f}" for c in chapters),
               flush=True)
@@ -1206,10 +1763,11 @@ def main():
             sheet.save(args.out / "preview.png")
             return 0
         master = args.out / "oslab-intro-film.mp4"
-        # Encode to a separate file so that a failed render keeps the previous master.
-        partial = args.out / "oslab-intro-film.partial.mp4"
-        render(film, partial, args.ffmpeg, args.crf)
-        partial.replace(master)
+        # A failed render leaves the previous master in place and removes the partial encode.
+        with tempfile.TemporaryDirectory(prefix="oslab-render-", dir=args.out) as work:
+            partial = Path(work) / master.name
+            render(film, partial, args.ffmpeg, args.crf)
+            partial.replace(master)
         print(master, flush=True)
         return 0
     finally:
