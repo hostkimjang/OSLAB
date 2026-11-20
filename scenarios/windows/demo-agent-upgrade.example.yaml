@@ -1,0 +1,128 @@
+# Demo Agent environment matrix: Windows 11, upgrade from 2.3.1 to 2.4.0.
+# The fixture recreates a machine that 2.3.1 registered. The candidate upgrades it in place, and the
+# run passes only if status and scan use the original registration without registering again.
+schemaVersion: 1
+id: demo.agent-matrix.windows-upgrade
+name: Demo Agent 2.3.1 to 2.4 upgrade on Windows 11
+os:
+  family: windows
+  version: "11"
+provider:
+  type: proxmox
+  template: windows11-template-qga-9200
+  templateVmId: 9200
+  vmIdRange:
+    start: 9102
+    end: 9199
+  clone:
+    network: disconnected
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: qemuAgent
+  screen:
+    signIn: true
+    showCommands: true
+fixtures:
+  - id: demo-agent-2.3.1
+    type: powershell
+    source: validation/fixtures/windows/demo-agent-2.3-installed.ps1
+    expectedOutput: "C:\\Oslab\\demo-agent-2.3.1-fixture.json"
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: "C:\\Oslab\\artifact"
+  transfer: archive
+  exclude:
+    - "*.py"
+product:
+  steps:
+    - id: version
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\demo-agent.ps1" version -Json'
+      captureStdoutJson: true
+      expectStdoutJson:
+        version: "2.4.0"
+        installed.version: "2.3.1"
+        registration.assetId: 3f6b2a8c-9d41-4e27-b5c3-1a7e0d9f4b62
+    - id: install
+      command:
+        shell: powershell
+        template: '& "{ArtifactDir}\demo-agent.ps1" install -Json'
+      captureStdoutJson: true
+      expectStdoutJson:
+        mode: upgrade
+        previousVersion: "2.3.1"
+        version: "2.4.0"
+        migration.status: migrated
+        migration.configFormat: ini->json
+        migration.stateSchema: 1->2
+        migration.previousRegistration.assetId: 3f6b2a8c-9d41-4e27-b5c3-1a7e0d9f4b62
+    - id: status
+      command:
+        shell: powershell
+        template: '& "C:\Program Files\DemoAgent\demo-agent.ps1" status -Json'
+      captureStdoutJson: true
+      expectStdoutJson:
+        installed.version: "2.4.0"
+        registration.assetId: 3f6b2a8c-9d41-4e27-b5c3-1a7e0d9f4b62
+        registration.assetName: demo-win11-upgrade
+        registration.registeredAtUtc: "2026-08-03T09:14:27Z"
+        registration.origin: migrated
+        migration.registrationKept: true
+        migration.backupPresent: true
+        migration.legacyConfigPresent: false
+        config.serverUrl: https://inventory.example.invalid
+        config.scanIntervalMinutes: 360
+        config.excludePaths:
+          - 'C:\Windows\Temp'
+          - 'C:\Users\Public\Downloads'
+        state.schemaVersion: 2
+    - id: scan
+      command:
+        shell: powershell
+        template: '& "C:\Program Files\DemoAgent\demo-agent.ps1" scan -Output "{OutputPath}" -Json'
+      captureStdoutJson: true
+      expectStdoutJson:
+        outputWritten: true
+        asset.id: 3f6b2a8c-9d41-4e27-b5c3-1a7e0d9f4b62
+        asset.origin: migrated
+outputs:
+  actual:
+    path: "C:\\Oslab\\demo-agent-inventory.json"
+    adapter: canonical.inventory
+assertions:
+  - type: inventory.contains
+    id: agent-reports-candidate-version
+    match:
+      name: Demo Agent
+      version: "2.4.0"
+    requiredSources:
+      - DemoAgent
+  - type: inventory.evidencePresent
+    id: agent-state-evidence
+    match:
+      name: Demo Agent
+    evidence:
+      type: state
+      source: DemoAgent
+  - type: inventory.evidencePresent
+    id: agent-migration-backup
+    match:
+      name: Demo Agent
+    evidence:
+      type: migration
+      source: DemoAgent
+      pathContains: 2.3.1
+  - type: inventory.sourcePresent
+    id: installed-programs-scanned
+    source: Registry
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

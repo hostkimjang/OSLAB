@@ -1,0 +1,128 @@
+# Demo Agent environment matrix: Ubuntu 24.04, upgrade from 2.3.1 to 2.4.0.
+# The fixture recreates a machine that 2.3.1 registered. The candidate upgrades it in place, and the
+# run passes only if status and scan use the original registration without registering again.
+schemaVersion: 1
+id: demo.agent-matrix.ubuntu-upgrade
+name: Demo Agent 2.3.1 to 2.4 upgrade on Ubuntu 24.04
+os:
+  family: linux
+  version: "24.04"
+provider:
+  type: proxmox
+  template: ubuntu-24.04-template
+  templateVmId: 9000
+  vmIdRange:
+    start: 9185
+    end: 9189
+  clone:
+    display: virtio
+    network: disconnected
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: qemuAgent
+  screen:
+    showCommands: true
+fixtures:
+  - id: demo-agent-2.3.1
+    type: shell
+    source: validation/fixtures/linux/demo-agent-2.3-installed.sh
+    expectedOutput: /opt/oslab/demo-agent-2.3.1-fixture.json
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: /opt/oslab/artifact
+  transfer: archive
+  exclude:
+    - "*.ps1"
+product:
+  steps:
+    - id: version
+      command:
+        shell: sh
+        template: python3 "{ArtifactDir}/demo-agent.py" version --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        version: "2.4.0"
+        installed.version: "2.3.1"
+        registration.assetId: 8c1e5f3a-7b20-4d96-a4e8-2f9b6c0d1e73
+    - id: install
+      command:
+        shell: sh
+        template: python3 "{ArtifactDir}/demo-agent.py" install --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        mode: upgrade
+        previousVersion: "2.3.1"
+        version: "2.4.0"
+        migration.status: migrated
+        migration.configFormat: ini->json
+        migration.stateSchema: 1->2
+        migration.previousRegistration.assetId: 8c1e5f3a-7b20-4d96-a4e8-2f9b6c0d1e73
+    - id: status
+      command:
+        shell: sh
+        template: /usr/local/bin/demo-agent status --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        installed.version: "2.4.0"
+        registration.assetId: 8c1e5f3a-7b20-4d96-a4e8-2f9b6c0d1e73
+        registration.assetName: demo-ubuntu-upgrade
+        registration.registeredAtUtc: "2026-08-05T02:41:09Z"
+        registration.origin: migrated
+        migration.registrationKept: true
+        migration.backupPresent: true
+        migration.legacyConfigPresent: false
+        config.serverUrl: https://inventory.example.invalid
+        config.scanIntervalMinutes: 360
+        config.excludePaths:
+          - /tmp
+          - /var/tmp
+        state.schemaVersion: 2
+    - id: scan
+      command:
+        shell: sh
+        template: /usr/local/bin/demo-agent scan --output "{OutputPath}" --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        outputWritten: true
+        asset.id: 8c1e5f3a-7b20-4d96-a4e8-2f9b6c0d1e73
+        asset.origin: migrated
+outputs:
+  actual:
+    path: /opt/oslab/demo-agent-inventory.json
+    adapter: canonical.inventory
+assertions:
+  - type: inventory.contains
+    id: agent-reports-candidate-version
+    match:
+      name: Demo Agent
+      version: "2.4.0"
+    requiredSources:
+      - DemoAgent
+  - type: inventory.evidencePresent
+    id: agent-state-evidence
+    match:
+      name: Demo Agent
+    evidence:
+      type: state
+      source: DemoAgent
+  - type: inventory.evidencePresent
+    id: agent-migration-backup
+    match:
+      name: Demo Agent
+    evidence:
+      type: migration
+      source: DemoAgent
+      pathContains: 2.3.1
+  - type: inventory.sourcePresent
+    id: installed-packages-scanned
+    source: dpkg
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false

@@ -15,6 +15,7 @@ README:
 | --- | --- |
 | [시작하기](getting-started.ko.md) | Proxmox Windows VM에서 generic demo 실행 |
 | [데모 카탈로그](demos.ko.md) | 공개 demo scenario와 각 demo가 가르치는 개념 |
+| [Demo Agent 환경 매트릭스](user-scenario.ko.md) | Windows와 Ubuntu에서 후보 빌드의 새 설치와 업그레이드를 재검증하는 예제 |
 | [소개 영상](intro-video.ko.md) | README 영상의 장 구성, 실제 녹화·편집 범위, 제작 방법 |
 | [도입 가이드](adoption-guide.ko.md) | Demo를 자신의 product artifact 테스트로 바꾸는 방법 |
 | [핵심 개념](concepts.ko.md) | Scenario, provider, guest channel, fixture, artifact, adapter, assertion, report 개념 |

@@ -1,0 +1,20 @@
+# Demo Agent environment matrix: four guest and install-path combinations of the same candidate.
+# Every entry receives the same artifact folder, validation/artifacts/demo-agent-cli. The Windows
+# scenarios run demo-agent.ps1 and the Ubuntu scenarios run demo-agent.py from it.
+schemaVersion: 1
+id: demo-agent-matrix
+name: Demo Agent 2.4 environment matrix
+maxParallel: 4
+runs:
+  - id: windows-fresh
+    scenario: scenarios/windows/demo-agent-fresh-install.example.yaml
+    tier: matrix
+  - id: windows-upgrade
+    scenario: scenarios/windows/demo-agent-upgrade.example.yaml
+    tier: matrix
+  - id: ubuntu-fresh
+    scenario: scenarios/linux/demo-agent-fresh-install.example.yaml
+    tier: matrix
+  - id: ubuntu-upgrade
+    scenario: scenarios/linux/demo-agent-upgrade.example.yaml
+    tier: matrix

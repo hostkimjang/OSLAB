@@ -1,0 +1,117 @@
+# Demo Agent environment matrix: Ubuntu 24.04, fresh install of 2.4.0.
+# A clean clone installs the candidate, registers once, then checks status and the first inventory.
+# The clone gets a virtio display so tty1 shows the steps in a large font, and no network because
+# the demo never contacts its server.
+schemaVersion: 1
+id: demo.agent-matrix.ubuntu-fresh
+name: Demo Agent 2.4 fresh install on Ubuntu 24.04
+os:
+  family: linux
+  version: "24.04"
+provider:
+  type: proxmox
+  template: ubuntu-24.04-template
+  templateVmId: 9000
+  vmIdRange:
+    start: 9185
+    end: 9189
+  clone:
+    display: virtio
+    network: disconnected
+isolation:
+  mode: ephemeralClone
+guest:
+  mode: qemuAgent
+  screen:
+    showCommands: true
+artifact:
+  type: folder
+  pathParam: artifactPath
+  destination: /opt/oslab/artifact
+  transfer: archive
+  exclude:
+    - "*.ps1"
+product:
+  steps:
+    - id: version
+      command:
+        shell: sh
+        template: python3 "{ArtifactDir}/demo-agent.py" version --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        version: "2.4.0"
+        installed.present: false
+        registered: false
+    - id: install
+      command:
+        shell: sh
+        template: python3 "{ArtifactDir}/demo-agent.py" install --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        mode: fresh
+        version: "2.4.0"
+        migration.status: not-needed
+    - id: register
+      command:
+        shell: sh
+        template: /usr/local/bin/demo-agent register --server-url https://inventory.example.invalid --asset-name demo-ubuntu-fresh --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        registered: true
+        alreadyRegistered: false
+        registration.assetName: demo-ubuntu-fresh
+    - id: status
+      command:
+        shell: sh
+        template: /usr/local/bin/demo-agent status --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        installed.version: "2.4.0"
+        registration.assetName: demo-ubuntu-fresh
+        registration.origin: registered
+        config.serverUrl: https://inventory.example.invalid
+        state.schemaVersion: 2
+        migration.status: not-needed
+    - id: scan
+      command:
+        shell: sh
+        template: /usr/local/bin/demo-agent scan --output "{OutputPath}" --json
+      captureStdoutJson: true
+      expectStdoutJson:
+        outputWritten: true
+        asset.name: demo-ubuntu-fresh
+outputs:
+  actual:
+    path: /opt/oslab/demo-agent-inventory.json
+    adapter: canonical.inventory
+assertions:
+  - type: inventory.contains
+    id: agent-reports-candidate-version
+    match:
+      name: Demo Agent
+      version: "2.4.0"
+    requiredSources:
+      - DemoAgent
+  - type: inventory.evidencePresent
+    id: agent-state-evidence
+    match:
+      name: Demo Agent
+    evidence:
+      type: state
+      source: DemoAgent
+  - type: inventory.sourcePresent
+    id: installed-packages-scanned
+    source: dpkg
+  - type: inventory.contains
+    id: guest-agent-found
+    match:
+      name: qemu-guest-agent
+      source: dpkg
+reports:
+  formats:
+    - junit
+    - json
+    - html
+cleanup:
+  destroyVm: true
+  keepVmOnFailure: false
