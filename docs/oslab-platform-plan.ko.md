@@ -313,7 +313,7 @@ class GuestChannel:
 
 | Channel | OS | 역할 |
 | --- | --- | --- |
-| QEMU Guest Agent | Windows, Linux | 현재 Windows 실행 경로 |
+| QEMU Guest Agent | Windows, Linux | 현재 Windows·Linux 실행 경로 |
 | WinRM | Windows | 향후 Windows fallback channel |
 | SSH | Linux | 향후 주요 Linux channel |
 
@@ -354,6 +354,8 @@ Windows MVP 점검 항목:
 | `oslab.directory` | `C:\Oslab` 생성 가능 | `preflight_failure` |
 | `oslab.file_roundtrip` | Guest upload/download 작동 | `preflight_failure` |
 | `oslab.cleanup_test_file` | Temporary file 삭제 가능 | `preflight_failure` |
+
+`guest.screen.signIn: true`이면 `desktop.sign_in` 점검을 가장 먼저 실행합니다. 데스크톱 테스트 계정이 로그인되고 자동 로그인 비밀번호가 다시 지워지면 통과하고, 그렇지 않으면 `preflight_failure`로 실패합니다.
 
 Linux 설계 점검 항목:
 
@@ -942,7 +944,7 @@ Fake provider와 fake guest channel을 사용합니다.
 | Product가 0이 아닌 종료 코드 반환 | `product_execution_failure` |
 | Assertion mismatch | `assertion_failure`, report 작성 |
 | Cleanup failure | Stale VM metadata 기록 |
-| Linux scenario validation | Schema 통과, SSH 구현 전까지 실제 실행 건너뜀 |
+| Linux scenario validation | Schema 통과, QEMU Guest Agent로 실제 실행 |
 
 ### 실제 lab smoke test
 

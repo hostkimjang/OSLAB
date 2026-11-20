@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import copy
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -260,7 +260,7 @@ def _config_with_output_root(config: OslabConfig, output_root: Path) -> OslabCon
         run_defaults = {}
     run_defaults["outputRoot"] = str(output_root)
     raw["runDefaults"] = run_defaults
-    return OslabConfig(path=config.path, raw=raw)
+    return replace(config, raw=raw, vmid_lock_dir_override=config.vmid_lock_dir)
 
 
 def _resolve_path(suite_path: Path, target: Path) -> Path:

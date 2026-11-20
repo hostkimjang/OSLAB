@@ -31,7 +31,7 @@ fixtures:
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `id` | Yes | Progress log, JUnit testcase name, raw output filename에 쓰이는 stable id |
-| `type` | Yes | Fixture runner type. 현재 Windows demo는 `powershell` 사용 |
+| `type` | Yes | Fixture runner type. Windows 게스트는 `powershell`, Linux 게스트는 `shell` |
 | `source` | Yes | Guest에 upload하고 실행할 local script |
 | `expectedOutput` | No | Fixture 실행 후 setup evidence로 수집할 guest file path |
 
@@ -69,6 +69,39 @@ $manifest |
 - Fixture는 idempotent해야 합니다. 이미 tool/state가 있어도 다시 실행 가능해야 합니다.
 - Secret을 출력하지 않습니다.
 - Product command를 여기에서 실행하지 않습니다.
+
+<a id="shell-fixture-규칙"></a>
+
+## Shell Fixture 작성 규칙(Linux)
+
+```yaml
+fixtures:
+  - id: baseline
+    type: shell
+    source: validation/fixtures/linux/generic-smoke.sh
+    expectedOutput: /opt/oslab/my-fixture.json
+```
+
+권장 형태:
+
+```sh
+#!/bin/sh
+set -eu
+
+mkdir -p /opt/oslab
+
+# 여기에서 guest state를 준비합니다.
+
+printf '{"schemaVersion": 1, "kind": "fixtureResult", "ready": true}\n' > /opt/oslab/my-fixture.json
+```
+
+OSLAB은 스크립트를 `/opt/oslab/fixtures/<파일 이름>`에 올리면서 CRLF 줄바꿈을 LF로 바꾸고, 실행 권한을 준 뒤 guest agent 사용자(보통 root)로 경로를 직접 실행합니다. shebang이 있으면 그 인터프리터를, 없으면 `sh`를 씁니다.
+
+규칙:
+
+- `set -eu`를 사용해 setup 명령이 실패하면 fixture도 실패하게 합니다.
+- `expectedOutput`을 설정했다면 deterministic evidence JSON을 씁니다.
+- Fixture는 idempotent해야 하고, secret을 출력하지 않으며, product command는 artifact에 둡니다.
 
 <a id="demo-fixture-동작"></a>
 
@@ -181,5 +214,15 @@ uv run oslab qga-exec `
   --env-file config/oslab.local.env `
   --vm-id <kept-vm-id> `
   -- powershell.exe -NoProfile -Command "Get-ChildItem C:\Oslab -Recurse"
+```
+
+Linux 시나리오는 아직 `fixture-smoke`를 쓸 수 없습니다. `oslab run --keep-vm`으로 복제본을 남긴 뒤 내부를 확인합니다.
+
+```powershell
+uv run oslab qga-exec `
+  --config config/oslab.local.yaml `
+  --env-file config/oslab.local.env `
+  --vm-id <kept-vm-id> `
+  -- sh -c "ls -la /opt/oslab /opt/oslab/fixtures"
 ```
 

@@ -1242,6 +1242,17 @@ Service가 없다면 VirtIO tools ISO에서 QEMU Guest Agent를 설치한 뒤 te
 - [ ] Fallback이 활성화된 경우 WinRM readiness 확인
 - [x] QEMU Guest Agent command execution readiness 확인
 
+### Windows 데스크톱 세션
+
+- [x] `guest.screen.signIn`: 무작위 비밀번호 로컬 계정 `OslabDesktop`, 1회 자동 로그인, 재시작 후 Explorer 대기, `desktop.sign_in` 사전 점검
+- [x] 첫 로그인 애니메이션, 개인 정보 설정, 알림, 설정 권유, OneDrive 설정, 첫 로그인 시작 메뉴 억제
+- [x] 로그인 직후와 실패 시 `DefaultPassword` 삭제, 비밀번호를 게스트 밖으로 꺼내지 않음
+- [x] `guest.screen.showCommands`: install/artifact command/product step을 데스크톱 콘솔 창(`OSLab · <step>`, 120,80 1040x620, Consolas 24px, UTF-8 창)에서 실행
+- [x] 콘솔 실행에서도 stdout/stderr 바이트, 종료 코드, `--command-timeout-seconds` 유지, 화면의 secret token 마스킹
+- [x] 실제 랩 검증: 템플릿 9099, run `20261120-022411-demo-desktop-session-windows`, `20261120-023435-demo-desktop-session-windows`, `20261120-024845-demo-desktop-session-windows`(Consolas 글꼴 확인)
+- [x] Windows 11 템플릿 9200으로 새 설치와 2.3.1 업그레이드 모두 통과: `intro-suite-v2-20261120`. 로그인된 콘솔에서 명령 실행과 결과를 확인하고 복제 VM을 삭제했습니다.
+- [ ] 명령이 Windows를 재시작한 뒤 데스크톱 다시 로그인
+
 ### Fixture 및 Artifact 실행
 
 - [x] `validation/fixtures/windows/product-specific/gold-lite.ps1` upload
@@ -1471,11 +1482,17 @@ Service가 없다면 VirtIO tools ISO에서 QEMU Guest Agent를 설치한 뒤 te
 - [x] Linux scenario example
 - [x] Linux guest channel selection design
 - [ ] Linux SSH implementation
-- [ ] Linux shell fixture execution
-- [ ] Linux file/package/process assertions
-- [ ] Linux real Proxmox template
-- [ ] Linux boot smoke
-- [ ] Linux guest preflight
+- [x] Linux QEMU Guest Agent artifact 실행(`oslab run`, `artifact-smoke`): folder `archive`/`files`, installer, `product.steps`, 출력 수집, assertion, 보고서, VM 정리
+- [x] Linux shell fixture execution(QGA, `expectedOutput` 수집, CRLF→LF 변환, shebang 없는 스크립트는 `sh` 실행)
+- [x] Linux file/directory assertions(artifact가 `metadata.files`/`metadata.directories`에 보고한 상태 기준)
+- [ ] Linux package/process assertions 실제 랩 검증
+- [x] Linux real Proxmox template(Ubuntu 24.04 cloud-init 템플릿, qemu-guest-agent 8.2.2)
+- [x] Linux boot smoke(`oslab boot-smoke`)
+- [x] Linux guest preflight(`oslab run` 내부 4개 점검. `guest-preflight` CLI는 아직 Windows 전용)
+- [ ] Linux `fixture-smoke`, `guest-preflight` CLI 지원
+- [x] `provider.clone`(`display: std|virtio`, `network: disconnected`) 모든 복제 경로에 적용
+- [x] `guest.screen.showCommands` Linux tty1 표시(getty 중지, Terminus 32x16, 프롬프트, 비밀 출력 숨김)
+- [x] Ubuntu 24.04 템플릿 9000에서 새 설치와 2.3.1 업그레이드 모두 통과: `intro-suite-v2-20261120`. Windows 항목을 포함해 네 환경에서 보고서를 생성했고 VM 삭제와 VMID 예약 해제를 확인했습니다.
 
 ### Security 및 운영
 

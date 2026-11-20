@@ -5,14 +5,16 @@ import io
 import json
 import zipfile
 import xml.etree.ElementTree as ET
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from oslab.config import OslabConfig
-from oslab.errors import ConfigError
-from oslab.models.scenario import load_scenario
+from oslab.errors import ConfigError, ProviderError
+from oslab.models.scenario import Scenario, load_scenario
 from oslab.providers.proxmox import ProxmoxConfig
+from oslab.providers.vmid import LocalVmidLock, VmidRange
 from oslab.runners import proxmox_artifact_smoke
 from oslab.runners.scenario_runner import run_artifact_validation
 from oslab.runners.proxmox_artifact_smoke import run_proxmox_artifact_smoke
@@ -253,6 +255,112 @@ def make_python_hello_artifact(tmp_path: Path) -> Path:
     (artifact / "hello.py").write_text('print("hello from python")\n', encoding="utf-8")
     (artifact / "run-python-demo.ps1").write_text("param($OutputPath)\n", encoding="utf-8")
     return artifact
+
+
+def load_windows_lifecycle_scenario() -> Scenario:
+    scenario = load_scenario(Path("scenarios/windows/demo-agent-fresh-install.example.yaml"))
+    return replace(scenario, raw={**scenario.raw, "provider": {**scenario.provider, "templateVmId": 9101}})
+
+
+def test_failed_clone_does_not_cleanup_unowned_vmid(tmp_path: Path, monkeypatch) -> None:
+    class FailedCloneClient(FakeProxmoxClient):
+        def wait_for_task(self, task_id: str, **kwargs):
+            raise ProviderError("VMID allocated by a different client")
+
+    client = FailedCloneClient(make_proxmox_config())
+    config = make_config(tmp_path)
+    scenario = load_windows_lifecycle_scenario()
+    events: list[proxmox_artifact_smoke.ProgressEvent] = []
+    monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", lambda _config: client)
+
+    with pytest.raises(ProviderError, match="different client"):
+        run_proxmox_artifact_smoke(
+            scenario=scenario,
+            oslab_config=config,
+            proxmox_config=client.config,
+            artifact_path=make_artifact(tmp_path),
+            vm_id=9102,
+            progress=events.append,
+        )
+
+    assert client.cloned_vmids == [9102]
+    assert not client.stopped_vmids
+    assert not client.destroyed_vmids
+    assert not list(config.vmid_lock_dir.glob("*.lock"))
+    assert "vm.clone.done" not in {event.phase for event in events}
+
+
+def test_explicit_vmid_respects_existing_reservation(tmp_path: Path, monkeypatch) -> None:
+    client = FakeProxmoxClient(make_proxmox_config())
+    config = make_config(tmp_path)
+    scenario = load_windows_lifecycle_scenario()
+    monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", lambda _config: client)
+    reservation = LocalVmidLock(config.vmid_lock_dir).reserve(VmidRange(9102, 9102), used_vmids=set())
+    try:
+        with pytest.raises(ProviderError, match="No available VMID lock"):
+            run_proxmox_artifact_smoke(
+                scenario=scenario,
+                oslab_config=config,
+                proxmox_config=client.config,
+                artifact_path=make_artifact(tmp_path),
+                vm_id=9102,
+            )
+
+        assert not client.cloned_vmids
+        assert reservation.lock_path.exists()
+    finally:
+        reservation.release()
+
+
+@pytest.mark.parametrize("owns_vmid", [True, False])
+def test_clone_config_failure_only_cleans_owned_clone(tmp_path: Path, monkeypatch, owns_vmid: bool) -> None:
+    class FailedConfigClient(FakeProxmoxClient):
+        clone_name = ""
+
+        def clone_vm(self, *, template_vmid: int, new_vmid: int, name: str, full_clone: bool):
+            self.clone_name = name
+            return super().clone_vm(template_vmid=template_vmid, new_vmid=new_vmid, name=name, full_clone=full_clone)
+
+        def get_vm_config(self, vmid: int, *, node: str | None = None):
+            return {"name": self.clone_name if owns_vmid else "different-clone", "net0": "virtio=AA:BB:CC:DD:EE:FF"}
+
+        def update_vm_config(self, vmid: int, settings: dict[str, str]) -> None:
+            raise ProviderError("Cannot apply clone configuration")
+
+    client = FailedConfigClient(make_proxmox_config())
+    config = make_config(tmp_path)
+    scenario = load_windows_lifecycle_scenario()
+    monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", lambda _config: client)
+
+    with pytest.raises(ProviderError, match="Cannot apply clone configuration"):
+        run_proxmox_artifact_smoke(
+            scenario=scenario,
+            oslab_config=config,
+            proxmox_config=client.config,
+            artifact_path=make_artifact(tmp_path),
+        )
+
+    assert not client.started_vmids
+    assert client.destroyed_vmids == ([9102] if owns_vmid else [])
+    assert not list(config.vmid_lock_dir.glob("*.lock"))
+
+
+@pytest.mark.parametrize("guest", [{"mode": "ssh"}, {"mode": "auto", "linuxOrder": ["ssh"]}])
+def test_linux_artifact_rejects_unsupported_guest_channels_before_provider(tmp_path: Path, monkeypatch, guest: dict) -> None:
+    def unexpected_client(_config):
+        pytest.fail("an unsupported guest channel must be rejected before connecting to Proxmox")
+
+    scenario = load_scenario(Path("scenarios/linux/generic-smoke.example.yaml"))
+    scenario = replace(scenario, raw={**scenario.raw, "guest": guest})
+    monkeypatch.setattr(proxmox_artifact_smoke, "ProxmoxClient", unexpected_client)
+
+    with pytest.raises(ProviderError, match="requires a QEMU Guest Agent guest channel"):
+        run_proxmox_artifact_smoke(
+            scenario=scenario,
+            oslab_config=make_config(tmp_path),
+            proxmox_config=make_proxmox_config(),
+            artifact_path=make_artifact(tmp_path),
+        )
 
 
 def test_run_proxmox_artifact_smoke_uploads_executes_collects_and_cleans_up(

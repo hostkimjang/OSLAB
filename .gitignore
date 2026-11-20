@@ -59,6 +59,7 @@ apps/**/test-results/
 /validation/fixtures/windows/qa-*.ps1
 /scenarios/windows/new-windows-smoke*.example.yaml
 /scenarios/windows/qa-*.example.yaml
+/scenarios/linux/qa-*.example.yaml
 /scenarios/windows/uat-*.example.yaml
 /validation/suites/new-smoke.example.yaml
 /validation/suites/qa-*.example.yaml

@@ -1,4 +1,8 @@
-"""Windows artifact upload/execution smoke runner over Proxmox QEMU Guest Agent."""
+"""Artifact upload/execution runner over Proxmox QEMU Guest Agent.
+
+This module owns the VM lifecycle and the Windows guest flow. Linux guests run
+through `oslab.runners.proxmox_linux_artifact`.
+"""
 
 from __future__ import annotations
 
@@ -8,23 +12,27 @@ import re
 import tempfile
 import zipfile
 from collections.abc import Callable
-from fnmatch import fnmatch
+from contextlib import suppress
 from dataclasses import dataclass, field, replace
+from fnmatch import fnmatch
+from functools import partial
 from pathlib import Path, PureWindowsPath
 from typing import Any
+from uuid import uuid4
 
 from oslab.analysis import analyze_inventory
 from oslab.assertions import AssertionResult, evaluate_assertions
 from oslab.commands import CommandSpec, render_command_template
 from oslab.config import OslabConfig
 from oslab.errors import ConfigError, OslabError, ProviderError
-from oslab.guests.qemu_agent import QemuAgentChannel
+from oslab.guests.base import GuestCommandResult
+from oslab.guests.qemu_agent import LinuxQemuAgentChannel, QemuAgentChannel
 from oslab.models.scenario import Scenario
 from oslab.plugins import normalize_output
 from oslab.providers.base import GuestInfo, TemplateRef, VmRef, VmSpec, VmStatus
 from oslab.providers.proxmox import ProxmoxClient, ProxmoxConfig, ProxmoxProvider
 from oslab.providers.proxmox_checks import check_proxmox_resources
-from oslab.providers.vmid import LocalVmidLock, VmidRange, VmidReservation, used_vmids_from_resources
+from oslab.providers.vmid import LocalVmidLock, VmidRange, used_vmids_from_resources
 from oslab.reports.html import write_artifact_html
 from oslab.reports.json_report import write_json
 from oslab.reports.junit import JUnitCase, write_junit
@@ -32,6 +40,7 @@ from oslab.runners.proxmox_boot_smoke import _best_effort_cleanup, wait_for_gues
 from oslab.runners.proxmox_clone_smoke import make_clone_name
 from oslab.runners.proxmox_fixture_smoke import FixtureSmokeItem, run_windows_fixtures
 from oslab.runners.proxmox_guest_preflight import GuestPreflightCheck, run_windows_guest_checks
+from oslab.runners.windows_desktop_session import ConsoleCommandChannel, DesktopConsole, open_desktop_console, sign_in_desktop
 
 
 @dataclass(frozen=True)
@@ -118,16 +127,20 @@ def run_proxmox_artifact_smoke(
     progress: ProgressCallback | None = None,
     run_dir: Path | None = None,
 ) -> ArtifactSmokeResult:
-    """Clone/start a Windows VM, upload artifact files, execute artifact command, collect output JSON."""
+    """Clone/start a Windows or Linux VM, upload artifact files, execute artifact command, collect output JSON."""
 
-    if scenario.os_family != "windows":
-        raise OslabError("Proxmox artifact smoke currently supports Windows scenarios only")
     if scenario.template_vm_id is None:
         raise ProviderError("Scenario provider.templateVmId is required for artifact smoke")
     if scenario.vmid_range is None and vm_id is None:
         raise ProviderError("Scenario provider.vmIdRange is required when --vm-id is not supplied")
     if not artifact_path.exists():
         raise OslabError(f"Artifact path does not exist: {artifact_path}", details={"path": str(artifact_path)})
+
+    if scenario.os_family == "linux":
+        guest_mode = scenario.guest_mode
+        linux_order = scenario.raw["guest"].get("linuxOrder", ["qemuAgent"])
+        if guest_mode != "qemuAgent" and not (guest_mode == "auto" and "qemuAgent" in linux_order):
+            raise ProviderError("Linux artifact smoke requires a QEMU Guest Agent guest channel")
 
     artifact = _scenario_artifact(scenario)
     if artifact.get("type") not in {"folder", "installer"}:
@@ -165,25 +178,28 @@ def run_proxmox_artifact_smoke(
 
     resources = client.list_vm_resources()
     used_vmids = used_vmids_from_resources(resources)
-    reservation: VmidReservation | None = None
-    selected_vm_id = vm_id
-    if selected_vm_id is None:
+    if vm_id is None:
         raw_range = scenario.vmid_range
         assert raw_range is not None
-        reservation = LocalVmidLock(oslab_config.output_root / ".locks").reserve(
-            VmidRange(start=raw_range["start"], end=raw_range["end"]),
-            used_vmids=used_vmids,
-        )
-        selected_vm_id = reservation.vm_id
-    elif selected_vm_id in used_vmids:
-        raise ProviderError(f"Requested VMID `{selected_vm_id}` is already in use")
-    _emit_progress(progress, "vm.allocate.done", "VMID allocated", vmId=selected_vm_id)
+        vmid_range = VmidRange(start=raw_range["start"], end=raw_range["end"])
+    else:
+        if vm_id in used_vmids:
+            raise ProviderError(f"Requested VMID `{vm_id}` is already in use")
+        vmid_range = VmidRange(start=vm_id, end=vm_id)
+    reservation = LocalVmidLock(oslab_config.vmid_lock_dir).reserve(vmid_range, used_vmids=used_vmids)
 
-    clone_name = make_clone_name(scenario.scenario_id, selected_vm_id)
-    vm = VmRef(vm_id=selected_vm_id, name=clone_name, node=proxmox_config.node)
+    owned_vm: VmRef | None = None
     started = False
     destroyed = False
+
+    def remember_created_vm(vm: VmRef) -> None:
+        nonlocal owned_vm
+        owned_vm = vm
+
     try:
+        selected_vm_id = reservation.vm_id
+        clone_name = make_clone_name(f"{scenario.scenario_id[:32]}-{uuid4().hex[:10]}", selected_vm_id)
+        _emit_progress(progress, "vm.allocate.done", "VMID allocated", vmId=selected_vm_id)
         _emit_progress(
             progress,
             "vm.clone.start",
@@ -194,9 +210,26 @@ def run_proxmox_artifact_smoke(
         )
         vm = provider.create_clone(
             TemplateRef(vm_id=scenario.template_vm_id, name=scenario.template_name),
-            VmSpec(vm_id=selected_vm_id, name=clone_name, full_clone=full_clone),
+            VmSpec(
+                vm_id=selected_vm_id,
+                name=clone_name,
+                full_clone=full_clone,
+                display=scenario.clone_display,
+                network=scenario.clone_network,
+            ),
+            on_created=remember_created_vm,
         )
-        _emit_progress(progress, "vm.clone.done", "Ephemeral VM clone created", vmId=vm.vm_id, cloneName=vm.name)
+        _emit_progress(
+            progress,
+            "vm.clone.done",
+            "Ephemeral VM clone created",
+            vmId=vm.vm_id,
+            cloneName=vm.name,
+            node=vm.node,
+            runId=run_dir.name if run_dir is not None else None,
+            display=scenario.clone_display or "<template>",
+            network=scenario.clone_network or "<template>",
+        )
         _emit_progress(progress, "vm.start.start", "Start VM", vmId=vm.vm_id)
         provider.start_vm(vm)
         started = True
@@ -230,8 +263,15 @@ def run_proxmox_artifact_smoke(
             poll_interval_seconds=poll_interval_seconds,
         )
         _emit_progress(progress, "guest.ready.done", "QEMU Guest Agent is ready", vmId=vm.vm_id)
-        result = run_windows_artifact(
-            QemuAgentChannel(client),
+        if scenario.os_family == "linux":
+            # Imported here because the Linux runner reuses helpers from this module.
+            from oslab.runners.proxmox_linux_artifact import run_linux_artifact
+
+            run_guest_artifact, channel = run_linux_artifact, LinuxQemuAgentChannel(client)
+        else:
+            run_guest_artifact, channel = run_windows_artifact, QemuAgentChannel(client)
+        result = run_guest_artifact(
+            channel,
             vm,
             scenario=scenario,
             oslab_config=oslab_config,
@@ -254,15 +294,29 @@ def run_proxmox_artifact_smoke(
         _emit_progress(progress, "vm.destroy.done", "VM clone destroyed", vmId=vm.vm_id)
         final_result = _with_lifecycle(result, status=status, guest_info=guest_info, started=started, destroyed=destroyed, kept=False)
         return _with_report_paths(final_result, _write_artifact_reports(oslab_config.output_root, scenario, final_result, run_dir=run_dir))
-    except Exception:
-        if not keep_vm:
-            _emit_progress(progress, "cleanup.best_effort.start", "Run best-effort cleanup", vmId=vm.vm_id)
-            _best_effort_cleanup(provider, vm, started=started)
-            _emit_progress(progress, "cleanup.best_effort.done", "Best-effort cleanup finished", vmId=vm.vm_id)
+    except BaseException:
+        if owned_vm is not None and not destroyed and not keep_vm:
+            _cleanup_owned_clone(provider, owned_vm, progress)
         raise
     finally:
-        if reservation is not None:
-            reservation.release()
+        reservation.release()
+
+
+def _cleanup_owned_clone(provider: ProxmoxProvider, vm: VmRef, progress: ProgressCallback | None) -> None:
+    try:
+        current_name = provider.client.get_vm_config(vm.vm_id, node=vm.node).get("name")
+    except Exception:
+        current_name = None
+    if current_name != vm.name:
+        with suppress(Exception):
+            _emit_progress(progress, "cleanup.skipped", "Cannot confirm VM clone ownership", vmId=vm.vm_id)
+        return
+    with suppress(Exception):
+        _emit_progress(progress, "cleanup.best_effort.start", "Run best-effort cleanup", vmId=vm.vm_id)
+    # A start task can fail while leaving the VM running. stop_vm already handles stopped VMs.
+    _best_effort_cleanup(provider, vm, started=True)
+    with suppress(Exception):
+        _emit_progress(progress, "cleanup.best_effort.done", "Best-effort cleanup finished", vmId=vm.vm_id)
 
 
 def run_windows_artifact(
@@ -289,9 +343,28 @@ def run_windows_artifact(
     install_stderr = ""
     guest_checks: list[GuestPreflightCheck] = []
     fixtures: list[FixtureSmokeItem] = []
+    console: DesktopConsole | None = None
+
+    if scenario.sign_in:
+        emit = partial(_emit_progress, progress)
+        guest_checks.append(sign_in_desktop(channel, vm, emit=emit))
+        if not guest_checks[-1].passed:
+            return _early_artifact_result(
+                vm,
+                scenario=scenario,
+                artifact_path=artifact_path,
+                artifact_destination=destination,
+                output_path=output_path,
+                output_adapter=output_adapter,
+                message="Desktop sign-in failed",
+                guest_checks=guest_checks,
+                fixtures=fixtures,
+            )
+        if scenario.show_commands:
+            console = open_desktop_console(channel, vm, secrets=_scenario_product_secret_values(scenario), emit=emit)
 
     if run_dir is not None:
-        guest_checks = _run_full_run_guest_preflight(
+        guest_checks += _run_full_run_guest_preflight(
             channel,
             vm,
             scenario=scenario,
@@ -376,7 +449,7 @@ def run_windows_artifact(
         }
         install_command = render_command_template(_scenario_install_command(artifact), command_tokens)
         _emit_progress(progress, "artifact.install.start", "Run artifact installer", destination=destination)
-        install_execution = channel.execute(
+        install_execution = _command_channel(channel, console, "install").execute(
             vm,
             _shell_argv(install_command),
             timeout_seconds=command_timeout_seconds,
@@ -453,7 +526,7 @@ def run_windows_artifact(
             step_id = str(step.get("id", "<missing>"))
             _emit_progress(progress, "product.step.start", "Run product step", stepId=step_id)
             step_result = _run_product_step(
-                channel,
+                _command_channel(channel, console, step_id),
                 vm,
                 scenario=scenario,
                 step=step,
@@ -497,7 +570,7 @@ def run_windows_artifact(
             command_tokens,
         )
         _emit_progress(progress, "product.command.start", "Run product command")
-        execution = channel.execute(
+        execution = _command_channel(channel, console, "command").execute(
             vm,
             _shell_argv(command),
             timeout_seconds=command_timeout_seconds,
@@ -1440,6 +1513,16 @@ def _shell_argv(command: CommandSpec) -> list[str]:
     raise OslabError(f"Unsupported Windows artifact command shell: {command.shell}")
 
 
+def _command_channel(
+    channel: QemuAgentChannel,
+    console: DesktopConsole | None,
+    label: str,
+) -> QemuAgentChannel | ConsoleCommandChannel:
+    """Run a product command through QEMU Guest Agent, or in the desktop console with `guest.screen.showCommands`."""
+
+    return channel if console is None else console.command_channel(label)
+
+
 def _scenario_artifact(scenario: Scenario) -> dict[str, Any]:
     artifact = scenario.raw.get("artifact")
     if not isinstance(artifact, dict):
@@ -1501,6 +1584,9 @@ def _run_product_step(
     tokens: dict[str, str],
     timeout_seconds: int,
     redaction_secrets: list[str] | None = None,
+    shell_argv: Callable[[CommandSpec], list[str]] = _shell_argv,
+    command_renderer: Callable[..., CommandSpec] = render_command_template,
+    execute_command: Callable[[CommandSpec], GuestCommandResult] | None = None,
 ) -> ProductStepResult:
     step_id = str(step["id"])
     command_mapping = step["command"]
@@ -1514,8 +1600,11 @@ def _run_product_step(
     )
     secret_tokens = _resolve_secret_tokens(step, step_id=step_id)
     redaction_values = _dedupe_secret_values([*(redaction_secrets or []), *secret_tokens.values()])
-    command = render_command_template(command_mapping, step_tokens, secret_tokens=secret_tokens)
-    execution = channel.execute(vm, _shell_argv(command), timeout_seconds=timeout_seconds)
+    command = command_renderer(command_mapping, step_tokens, secret_tokens=secret_tokens)
+    if execute_command is None:
+        execution = channel.execute(vm, shell_argv(command), timeout_seconds=timeout_seconds)
+    else:
+        execution = execute_command(command)
     stdout_json: dict[str, Any] | list[Any] | None = None
     details: dict[str, Any] = {}
     passed = execution.passed
@@ -1630,14 +1719,7 @@ def _default_asset_name(scenario_id: str, vm_id: int) -> str:
 
 
 def _scenario_output_path(scenario: Scenario) -> str:
-    outputs = scenario.raw.get("outputs")
-    if isinstance(outputs, dict):
-        actual = outputs.get("actual")
-        if isinstance(actual, dict):
-            path = actual.get("path")
-            if isinstance(path, str) and path.strip():
-                return path
-    return "C:\\Oslab\\scan-result.json"
+    return scenario.output_path or "C:\\Oslab\\scan-result.json"
 
 
 def _is_product_failure_artifact(payload: dict[str, Any] | list[Any] | None) -> bool:

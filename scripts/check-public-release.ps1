@@ -47,6 +47,7 @@ $generatedPatterns = @(
   '^validation/artifacts/(web-|artifact-studio-smoke-|artifact-studio-project-|api-project-debug-|.*-starter-|web-ui-demo-)',
   '^validation/fixtures/windows/qa-.*\.ps1$',
   '^scenarios/windows/(new-windows-smoke|qa-|uat-).*\.example\.yaml$',
+  '^scenarios/linux/qa-.*\.example\.yaml$',
   '^validation/suites/(new-smoke|qa-).*\.example\.yaml$'
 )
 

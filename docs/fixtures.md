@@ -29,7 +29,7 @@ fixtures:
 | Field | Required | Meaning |
 | --- | --- | --- |
 | `id` | Yes | Stable id used in progress logs, JUnit testcase names, and raw output filenames |
-| `type` | Yes | Fixture runner type. Current Windows demos use `powershell` |
+| `type` | Yes | Fixture runner type, `powershell` for Windows guests and `shell` for Linux guests |
 | `source` | Yes | Local script uploaded and executed in the guest |
 | `expectedOutput` | No | Guest path collected after fixture execution as setup evidence |
 
@@ -65,6 +65,37 @@ Rules:
 - Keep setup idempotent; a fixture should tolerate being run on a clone that already has the tool/state.
 - Do not print secrets.
 - Do not run the product command here.
+
+## Shell Fixture Rules (Linux)
+
+```yaml
+fixtures:
+  - id: baseline
+    type: shell
+    source: validation/fixtures/linux/generic-smoke.sh
+    expectedOutput: /opt/oslab/my-fixture.json
+```
+
+Recommended shape:
+
+```sh
+#!/bin/sh
+set -eu
+
+mkdir -p /opt/oslab
+
+# Prepare guest state here.
+
+printf '{"schemaVersion": 1, "kind": "fixtureResult", "ready": true}\n' > /opt/oslab/my-fixture.json
+```
+
+OSLAB uploads the script to `/opt/oslab/fixtures/<file name>`, converts CRLF line endings to LF, makes it executable, and runs it by path as the guest agent user, normally root. A shebang line picks the interpreter, and a script without one runs under `sh`.
+
+Rules:
+
+- Use `set -eu` so a failing setup command fails the fixture.
+- Write deterministic evidence JSON when `expectedOutput` is configured.
+- Keep setup idempotent, print no secrets, and leave the product command to the artifact.
 
 ## Demo Fixture Behavior
 
@@ -171,5 +202,15 @@ uv run oslab qga-exec `
   --env-file config/oslab.local.env `
   --vm-id <kept-vm-id> `
   -- powershell.exe -NoProfile -Command "Get-ChildItem C:\Oslab -Recurse"
+```
+
+Linux scenarios cannot use `fixture-smoke` yet. Keep the clone with `oslab run --keep-vm`, then inspect it:
+
+```powershell
+uv run oslab qga-exec `
+  --config config/oslab.local.yaml `
+  --env-file config/oslab.local.env `
+  --vm-id <kept-vm-id> `
+  -- sh -c "ls -la /opt/oslab /opt/oslab/fixtures"
 ```
 

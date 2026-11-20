@@ -201,6 +201,6 @@ Some validation pieces are deliberately outside the generic core:
 | Product-specific login/register flows | Put in scenario `product.steps`, artifact scripts, or product-owned docs |
 | Product-specific inventory semantics | Put in adapters/assertions owned by that product |
 | CI runner provisioning | Documented as a pattern, but each lab needs its own runner/network/secret setup |
-| Linux SSH execution | Scenario model exists; implementation is not complete yet |
+| SSH guest channel | Scenario model exists; Linux scenarios run through QEMU Guest Agent instead |
 
 The generic core should keep owning VM lifecycle, guest execution, fixture execution, artifact transfer, output collection, normalization hooks, assertions, and reports.
